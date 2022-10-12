@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="bruteForceBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="507.0" prefHeight="475.0" prefWidth="798.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.contest.ContestController">
+   <top>
+      <BorderPane prefHeight="216.0" prefWidth="813.0">
+         <left>
+            <ScrollPane fx:id="scrollPaneEncryptDecrypt" prefHeight="197.0" prefWidth="521.0" BorderPane.alignment="CENTER">
+               <content>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="193.0" prefWidth="518.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="401.0">
+                           <children>
+                              <Label minWidth="-Infinity" text="Current Code:">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                                 <padding>
+                                    <Insets left="40.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="codeConfigurationLabel" minWidth="-Infinity" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" layoutY="32.0">
+                           <children>
+                              <Button fx:id="resetCodeButton" mnemonicParsing="false" onAction="#resetCodeButton" text="reset code" />
+                           </children>
+                           <padding>
+                              <Insets left="220.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" layoutX="1.0" layoutY="74.0" prefHeight="31.0" prefWidth="491.0">
+                           <children>
+                              <Label prefHeight="21.0" prefWidth="190.0" text="Encrypt/Decrypt Messege">
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="encryptedMessage" prefHeight="18.0" prefWidth="204.0" />
+                              <VBox prefHeight="31.0" prefWidth="158.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="131.0">
+                                       <children>
+                                          <Button fx:id="ProcessButton" mnemonicParsing="false" onAction="#EncryptFullMessage" prefHeight="23.0" prefWidth="61.0" text="process" />
+                                          <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearTextAndProcessNewMessage" prefHeight="22.0" prefWidth="50.0" text="clear" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="104.0" minWidth="-Infinity" spacing="10.0">
+                           <children>
+                              <Label minWidth="-Infinity" text="Encrypt/Decrypt Result: " />
+                              <Label fx:id="EncryptDecryptResultLabel" minWidth="-Infinity">
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </ScrollPane>
+         </left>
+         <right>
+            <VBox prefHeight="187.0" prefWidth="313.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="TOP_CENTER" prefHeight="29.0" prefWidth="259.0">
+                     <children>
+                        <Label text="Dictionary" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="13.0" prefWidth="259.0">
+                     <children>
+                        <Label text="Search">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="SearchField" onKeyReleased="#getWordsByPrefix" prefHeight="25.0" prefWidth="189.0" />
+                     </children>
+                  </HBox>
+                  <ScrollPane prefHeight="125.0" prefWidth="182.0">
+                     <content>
+                        <ListView fx:id="DictionaryListViewField" onMouseClicked="#AddWordToEncryptTextField" prefHeight="123.0" prefWidth="187.0" />
+                     </content>
+                     <VBox.margin>
+                        <Insets left="46.0" right="78.0" />
+                     </VBox.margin>
+                  </ScrollPane>
+               </children>
+               <BorderPane.margin>
+                  <Insets left="10.0" top="10.0" />
+               </BorderPane.margin>
+            </VBox>
+         </right>
+         <bottom>
+            <HBox alignment="CENTER" prefHeight="19.0" prefWidth="820.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Separator maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="0.0" prefWidth="839.0">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Separator>
+               </children>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </top>
+</BorderPane>
