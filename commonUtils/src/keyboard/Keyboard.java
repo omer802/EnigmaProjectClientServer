@@ -43,5 +43,8 @@ public class Keyboard implements Serializable {
     public static int keyboardSize() {
         return alphabet.length();
     }
-    
+
+    public static String getAlphabet() {
+        return alphabet;
+    }
 }

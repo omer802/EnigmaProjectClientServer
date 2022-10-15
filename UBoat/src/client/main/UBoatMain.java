@@ -1,7 +1,6 @@
 package client.main;
 
 import client.javafx.Login.UBoatLoginController;
-import client.util.http.HttpClientUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,8 +10,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 
-import static client.util.Constants.LOGIN_PAGE_CSS_RESOURCE_LOCATION;
-import static client.util.Constants.LOGIN_PAGE_FXML_RESOURCE_LOCATION;
+import static client.constants.ConstantsUBoat.LOGIN_PAGE_CSS_RESOURCE_LOCATION;
+import static client.constants.ConstantsUBoat.LOGIN_PAGE_FXML_RESOURCE_LOCATION;
 
 public class UBoatMain extends Application {
     private UBoatLoginController loginController;
@@ -29,7 +28,7 @@ public class UBoatMain extends Application {
             fxmlLoader.setLocation(loginPage);
             Parent root = fxmlLoader.load();
             loginController = fxmlLoader.getController();
-            loginController.backgroundLoadUBoatScreen(primaryStage);
+            loginController.backgroundLoadAlliesScreen(primaryStage);
             Scene scene = new Scene(root, 303, 192);
             scene.getStylesheets().add(getClass().getResource(LOGIN_PAGE_CSS_RESOURCE_LOCATION).toExternalForm());
             primaryStage.setScene(scene);

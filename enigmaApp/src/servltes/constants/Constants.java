@@ -1,9 +1,10 @@
-package servltes.login.constants;
+package servltes.constants;
 
 import com.google.gson.Gson;
 
 public class Constants {
     public static final String USERNAME = "username";
+    public static final String CLIENT_TYPE = "client_type";
     public static final String USER_NAME_ERROR = "username_error";
 
     public static final String CHAT_PARAMETER = "userstring";

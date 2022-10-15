@@ -7,23 +7,25 @@ import DTOS.Configuration.UserConfigurationDTO;
 import DTOS.StatisticsDTO.MachineStatisticsDTO;
 import DTOS.Validators.xmlFileValidatorDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
-import engine.battleField.Battlefield;
+import dictionary.Dictionary;
+import registerManagers.UBoatManager.UBoat;
+import registerManagers.battleField.Battlefield;
 import engine.decryptionManager.DM;
-import Trie.Trie;
+import dictionary.Trie;
 import engine.decryptionManager.task.TimeToCalc;
 import engine.enigma.Enigma;
 import engine.enigma.Machine.EnigmaMachine;
 import engine.enigma.Machine.NotchAndLetterAtPeekPane;
-import engine.enigma.keyboard.Keyboard;
 import engine.enigma.reflector.Reflectors;
 import engine.LoadData.LoadData;
 import engine.LoadData.LoadDataFromXml;
 import engine.enigma.statistics.ConfigurationAndEncryption;
 import engine.enigma.statistics.EncryptionData;
-import engine.registerManagers.BattlefieldManager;
+import registerManagers.battlefieldManager.BattlefieldManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import keyboard.Keyboard;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -42,7 +44,6 @@ public class ApiEnigmaImp implements ApiEnigma {
 
     private FileConfigurationDTO fileConfigurationDTO;
 
-    // TODO: 9/14/2022 notice that added dependency on uiadapter make a cirlce dependency with javafx
     public void DecipherMessage(DecryptionManagerDTO decryptionManagerDTO, Runnable onFinish)
     {
         enigma.getDecipher().setMachine(enigma.getMachine().clone());
@@ -109,14 +110,15 @@ public class ApiEnigmaImp implements ApiEnigma {
 
     }
 
-    public String dataEncryption(String data){
+    public UserConfigurationDTO dataEncryption(String data){
         String encodeInformation = enigma.getMachine().encodeString(data);
         UserConfigurationDTO config = getCurrentConfiguration();
-        UpdateCode(config);
-        updateStatisticsProperty();
+        config.setEncryptedMessage(encodeInformation);
+        //UpdateCode(config);
+        //updateStatisticsProperty();
         //System.out.println("-----------------");
         //System.out.println(statistics.getValue());
-        return encodeInformation;
+        return config;
 
     }
     public void updateStatistics(String input, String output, long processingTime){
@@ -268,6 +270,7 @@ public class ApiEnigmaImp implements ApiEnigma {
             userConfigurationDTOAdapter.setNotchAndLetterAtPeekPaneStartingPosition(configurationArray[2]);
             userConfigurationDTOAdapter.setFullConfiguration(originalConfiguration.toString());
         }
+
     }
     public void setUserConfigurationDTO(UserConfigurationDTO originalConfigurationDTO){
         StringBuilder originalConfiguration = getStringDataReceiveFromUser(originalConfigurationDTO);
@@ -330,10 +333,14 @@ public class ApiEnigmaImp implements ApiEnigma {
     public Trie getTrieFromDictionary(){
         return enigma.getDecipher().getTrieFromDictionary();
     }
+    public Dictionary getDictionary(){
+        return enigma.getDecipher().getDictionary();
+
+    }
     public int getAmountOfAgents(){
         return enigma.getDecipher().getAmountOfAgents();
     }
-    public double calculateAmountOfTasks(Integer missionSize, DM.DifficultyLevel level){
+    public double calculateAmountOfTasks(Integer missionSize, UBoat.DifficultyLevel level){
         return enigma.getDecipher().calculateAmountOfTasks(missionSize,level);
     }
     public void cancelCurrentTask(){

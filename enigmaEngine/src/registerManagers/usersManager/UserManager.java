@@ -1,8 +1,6 @@
-package engine.registerManagers;
+package registerManagers.usersManager;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /*
 Adding and retrieving users is synchronized and in that manner - these actions are thread safe
@@ -12,8 +10,8 @@ of the user of this class to handle the synchronization of isUserExists with oth
 public class UserManager {
 
     private final Set<String> usersSet;
-
     public UserManager() {
+
         usersSet = new HashSet<>();
     }
 

@@ -1,17 +1,17 @@
 package engine.LoadData;
 
 import DTOS.Validators.xmlFileValidatorDTO;
-import engine.decryptionManager.dictionary.Dictionary;
-import engine.battleField.Battlefield;
+import dictionary.Dictionary;
+import registerManagers.battleField.Battlefield;
 import engine.decryptionManager.DM;
 import engine.enigma.*;
 import engine.enigma.Machine.EnigmaMachine;
-import engine.enigma.keyboard.Keyboard;
 import engine.enigma.reflector.Reflector;
 import engine.enigma.reflector.inputOutputPair;
 import engine.enigma.rotors.RotatingRotor;
 import engine.LoadData.jaxb.schema.generated.*;
-import engine.registerManagers.BattlefieldManager;
+import registerManagers.battlefieldManager.BattlefieldManager;
+import keyboard.Keyboard;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

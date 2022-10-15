@@ -1,6 +1,6 @@
 package engine.enigma;
 
-import engine.battleField.Battlefield;
+import registerManagers.battleField.Battlefield;
 import engine.decryptionManager.DM;
 import engine.enigma.Machine.EnigmaMachine;
 

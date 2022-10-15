@@ -1,7 +1,7 @@
 package DTOS.Configuration;
 
 import engine.enigma.Machine.EnigmaMachine;
-import engine.enigma.keyboard.Keyboard;
+import keyboard.Keyboard;
 
 import java.util.List;
 
@@ -27,6 +27,9 @@ public class FileConfigurationDTO {
 
 
     private List<String> possibleReflectors;
+
+
+
 
     public FileConfigurationDTO(final EnigmaMachine machineInput) {
         //setPairOfNotchAndRotorId(machineInput);

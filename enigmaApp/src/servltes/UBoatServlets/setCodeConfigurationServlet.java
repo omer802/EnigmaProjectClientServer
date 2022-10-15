@@ -1,4 +1,4 @@
-package servltes;
+package servltes.UBoatServlets;
 
 import DTOS.Configuration.UserConfigurationDTO;
 import com.google.gson.Gson;
@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import servltes.utils.ServletUtils;
+import servltes.utils.SessionUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +22,8 @@ public class setCodeConfigurationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (PrintWriter out = resp.getWriter()) {
-            ApiEnigma api = ServletUtils.getEnigmaApi(getServletContext());
+            String usernameFromSession = SessionUtils.getUsername(req);
+            ApiEnigma api = ServletUtils.getEnigmaApi(getServletContext(),usernameFromSession);
             sendRequestToApi(req,api);
             sendResponseToClient(resp,api,out);
 
@@ -33,7 +35,6 @@ public class setCodeConfigurationServlet extends HttpServlet {
         Gson gson = new Gson();
         String jsonConfiguration = gson.toJson(configurationDTO);
         out.println(jsonConfiguration);
-        System.out.println(jsonConfiguration);
         out.flush();
 
     }

@@ -24,5 +24,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Tomcat 10.0.26" level="application_server_libraries" />
     <orderEntry type="library" scope="PROVIDED" name="gson-2.8.8" level="project" />
     <orderEntry type="module" module-name="DTO" />
+    <orderEntry type="module" module-name="commonUtils" />
   </component>
 </module>

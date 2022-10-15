@@ -1,33 +1,34 @@
 package client.javafx.contest;
 
-import Trie.Trie;
+import DTOS.Configuration.FileConfigurationDTO;
+import DTOS.Configuration.UserConfigurationDTO;
+import client.javafx.Candidate.Candidate;
+import client.javafx.Candidate.candidateController;
+import client.javafx.activeTeamsDetails.TeamDetail;
+import client.javafx.activeTeamsDetails.activeTeamsDetailsController;
+import dictionary.Dictionary;
+import dictionary.Trie;
 import client.javafx.UBoatMainController.MainController;
-import client.util.Constants;
-import client.util.http.HttpClientUtil;
+import client.constants.ConstantsUBoat;
+import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.HttpUrl;
-import okhttp3.Response;
+import keyboard.Keyboard;
+import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
 
-import static client.util.Constants.GSON_INSTANCE;
+import static util.CommonConstants.GSON_INSTANCE;
 
 public class ContestController {
 
@@ -38,6 +39,16 @@ public class ContestController {
 
     @FXML
     private ScrollPane scrollPaneEncryptDecrypt;
+    @FXML
+    private TableView<Candidate> candidate;
+    @FXML
+    private candidateController candidateController;
+
+
+    @FXML
+    private TableView<TeamDetail> activeTeamDetails;
+    @FXML
+    private activeTeamsDetailsController activeTeamDetailsController;
 
     @FXML
     private Label codeConfigurationLabel;
@@ -63,13 +74,21 @@ public class ContestController {
     @FXML
     private ListView<String> DictionaryListViewField;
 
+    @FXML
+    private Button readyButton;
+    @FXML
+    private Label labelIndication;
+
     private MainController mainController;
-    private SimpleBooleanProperty isConfig;
+    public  SimpleBooleanProperty isConfig;
     private SimpleStringProperty encryptionResultProperty;
     private SimpleStringProperty codeConfiguration;
-    private String decryptedMessage;
-    private Trie trieAutoComplete;
+    private String encryptionResult;
+    private Dictionary dictionary;
+    private Keyboard keyboard;
 
+
+    @FXML
     private void initialize() {
         bruteForceBorderPane.disableProperty().bind(isConfig.not());
         EncryptDecryptResultLabel.textProperty().bind(Bindings.format("%s", encryptionResultProperty));
@@ -79,73 +98,114 @@ public class ContestController {
     public ContestController(){
         this.encryptionResultProperty = new SimpleStringProperty("");
         this.isBruteForceProcess = new SimpleBooleanProperty();
-        this.codeConfiguration = new SimpleStringProperty();
+        this.codeConfiguration = new SimpleStringProperty("");
         this.encryptionTextFiled = new SimpleStringProperty("");
         this.isConfig = new SimpleBooleanProperty();
     }
 
-    public void setMainPageController(MainController mainPageController) {
-        this.mainController = mainPageController;
-        this.isConfig.bind(mainPageController.isConfigProperty());
+    public void setMainPageController(MainController mainController) {
+        this.mainController = mainController;
+        this.isConfig.bind(mainController.isConfigProperty());
     }
 
 
 
     @FXML
     void AddWordToEncryptTextField(MouseEvent event) {
-
+        if (event.getClickCount() == 2) {
+            //Use ListView's getSelected Item
+            String currentItemSelected = DictionaryListViewField.getSelectionModel()
+                    .getSelectedItem();
+            encryptedMessage.appendText(currentItemSelected+" ");
+        }
     }
 
     @FXML
     void EncryptFullMessage(ActionEvent event) {
         String toEncrypt = encryptedMessage.getText();
-       // String cleanedToEncrypt = api.cleanStringFromExcludeChars(toEncrypt);
-       /* if(api.isDictionaryContainString(cleanedToEncrypt))
-        {
+        String cleanedToEncrypt = dictionary.cleanStringFromExcludeChars(toEncrypt);
+        if(dictionary.isDictionaryContainString(cleanedToEncrypt)) {
             String encryptionResult = encryptFullMessageNoneAction(cleanedToEncrypt);
-            encryptionResultProperty.set(encryptionResult);
-            decryptedMessage = encryptionResult;
+
         }
         else{
-            mainPageController.alertShowException(new RuntimeException("The word you entered is not in the dictionary"));
-        }*/
+            mainController.alertShowException(new RuntimeException("The word you entered is not in the dictionary"));
+        }
     }
+
+
     private String encryptFullMessageNoneAction(String toEncrypt) {
-       /* toEncrypt = toEncrypt.toUpperCase();
-        //boolean isStringValid = api.validateStringToEncrypt(toEncrypt);
-        if (!isStringValid) {
+        toEncrypt = toEncrypt.toUpperCase();
+        if (!keyboard.isStringInRange(toEncrypt)) {
             mainController.alertShowException(new RuntimeException("Some of the letters you entered are not from the alphabet"));
-            //System.out.println("Some of the letters you entered are not from the alphabet");
             return null;
         }
         else {
             if (toEncrypt.length() > 0) {
-                //String encryptedString = api.dataEncryption(toEncrypt);
-                return encryptedString;
-                return null
+               sendStringToEncryptToServer(toEncrypt);
+
             }
-        }*/
+        }
         return null;
     }
 
-    public void setBruteForceComponent(){
-        initProcessComponent();
-        fetchTrie();
-        fillDictionary();
-    }
-    private void initProcessComponent()
-    {
-        encryptedMessage.setText("");
-        encryptionResultProperty.set("");
-    }
-    public void fetchTrie(){
+    private void sendStringToEncryptToServer(String toEncrypt) {
         String finalUrl = HttpUrl
-                .parse(Constants.LOGIN_PAGE)
+                .parse(ConstantsUBoat.ENCRYPT_MESSAGE)
                 .newBuilder()
                 .build()
                 .toString();
 
-        /*HttpClientUtil.runAsync(finalUrl, new Callback() {
+        RequestBody body = new FormBody.Builder()
+                .add("messageToEncrypt", toEncrypt)
+                .build();
+        HttpClientUtil.runAsyncPost(finalUrl,body, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() -> {
+                    mainController.alertShowException(e);
+                });
+            }
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    handleErrorFromServer(response);
+                } else {
+                    Platform.runLater(() -> {
+                        try {
+                            String jsonConfigurationDTOString = response.body().string();
+                            //System.out.println(jsonConfigurationDTOString);
+                            UserConfigurationDTO configurationDTO = GSON_INSTANCE.fromJson(jsonConfigurationDTOString, UserConfigurationDTO.class);
+                            updateCurrentConfiguration(configurationDTO);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            }
+
+        });
+    }
+
+    public void setBruteForceComponent(FileConfigurationDTO fileConfigurationDTO){
+        String alphabet = fileConfigurationDTO.getAlphabet();
+        this.keyboard = new Keyboard(alphabet);
+        initProcessComponent();
+        fetchDictionary();
+    }
+    private void initProcessComponent() {
+        encryptionResultProperty.set("");
+        encryptionResultProperty.set("");
+    }
+    public void fetchDictionary(){
+        String finalUrl = HttpUrl
+                .parse(ConstantsUBoat.FETCH_Dictionary)
+                .newBuilder()
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -157,45 +217,139 @@ public class ContestController {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            mainController.alertShowException(new RuntimeException(responseBody)));
+                    handleErrorFromServer(response);
                 } else {
                     Platform.runLater(() -> {
                         try {
-                            String trieJsonString = response.body().string();
-                            trieAutoComplete = GSON_INSTANCE.fromJson(trieJsonString, Trie.class);
+                            String dictionaryJsonString = response.body().string();
+                            dictionary = GSON_INSTANCE.fromJson(dictionaryJsonString, Dictionary.class);
+                           // System.out.println(" fill dictionary");
+                            fillDictionary();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     });
                 }
             }
-        });*/
+        });
 
     }
 
     public void fillDictionary(){
         SearchField.setText("");
         DictionaryListViewField.getItems().clear();
-        List<String> allWordsInTrie = trieAutoComplete.suggest("");
+        List<String> allWordsInTrie = dictionary.getTrie().suggest("");
         for (String word: allWordsInTrie) {
             DictionaryListViewField.getItems().add(word);
         }
     }
     @FXML
     void clearTextAndProcessNewMessage(ActionEvent event) {
-
+        encryptedMessage.setText("");
+        encryptionResultProperty.set("");
     }
-
     @FXML
     void getWordsByPrefix(KeyEvent event) {
+        String prefix = SearchField.getText();
+        prefix = prefix.toUpperCase();
+        Trie trie = dictionary.getTrie();
+        List<String> suggestWords = trie.suggest(prefix);
+        DictionaryListViewField.getItems().clear();
+        for (String word: suggestWords) {
+            DictionaryListViewField.getItems().add(word);
+        }
+    }
+    @FXML
+    private void resetCodeButton(ActionEvent event) {
+        String finalUrl = HttpUrl
+                .parse(ConstantsUBoat.RESET_CODE)
+                .newBuilder()
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() -> {
+                    mainController.alertShowException(e);
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    handleErrorFromServer(response);
+                } else {
+                    Platform.runLater(() -> {
+                        try {
+                            String jsonConfigurationDTOString = response.body().string();
+                            UserConfigurationDTO configurationDTO = GSON_INSTANCE.fromJson(jsonConfigurationDTOString, UserConfigurationDTO.class);
+                            mainController.updateConfigurationLabels(configurationDTO);
+                            updateCurrentConfiguration(configurationDTO);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            }
+
+        });
 
     }
-
+    private void handleErrorFromServer(@NotNull Response response) throws IOException {
+        String responseBody = response.body().string();
+        Platform.runLater(() ->
+                mainController.alertShowException(new RuntimeException(responseBody)));
+    }
+    public void updateCurrentConfiguration(UserConfigurationDTO configurationDTO){
+        if(configurationDTO.getNumberOfMessageEncrypted()>0)
+        {
+            if (configurationDTO.getEncryptedMessage() != null) {
+                encryptionResult = configurationDTO.getEncryptedMessage();
+                encryptionResultProperty.set(encryptionResult);
+               // Candidate candidate1 = new Candidate(encryptionResult,"1",configurationDTO.getCodeConfigurationString().toString());
+               // candidateController.addCandidate(candidate1);
+               // TeamDetail teamDetail = new TeamDetail("omer team", 5,10);
+               // activeTeamDetailsController.addTeamToTable(teamDetail);
+            }
+            else{
+                encryptionResultProperty.set("");
+            }
+        }
+        String codeConfigurationString= configurationDTO.getCodeConfigurationString().toString();
+        codeConfiguration.set(codeConfigurationString);
+    }
     @FXML
-    void resetCodeButton(ActionEvent event) {
+    void readyForContestAction(ActionEvent event){
+        String finalUrl = HttpUrl
+                .parse(ConstantsUBoat.MAKE_UBOAT_READY)
+                .newBuilder()
+                .build()
+                .toString();
 
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->{
+                    mainController.alertShowException(e);
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    handleErrorFromServer(response);
+                } else {
+                    Platform.runLater(() -> {
+                        labelIndication.setText("Waiting For allies to join contest");
+
+                        });
+                    }
+                }
+
+        });
     }
 
 }

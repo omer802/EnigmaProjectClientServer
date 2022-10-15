@@ -1,18 +1,22 @@
-package engine.battleField;
+package registerManagers.battleField;
 
+
+import registerManagers.UBoatManager.UBoat;
 
 import java.util.Objects;
 
 public class Battlefield {
 
-    private String level;
+
+    private UBoat.DifficultyLevel level;
+
     private String battleName;
     private int allies;
 
 
     public Battlefield(String battleName, String level, int allies){
-        this.level = level;
         this.battleName = battleName;
+        this.level = UBoat.DifficultyLevel.valueOf(level.toUpperCase());
         this.allies = allies;
 
     }
@@ -28,5 +32,16 @@ public class Battlefield {
     @Override
     public int hashCode() {
         return Objects.hash(battleName);
+    }
+    public UBoat.DifficultyLevel getLevel() {
+        return level;
+    }
+
+    public String getBattleName() {
+        return battleName;
+    }
+
+    public int getAmountOfAlliesNeededForContest() {
+        return allies;
     }
 }

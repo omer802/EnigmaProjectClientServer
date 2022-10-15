@@ -1,6 +1,7 @@
 package engine.decryptionManager.MathCalculations;
 
-import engine.enigma.keyboard.Keyboard;
+
+import keyboard.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;

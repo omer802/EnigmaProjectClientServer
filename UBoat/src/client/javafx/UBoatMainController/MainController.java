@@ -6,8 +6,8 @@ import DTOS.Configuration.UserConfigurationDTO;
 import client.javafx.Login.UBoatLoginController;
 import client.javafx.contest.ContestController;
 import client.javafx.plugboard.PlugBoardUI;
-import client.util.Constants;
-import client.util.http.HttpClientUtil;
+import client.constants.ConstantsUBoat;
+import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -32,7 +32,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static client.util.Constants.GSON_INSTANCE;
+import static util.CommonConstants.GSON_INSTANCE;
+
 
 public class MainController {
 
@@ -97,8 +98,9 @@ public class MainController {
     private Button randomCodeButton;
     @FXML
     private FlowPane machineDetailsFlowPane;
+
     @FXML
-    private ScrollPane Contest;
+    private BorderPane Contest;
     @FXML
     private ContestController ContestController;
 
@@ -145,7 +147,6 @@ public class MainController {
     }
     @FXML
     public void initialize() {
-
         errorMessageLabel.textProperty().bind(errorMessageProperty);
 
         CheckBoxIsPluged.disableProperty().bind(isFileSelected.not());
@@ -170,6 +171,7 @@ public class MainController {
         machineDetailsFlowPane.disableProperty().bind(isFileSelected.not());
         CheckBoxIsPluged.disableProperty().bind(isFileSelected.not());
 
+        ContestController.setMainPageController(this);
 
     }
 
@@ -195,14 +197,16 @@ public class MainController {
                         .addFormDataPart(userName, selectedFile.getName(), RequestBody.create(selectedFile,
                                 MediaType.parse("text/plain"))).build();
         Request request = new Request.Builder()
-                .url(Constants.UPLOAD_XML_FILE)
+                .url(ConstantsUBoat.UPLOAD_XML_FILE)
                 .post(body)
                 .build();
 
 
-        Call call = HttpClientUtil.getHttpClient().newCall(request);
+        Response response = HttpClientUtil.runSync(request);
 
-        Response response = call.execute();
+        //Call call = HttpClientUtil.getHttpClient().newCall(request);
+
+        //Response response = call.execute();
         if (response.code() != 200) {
             String responseBody = response.body().string();
             Platform.runLater(() ->
@@ -236,7 +240,7 @@ public class MainController {
         // TODO: 10/11/2022 change this name to beeter name 
         fileConfigurationDTOAdapter.setDataFromFileDTO(fileConfigurationDTO);
         if(ContestController!=null)
-        ContestController.setBruteForceComponent();
+            ContestController.setBruteForceComponent(fileConfigurationDTO);
 
 
         //BruteForceController.setBruteForceComponent();
@@ -379,7 +383,7 @@ public class MainController {
                         .addFormDataPart("jsonUserConfigurationDTO", jsonCodeConfigurationDTO)
                         .build();
         Request finalUrl = new Request.Builder()
-                .url(Constants.SEND_CODE_CONFIGURATION)
+                .url(ConstantsUBoat.SEND_CODE_CONFIGURATION)
                 .post(body)
                 .build();
 
@@ -400,12 +404,10 @@ public class MainController {
 
     public void updateConfigurationLabels(UserConfigurationDTO userConfiguration){
         if(userConfiguration == null){
-            System.out.println(" the configuration is null !");
         }
         setOriginalConfiguration(userConfiguration);
         //setCurrentConfiguration();todo add this also after implement servlet
         isConfig.set(true);
-
     }
     public void setOriginalConfiguration(UserConfigurationDTO originalConfigurationDTO){
         String codeConfigurationWithSeprator = originalConfigurationDTO.getCodeConfigurationString().toString();
@@ -553,7 +555,7 @@ public class MainController {
     @FXML
     void generateRandomCode(ActionEvent event) {
         String finalUrl = HttpUrl
-                .parse(Constants.GENERATE_RANDOM_CODE_CONFIGURATION)
+                .parse(ConstantsUBoat.GENERATE_RANDOM_CODE_CONFIGURATION)
                 .newBuilder()
                 .build()
                 .toString();
@@ -584,6 +586,7 @@ public class MainController {
                     UserConfigurationDTO userConfiguration = GSON_INSTANCE.fromJson(userConfigurationString, UserConfigurationDTO.class);
                     userOriginalConfiguration = userConfiguration;
                     updateConfigurationLabels(userConfiguration);
+                    ContestController.updateCurrentConfiguration(userConfiguration);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

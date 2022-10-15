@@ -2,7 +2,7 @@ package engine.LoadData;
 
 import DTOS.Validators.xmlFileValidatorDTO;
 import engine.enigma.Enigma;
-import engine.registerManagers.BattlefieldManager;
+import registerManagers.battlefieldManager.BattlefieldManager;
 
 import java.io.InputStream;
 

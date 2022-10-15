@@ -1,10 +1,7 @@
-package client.util.http;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import sun.net.www.http.HttpClient;
+package client.constants.http;
+import okhttp3.*;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 public class HttpClientUtil {
@@ -34,9 +31,23 @@ public class HttpClientUtil {
     public static OkHttpClient getHttpClient(){
         return HTTP_CLIENT;
     }
+    public static Response runSync(Request request) throws IOException {
+        Call call = HTTP_CLIENT.newCall(request);
+
+        Response response = call.execute();
+        return response;
+    }
     public static void runAsync(Request request, Callback callback){
         Call call = HttpClientUtil.HTTP_CLIENT.newCall(request);
         call.enqueue(callback);
+    }
+    public static void runAsyncPost(String finalUrl,RequestBody body, Callback callback){
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(body)
+                .build();
+
+        runAsync(request, callback);
     }
 
     public static void shutdown() {

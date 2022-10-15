@@ -1,8 +1,9 @@
 package servltes.login;
 
 
-import com.google.gson.Gson;
-import engine.registerManagers.UserManager;
+import registerManagers.RegisterManager;
+import registerManagers.genericManager.GenericManager;
+import registerManagers.usersManager.ClientUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,7 +14,8 @@ import servltes.utils.SessionUtils;
 
 import java.io.IOException;
 
-import static servltes.login.constants.Constants.USERNAME;
+import static servltes.constants.Constants.CLIENT_TYPE;
+import static servltes.constants.Constants.USERNAME;
 
 @WebServlet(name = "login request", urlPatterns = "/loginRequest" )
 public class LoginServlet extends HttpServlet {
@@ -27,20 +29,30 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
-        UserManager userManager = ServletUtils.getUserManager(getServletContext());
-        System.out.println(userManager.getUsers());
+        RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
+        GenericManager<ClientUser> userManager = registerManager.getUserManager();
         if (usernameFromSession == null) {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);
-            System.out.println(usernameFromParameter);
+            String userType = request.getParameter(CLIENT_TYPE);
             if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
-            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("You cannot login without username");
+            }
+            if(userType == null || ((!userType.equals("UBoat"))&&
+                    (!userType.equals("Allies"))&& (!userType.equals("Agent")))) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("You cannot login without right client type");
+
+            }
+             else {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
-
-
                 synchronized (this) {
-                    if (userManager.isUserExists(usernameFromParameter)) {
+                    //System.out.println("the client in the system are: "+ userManager.getClients());
+                    RegisterManager.ClientType client = RegisterManager.ClientType.valueOf(userType.toUpperCase());
+                    ClientUser clientUser = new ClientUser(client,usernameFromParameter);
+                    if (userManager.isClientExists(clientUser)) {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
 
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -48,19 +60,24 @@ public class LoginServlet extends HttpServlet {
                     }
                     else {
                         //add the new user to the users list
-                        userManager.addUser(usernameFromParameter);
+
+                        registerManager.addUserByType(clientUser);
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
                         request.getSession(true).setAttribute(USERNAME, usernameFromParameter);
-                        System.out.println("On login, request URI is: " + request.getRequestURI());
                     }
                 }
             }
         } else {
             //user is already logged in
+            response.getWriter().println(" its only beacuse you alerady entered here");
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
         }
     }
+
+
+
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -74,7 +91,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("in get");
         processRequest(request, response);
     }
 
@@ -89,7 +105,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("in post");
         processRequest(request, response);
     }
 

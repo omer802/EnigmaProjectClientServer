@@ -1,16 +1,16 @@
 package DTOS.decryptionManager;
 
-import engine.decryptionManager.DM;
+import registerManagers.UBoatManager.UBoat;
 
 public class DecryptionManagerDTO {
     private String messageToDecipher;
-    private DM.DifficultyLevel level;
+    private UBoat.DifficultyLevel level;
     private Double missionSize;
 
     private int amountOfAgentsForProcess;
     private double missionAmount;
 
-    public DecryptionManagerDTO(String messageToDecipher, DM.DifficultyLevel difficulty, Double missionSize, int amountOfAgentsForProcess, Double missionAmount){
+    public DecryptionManagerDTO(String messageToDecipher, UBoat.DifficultyLevel difficulty, Double missionSize, int amountOfAgentsForProcess, Double missionAmount){
        this.messageToDecipher = messageToDecipher;
        this.level = difficulty;
        this.missionSize = missionSize;
@@ -22,7 +22,7 @@ public class DecryptionManagerDTO {
         return messageToDecipher;
     }
 
-    public DM.DifficultyLevel getLevel() {
+    public UBoat.DifficultyLevel getLevel() {
         return level;
     }
 

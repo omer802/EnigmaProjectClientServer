@@ -20,63 +20,80 @@
                <content>
                   <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="193.0" prefWidth="518.0">
                      <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="401.0">
+                        <VBox prefHeight="195.0" prefWidth="512.0">
                            <children>
-                              <Label minWidth="-Infinity" text="Current Code:">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                                 <padding>
-                                    <Insets left="40.0" />
-                                 </padding>
-                              </Label>
-                              <Label fx:id="codeConfigurationLabel" minWidth="-Infinity" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" layoutY="32.0">
-                           <children>
-                              <Button fx:id="resetCodeButton" mnemonicParsing="false" onAction="#resetCodeButton" text="reset code" />
-                           </children>
-                           <padding>
-                              <Insets left="220.0" />
-                           </padding>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" layoutX="1.0" layoutY="74.0" prefHeight="31.0" prefWidth="491.0">
-                           <children>
-                              <Label prefHeight="21.0" prefWidth="190.0" text="Encrypt/Decrypt Messege">
-                                 <padding>
-                                    <Insets right="5.0" />
-                                 </padding>
-                                 <HBox.margin>
-                                    <Insets left="10.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="encryptedMessage" prefHeight="18.0" prefWidth="204.0" />
-                              <VBox prefHeight="31.0" prefWidth="158.0">
+                              <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="401.0">
                                  <children>
-                                    <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="131.0">
-                                       <children>
-                                          <Button fx:id="ProcessButton" mnemonicParsing="false" onAction="#EncryptFullMessage" prefHeight="23.0" prefWidth="61.0" text="process" />
-                                          <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearTextAndProcessNewMessage" prefHeight="22.0" prefWidth="50.0" text="clear" />
-                                       </children>
-                                    </HBox>
+                                    <Label minWidth="-Infinity" text="Current Code:">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets left="40.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label fx:id="codeConfigurationLabel" minWidth="-Infinity" />
                                  </children>
-                              </VBox>
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" layoutX="12.0" layoutY="104.0" minWidth="-Infinity" spacing="10.0">
-                           <children>
-                              <Label minWidth="-Infinity" text="Encrypt/Decrypt Result: " />
-                              <Label fx:id="EncryptDecryptResultLabel" minWidth="-Infinity">
+                              </HBox>
+                              <HBox alignment="CENTER">
+                                 <children>
+                                    <Button fx:id="resetCodeButton" mnemonicParsing="false" onAction="#resetCodeButton" text="reset code" />
+                                 </children>
                                  <padding>
-                                    <Insets right="5.0" />
+                                    <Insets bottom="10.0" />
                                  </padding>
-                              </Label>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="491.0">
+                                 <children>
+                                    <Label prefHeight="21.0" prefWidth="190.0" text="Encrypt/Decrypt Messege">
+                                       <padding>
+                                          <Insets right="5.0" />
+                                       </padding>
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="encryptedMessage" prefHeight="18.0" prefWidth="204.0" />
+                                    <VBox prefHeight="31.0" prefWidth="158.0">
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="131.0">
+                                             <children>
+                                                <Button fx:id="ProcessButton" mnemonicParsing="false" onAction="#EncryptFullMessage" prefHeight="23.0" prefWidth="61.0" text="process" />
+                                                <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearTextAndProcessNewMessage" prefHeight="22.0" prefWidth="50.0" text="clear" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" minWidth="-Infinity" spacing="10.0">
+                                 <children>
+                                    <Label minWidth="-Infinity" text="Encrypt/Decrypt Result: " />
+                                    <Label fx:id="EncryptDecryptResultLabel" minWidth="-Infinity">
+                                       <padding>
+                                          <Insets right="5.0" />
+                                       </padding>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets top="5.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="45.0" prefWidth="512.0">
+                                 <children>
+                                    <Button fx:id="readyButton" mnemonicParsing="false" onAction="#readyForContestAction" prefHeight="25.0" prefWidth="82.0" text="Ready!">
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin></Button>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="34.0" prefWidth="512.0">
+                                 <children>
+                                    <Label fx:id="labelIndication" minWidth="-Infinity" />
+                                 </children>
+                              </HBox>
                            </children>
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </HBox>
+                        </VBox>
                      </children>
                   </AnchorPane>
                </content>
@@ -115,7 +132,7 @@
             </VBox>
          </right>
          <bottom>
-            <HBox alignment="CENTER" prefHeight="19.0" prefWidth="820.0" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER" prefHeight="19.0" prefWidth="777.0" BorderPane.alignment="CENTER">
                <children>
                   <Separator maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="0.0" prefWidth="839.0">
                      <HBox.margin>
@@ -127,4 +144,17 @@
          </bottom>
       </BorderPane>
    </top>
+   <center>
+      <AnchorPane prefHeight="271.0" prefWidth="798.0" BorderPane.alignment="CENTER">
+         <children>
+            <fx:include fx:id="candidate" source="../Candidate/candidate.fxml" />
+          <AnchorPane layoutX="385.0" minHeight="0.0" minWidth="0.0" prefHeight="221.0" prefWidth="272.0">
+               <children>
+                  <fx:include fx:id="activeTeamDetails" source="../activeTeamsDetails/activeTeamDetail.fxml" />
+               </children>
+            </AnchorPane>
+            <Button layoutX="633.0" layoutY="221.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="123.0" text="Logout" AnchorPane.bottomAnchor="7.0" AnchorPane.rightAnchor="14.0" />
+         </children>
+      </AnchorPane>
+   </center>
 </BorderPane>

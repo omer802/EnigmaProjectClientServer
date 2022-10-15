@@ -1,4 +1,4 @@
-package client.util.http;
+package client.constants.http;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;

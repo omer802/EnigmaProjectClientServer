@@ -1,12 +1,13 @@
 package engine.decryptionManager;
 
 import DTOS.decryptionManager.DecryptionManagerDTO;
-import engine.decryptionManager.dictionary.Dictionary;
-import Trie.Trie;
+import dictionary.Dictionary;
+import dictionary.Trie;
 import engine.decryptionManager.task.TasksManager;
 import engine.decryptionManager.task.TimeToCalc;
 import engine.enigma.Machine.EnigmaMachine;
-import engine.enigma.keyboard.Keyboard;
+import keyboard.Keyboard;
+import registerManagers.UBoatManager.UBoat;
 
 import java.math.BigInteger;
 
@@ -16,9 +17,9 @@ public class DM {
 
 
     // TODO: 9/10/2022 change from agents to tasks
-    public static enum DifficultyLevel{
+   /* public static enum DifficultyLevel{
         EASY, MEDIUM, HARD, IMPOSSIBLE
-    }
+    }*/
     private int maxAgentAmount;
     private Dictionary dictionary;
 
@@ -42,7 +43,7 @@ public class DM {
         if(decryptionManagerDTO.getAmountOfAgentsForProcess()>maxAgentAmount)
             throw new RuntimeException();
             this.timeToCalc = new TimeToCalc(System.currentTimeMillis());
-            this.tasksCreator = new TasksManager(decryptionManagerDTO,machine.clone(),timeToCalc);
+            this.tasksCreator = new TasksManager(decryptionManagerDTO,machine.clone(),timeToCalc,dictionary);
 
         new Thread(tasksCreator,"Manager tasks thread ").start();
     }
@@ -60,7 +61,7 @@ public class DM {
         return dictionary.cleanStringFromExcludeChars(words);
     }
     public Trie getTrieFromDictionary(){
-        return dictionary.createTrieFromDictionary();
+        return dictionary.getTrie();
     }
 
 
@@ -85,7 +86,7 @@ public class DM {
     public int getAmountOfAgents() {
         return maxAgentAmount;
     }
-    public  double calculateAmountOfTasks(Integer missionSize, DifficultyLevel level) {
+    public  double calculateAmountOfTasks(Integer missionSize, UBoat.DifficultyLevel level) {
         double amountOfMission = 0;
         switch (level) {
             case EASY:

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.allies.alliesController">
+   <content>
+      <BorderPane minHeight="-Infinity" minWidth="-Infinity">
+         <top>
+            <GridPane maxHeight="-Infinity" prefHeight="43.0" prefWidth="796.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="-Infinity" prefWidth="114.0" />
+                  <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="527.0" minWidth="48.0" prefWidth="88.0" />
+                  <ColumnConstraints hgrow="ALWAYS" maxWidth="527.0" minWidth="125.0" prefWidth="324.0" />
+                  <ColumnConstraints hgrow="ALWAYS" maxWidth="301.0" minWidth="15.0" prefWidth="229.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="NEVER" />
+                  <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="54.0" minHeight="2.0" prefHeight="11.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label alignment="TOP_LEFT" minWidth="-Infinity" prefHeight="26.0" prefWidth="167.0" text="Allies" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets left="130.0" />
+                     </GridPane.margin>
+                  </Label>
+               </children>
+            </GridPane>
+         </top>
+         <center>
+            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+              <tabs>
+                <Tab text="Dashboard">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Label layoutX="93.0" layoutY="55.0" text="Team’s agents data">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="496.0" layoutY="55.0" text="Contests data">
+                                 <font>
+                                    <Font name="System Bold Italic" size="15.0" />
+                                 </font>
+                              </Label>
+                              <AnchorPane fx:id="teamAgentsTableView" layoutX="20.0" layoutY="99.0" prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <fx:include source="../teamsAgentsData/teamsAgentsData.fxml" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane fx:id="teamsAgentsData" layoutX="337.0" layoutY="99.0" prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <fx:include source="../contestsData/contestsData.fxml" />
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Contest">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </center>
+      </BorderPane>
+   </content>
+</ScrollPane>

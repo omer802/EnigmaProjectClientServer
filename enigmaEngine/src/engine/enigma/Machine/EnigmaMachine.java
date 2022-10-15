@@ -4,12 +4,12 @@ package engine.enigma.Machine;
 import DTOS.Configuration.UserConfigurationDTO;
 import DTOS.StatisticsDTO.MachineStatisticsDTO;
 import engine.enigma.PlugBoard.PlugBoard;
-import engine.enigma.keyboard.Keyboard;
 import engine.enigma.reflector.Reflector;
 import engine.enigma.reflector.Reflectors;
 import engine.enigma.rotors.RotatingRotor;
 import engine.enigma.rotors.RotatingRotors;
 import engine.enigma.statistics.Statistics;
+import keyboard.Keyboard;
 
 import java.io.*;
 import java.util.*;
@@ -19,6 +19,11 @@ public class EnigmaMachine implements Serializable, Cloneable {
     private Reflectors reflectors;
     private PlugBoard plugBoard;
     private boolean havePlugBoard;
+
+    public Keyboard getKeyboard() {
+        return keyboard;
+    }
+
     // TODO: 10/11/2022 make keyboard real object only in enigmaMachineClass and get from this class the alphabet
     private Keyboard keyboard;
 

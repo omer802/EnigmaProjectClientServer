@@ -7,7 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="EnigmaEngine" />
     <orderEntry type="module" module-name="commonUtils" />
+    <orderEntry type="library" name="okHttp" level="project" />
+    <orderEntry type="module" module-name="DTO" />
   </component>
 </module>

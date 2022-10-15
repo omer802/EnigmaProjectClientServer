@@ -7,11 +7,13 @@ import DTOS.Configuration.UserConfigurationDTO;
 import DTOS.StatisticsDTO.MachineStatisticsDTO;
 import DTOS.Validators.xmlFileValidatorDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
-import engine.battleField.Battlefield;
+import dictionary.Dictionary;
+import registerManagers.UBoatManager.UBoat;
+import registerManagers.battleField.Battlefield;
 import engine.decryptionManager.DM;
-import Trie.Trie;
+import dictionary.Trie;
 import engine.decryptionManager.task.TimeToCalc;
-import engine.registerManagers.BattlefieldManager;
+import registerManagers.battlefieldManager.BattlefieldManager;
 import javafx.beans.property.StringProperty;
 
 import java.io.InputStream;
@@ -24,7 +26,7 @@ public interface ApiEnigma {
 
     void selectInitialCodeConfiguration(UserConfigurationDTO configuration);
 
-    String dataEncryption(String data);
+    UserConfigurationDTO dataEncryption(String data);
 
     void resetPositions();
 
@@ -95,10 +97,11 @@ public interface ApiEnigma {
     String cleanStringFromExcludeChars(String words);
 
     Trie getTrieFromDictionary();
+    public Dictionary getDictionary();
 
     int getAmountOfAgents();
 
-    double calculateAmountOfTasks(Integer missionSize, DM.DifficultyLevel level);
+    double calculateAmountOfTasks(Integer missionSize, UBoat.DifficultyLevel level);
     void cancelCurrentTask();
 
     void pauseCurrentTask();

@@ -1,6 +1,7 @@
 package engine.decryptionManager.task;
 
 import DTOS.decryptionManager.DecryptionManagerDTO;
+import dictionary.Dictionary;
 import engine.decryptionManager.CustomThreadPool.CustomThreadPoolExecutor;
 import engine.decryptionManager.DM;
 import engine.decryptionManager.MathCalculations.RotorsPermuter;
@@ -8,8 +9,9 @@ import engine.decryptionManager.MathCalculations.CodeGenerator;
 import engine.decryptionManager.CustomThreadPool.ThreadFactoryBuilder;
 import engine.decryptionManager.UpdateCandidateBlockingQueue.UpdateCandidateConsumer;
 import engine.enigma.Machine.EnigmaMachine;
-import engine.enigma.keyboard.Keyboard;
 import javafx.concurrent.Task;
+import keyboard.Keyboard;
+import registerManagers.UBoatManager.UBoat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class TasksManager extends Task<Boolean> {
     private Double missionSize;
 
     // TODO: 9/11/2022 change difficulty to enum
-    private DM.DifficultyLevel difficulty;
+    private UBoat.DifficultyLevel difficulty;
     private String messageToDecode;
     private int possibleAmountOfCodes;
     private EnigmaMachine machine;
@@ -41,8 +43,9 @@ public class TasksManager extends Task<Boolean> {
 
     BlockingDeque<AgentCandidatesList> candidateBlockingQueue;
     private Thread blockingConsumer;
+    private Dictionary dictionary;
 
-    public TasksManager(DecryptionManagerDTO decryptionManagerDTO, EnigmaMachine machine, TimeToCalc timeToCalc) {
+    public TasksManager(DecryptionManagerDTO decryptionManagerDTO, EnigmaMachine machine, TimeToCalc timeToCalc, Dictionary dictionary) {
         this.missionSize = decryptionManagerDTO.getMissionSize();
         this.difficulty = decryptionManagerDTO.getLevel();
         this.agentsAmount = decryptionManagerDTO.getAmountOfAgentsForProcess();
@@ -56,6 +59,7 @@ public class TasksManager extends Task<Boolean> {
         this.machine = machine;
         this.timeToCalc = timeToCalc;
         this.totalMissionAmountToSend = new AtomicLong((long) totalMissionAmount);
+        this.dictionary = dictionary;
 
     }
 
@@ -87,7 +91,7 @@ public class TasksManager extends Task<Boolean> {
 
 
 
-    private void generateMissionByLevel(DM.DifficultyLevel difficulty, CodeGenerator codeGenerator) throws InterruptedException {
+    private void generateMissionByLevel(UBoat.DifficultyLevel difficulty, CodeGenerator codeGenerator) throws InterruptedException {
         switch (difficulty) {
             case EASY:
                 easyDifficultyLevel(codeGenerator);
@@ -190,7 +194,7 @@ public class TasksManager extends Task<Boolean> {
 
     private void generateTaskAndPushToBlockingQueue(CodeGenerator codeGenerator, Double missionSize) throws InterruptedException {
         List<String> positionsList = codeGenerator.generateNextPositionsListForTask(missionSize);
-        MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,
+        MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,dictionary,
                 candidateBlockingQueue,totalMissionAmount, timeToCalc,totalMissionAmountToSend,()-> updateProgress(missionCount[0]++, totalMissionAmount)
                 );
 

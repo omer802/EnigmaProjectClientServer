@@ -1,6 +1,6 @@
-package engine.registerManagers;
+package registerManagers.battlefieldManager;
 
-import engine.battleField.Battlefield;
+import registerManagers.battleField.Battlefield;
 
 import java.util.*;
 

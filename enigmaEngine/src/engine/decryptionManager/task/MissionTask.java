@@ -1,7 +1,7 @@
 package engine.decryptionManager.task;
 
 import DTOS.Configuration.UserConfigurationDTO;
-import engine.decryptionManager.dictionary.Dictionary;
+import dictionary.Dictionary;
 import engine.enigma.Machine.EnigmaMachine;
 
 import java.util.Arrays;
@@ -37,10 +37,10 @@ public class MissionTask implements Runnable{
 
     public AgentCandidatesList candidatesList;
     Runnable updateProgress;
-
+    private Dictionary dictionary;
 
     public MissionTask(EnigmaMachine machine, List<String> positions,
-                       String toDecode, BlockingDeque<AgentCandidatesList> candidateBlockingQueue,
+                       String toDecode, Dictionary dictionary, BlockingDeque<AgentCandidatesList> candidateBlockingQueue,
                        double totalMissionAmount, TimeToCalc timeToCalc,
                        AtomicLong totalMissionAmountToSend, Runnable updateProgress){
         this.machine = machine;
@@ -48,6 +48,7 @@ public class MissionTask implements Runnable{
         this.toDecode = toDecode;
         this.candidateBlockingQueue = candidateBlockingQueue;
         this.totalMissionAmount = totalMissionAmount;
+        this.dictionary = dictionary;
         this.timeToCalc = timeToCalc;
         this.updateProgress = updateProgress;
         finish = new AtomicBoolean(false);
@@ -103,7 +104,7 @@ public class MissionTask implements Runnable{
         String decryptionResult = machine.encodeString(toDecode);
         List<String> words = splitDecryptionToWords(decryptionResult);
         //System.out.println(position);
-        if(Dictionary.isWordsInDictionary(words)) {
+        if(dictionary.isWordsInDictionary(words)) {
             return decryptionResult;
         }
         else

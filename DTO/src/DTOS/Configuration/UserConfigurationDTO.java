@@ -21,6 +21,9 @@ public class UserConfigurationDTO implements Serializable {
 
     private List<NotchAndLetterAtPeekPane> NotchAndLetterPair;
 
+
+    private String encryptedMessage;
+
     public void removePlug(){
         isPlugged = false;
     }
@@ -138,17 +141,12 @@ public class UserConfigurationDTO implements Serializable {
         }
         stringBuilderInput.append(">");
     }
-
-    @Override
-    public String toString() {
-        return "UserConfigurationDTO{" +
-                "numberOfMessageEncrypted=" + numberOfMessageEncrypted +
-                ", chosenRotorsWithOrder=" + chosenRotorsWithOrder +
-                ", RotorsStartingPosition='" + RotorsStartingPosition + '\'' +
-                ", isPlugged=" + isPlugged +
-                ", plugBoardConnections=" + plugBoardConnections +
-                ", chosenReflector=" + chosenReflector +
-                ", NotchAndLetterPair=" + NotchAndLetterPair +
-                '}';
+    public String getEncryptedMessage() {
+        return encryptedMessage;
     }
+
+    public void setEncryptedMessage(String encryptedMessage) {
+        this.encryptedMessage = encryptedMessage;
+    }
+
 }

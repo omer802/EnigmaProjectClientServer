@@ -1,7 +1,5 @@
 package client.javafx.Login;
 
-import client.javafx.UBoatMainController.MainController;
-import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -20,23 +18,23 @@ import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import util.CommonConstants;
+import util.http.HttpClientUtil;
 
 import java.io.IOException;
 import java.net.URL;
 
-import static client.constants.ConstantsUBoat.MAIN_PAGE_FXML_RESOURCE_LOCATION;
+import static client.AlliesConstants.MAIN_PAGE_FXML_RESOURCE_LOCATION;
 
-public class UBoatLoginController {
 
-    // TODO: 10/15/2022 think how to create generic login page
-    private Scene UBoatScene;
-    private MainController mainController;
+public class AlliesLoginController {
+
+    private Scene alliesScene;
+    private client.javafx.allies.alliesController alliesController;
     @FXML
     public TextField userNameTextField;
 
     @FXML
     public Label errorMessageLabel;
-
 
     private final StringProperty errorMessageProperty = new SimpleStringProperty();
     private Stage primaryStage;
@@ -63,7 +61,7 @@ public class UBoatLoginController {
                 .parse(CommonConstants.LOGIN_PAGE)
                 .newBuilder()
                 .addQueryParameter("username", userName)
-                .addQueryParameter("client_type","UBoat")
+                .addQueryParameter("client_type","Allies")
                 .build()
                 .toString();
 
@@ -83,15 +81,14 @@ public class UBoatLoginController {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.code() != 200) {
                     String responseBody = response.body().string();
-                    //System.out.println(responseBody);
                     Platform.runLater(() ->
                             errorMessageProperty.set("Something went wrong: " + responseBody)
                     );
                 } else {
                     Platform.runLater(() -> {
-                        primaryStage.setScene(UBoatScene);
+                        primaryStage.setScene(alliesScene);
                         primaryStage.show();
-                        mainController.setUserName(userName);
+                        alliesController.setUserName(userName);
                     });
                 }
             }
@@ -112,17 +109,17 @@ public class UBoatLoginController {
         //chatAppMainController.updateHttpLine(data);
     }
 
-    public void backgroundLoadAlliesScreen(Stage primaryStage) {
+    public void backgroundLoadUBoatScreen(Stage primaryStage) {
         this.primaryStage = primaryStage;
         FXMLLoader fxmlLoader = new FXMLLoader();
-        URL UBoatScreenURL = getClass().getResource(MAIN_PAGE_FXML_RESOURCE_LOCATION);
-        fxmlLoader.setLocation(UBoatScreenURL);
+        URL alliesScreenURL = getClass().getResource(MAIN_PAGE_FXML_RESOURCE_LOCATION);
+        fxmlLoader.setLocation(alliesScreenURL);
         try {
-            Parent AlliesScreen = fxmlLoader.load(UBoatScreenURL.openStream());
-            mainController = fxmlLoader.getController();
-            mainController.setPrimaryStage(primaryStage);
-            primaryStage.setTitle("Allies Client");
-            UBoatScene = new Scene(AlliesScreen, 800,600);
+            Parent UBoatScreen = fxmlLoader.load(alliesScreenURL.openStream());
+            alliesController = fxmlLoader.getController();
+            alliesController.setPrimaryStage(primaryStage);
+            primaryStage.setTitle("UBoat Client");
+            alliesScene = new Scene(UBoatScreen, 800,600);
             primaryStage.setMinHeight(300f);
             primaryStage.setMinWidth(400f);
         }

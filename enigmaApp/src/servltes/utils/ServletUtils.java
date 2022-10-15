@@ -1,14 +1,17 @@
 package servltes.utils;
 
 
+import DTOS.Configuration.UserConfigurationDTO;
 import engine.api.ApiEnigma;
-import engine.api.ApiEnigmaImp;
-import engine.registerManagers.BattlefieldManager;
-import engine.registerManagers.UserManager;
+import registerManagers.RegisterManager;
+import registerManagers.UBoatManager.UBoat;
+import registerManagers.battlefieldManager.BattlefieldManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
+import registerManagers.genericManager.GenericManager;
+import registerManagers.usersManager.ClientUser;
 
-import static servltes.login.constants.Constants.INT_PARAMETER_ERROR;
+import static servltes.constants.Constants.INT_PARAMETER_ERROR;
 
 
 public class ServletUtils {
@@ -16,23 +19,35 @@ public class ServletUtils {
 	private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
 	private static final String API_ENGINE_ATTRIBUTE_NAME = "apiEngine";
 	private static final String BATTLEFIELD_MANAGER_ATTRIBUTE_NAME = "battleFieldManager";
+
+	private static final String REGISTER_MANAGER_ATTRIBUTE_NAME = "registerManager";
 	/*
 	Note how the synchronization is done only on the question and\or creation of the relevant managers and once they exists -
 	the actual fetch of them is remained un-synchronized for performance POV
 	 */
-	private static final Object userManagerLock = new Object();
 	private static final Object enigmaApiLock = new Object();
 
 	private static final Object BattlefieldManagerLock = new Object();
-	public static UserManager getUserManager(ServletContext servletContext) {
+	private static final Object RegisterManagerLock = new Object();
+	private static final Object UBoatLock = new Object();
 
-		synchronized (userManagerLock) {
-			if (servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME) == null) {
-				servletContext.setAttribute(USER_MANAGER_ATTRIBUTE_NAME, new UserManager());
+
+	public static RegisterManager getRegisterManager(ServletContext servletContext) {
+
+		synchronized (RegisterManagerLock) {
+			if (servletContext.getAttribute(REGISTER_MANAGER_ATTRIBUTE_NAME) == null) {
+				servletContext.setAttribute(REGISTER_MANAGER_ATTRIBUTE_NAME, new RegisterManager());
 			}
 		}
-		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
+		return (RegisterManager) servletContext.getAttribute(REGISTER_MANAGER_ATTRIBUTE_NAME);
 	}
+	public static GenericManager<ClientUser> getUserManager(ServletContext servletContext) {
+
+		RegisterManager registerManager = getRegisterManager(servletContext);
+
+		return (GenericManager<ClientUser>) registerManager.getUserManager();
+	}
+
 
 	public static BattlefieldManager getBattleFieldManager(ServletContext servletContext) {
 
@@ -44,14 +59,15 @@ public class ServletUtils {
 		return (BattlefieldManager) servletContext.getAttribute(BATTLEFIELD_MANAGER_ATTRIBUTE_NAME);
 	}
 
-	public static ApiEnigma getEnigmaApi(ServletContext servletContext) {
+	public static ApiEnigma getEnigmaApi(ServletContext servletContext,String username) {
+		RegisterManager registerManager = getRegisterManager(servletContext);
+		ApiEnigma api = registerManager.getApiFromUBoat(username);
+		return api;
 
-		synchronized (enigmaApiLock) {
-			if (servletContext.getAttribute(API_ENGINE_ATTRIBUTE_NAME) == null) {
-				servletContext.setAttribute(API_ENGINE_ATTRIBUTE_NAME, new ApiEnigmaImp());
-			}
-		}
-		return (ApiEnigma) servletContext.getAttribute(API_ENGINE_ATTRIBUTE_NAME);
+	}
+	public static UBoat getUBoatByName(ServletContext servletContext,String username){
+		RegisterManager registerManager = getRegisterManager(servletContext);
+		return registerManager.getUBoatByName(username);
 	}
 
 	/*public static ChatManager getChatManager(ServletContext servletContext) {
@@ -72,5 +88,10 @@ public class ServletUtils {
 			}
 		}
 		return INT_PARAMETER_ERROR;
+	}
+
+	public static RegisterManager.ClientType getTypeByName(String username, ServletContext servletContext) {
+		RegisterManager registerManager =  getRegisterManager(servletContext);
+		return registerManager.getTypeByName(username);
 	}
 }

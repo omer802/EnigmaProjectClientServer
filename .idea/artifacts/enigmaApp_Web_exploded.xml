@@ -11,6 +11,7 @@
           <element id="artifact" artifact-name="EnigmaEngine:jar" />
           <element id="library" level="project" name="gson-2.8.8" />
           <element id="artifact" artifact-name="commonUtils:jar" />
+          <element id="library" level="project" name="okHttp" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="enigmaAppliaction/web/Web" />

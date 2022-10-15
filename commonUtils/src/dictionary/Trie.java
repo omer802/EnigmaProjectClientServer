@@ -1,4 +1,4 @@
-package Trie;
+package dictionary;
 
 import java.util.*;
 

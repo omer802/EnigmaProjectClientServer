@@ -2,7 +2,7 @@ package servltes.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import servltes.login.constants.Constants;
+import servltes.constants.Constants;
 
 public class SessionUtils {
 
@@ -11,6 +11,7 @@ public class SessionUtils {
         Object sessionAttribute = session != null ? session.getAttribute(Constants.USERNAME) : null;
         return sessionAttribute != null ? sessionAttribute.toString() : null;
     }
+
     
     public static void clearSession (HttpServletRequest request) {
         request.getSession().invalidate();
