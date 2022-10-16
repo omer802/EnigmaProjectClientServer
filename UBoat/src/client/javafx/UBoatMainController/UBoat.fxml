@@ -23,7 +23,7 @@
    <content>
       <BorderPane minHeight="-Infinity" minWidth="-Infinity">
          <top>
-            <GridPane maxHeight="-Infinity" prefHeight="79.0" prefWidth="790.0">
+            <GridPane maxHeight="-Infinity" prefHeight="88.0" prefWidth="790.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="-Infinity" prefWidth="114.0" />
@@ -33,13 +33,13 @@
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="54.0" minHeight="2.0" prefHeight="11.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="16.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="57.0" minHeight="8.0" prefHeight="18.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadXmlFile" prefHeight="25.0" prefWidth="99.0" text="Load file" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadXmlFile" prefHeight="25.0" prefWidth="99.0" text="Load file" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Label alignment="TOP_LEFT" minWidth="-Infinity" prefHeight="26.0" prefWidth="167.0" text="UBoat" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                      <font>
                         <Font name="System Bold" size="16.0" />
@@ -48,21 +48,22 @@
                         <Insets left="130.0" />
                      </GridPane.margin>
                   </Label>
-                  <AnchorPane minWidth="30.0" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="2">
+                  <AnchorPane minWidth="30.0" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3">
                      <children>
-                        <TextField fx:id="URLFileText" layoutY="6.0" minWidth="70.0" prefHeight="24.0" prefWidth="626.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="24.0" />
+                        <TextField fx:id="URLFileText" layoutY="9.0" minWidth="70.0" prefHeight="24.0" prefWidth="626.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="24.0" />
                      </children>
                   </AnchorPane>
-                  <Label fx:id="errorMessageLabel" minWidth="-Infinity" prefHeight="22.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                  <Label fx:id="errorMessageLabel" minWidth="-Infinity" prefHeight="22.0" GridPane.columnIndex="2" GridPane.rowIndex="4">
                      <padding>
                         <Insets top="5.0" />
                      </padding>
                   </Label>
+                  <Label fx:id="userGreetingLabel" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
          </top>
          <center>
-            <TabPane tabClosingPolicy="UNAVAILABLE">
+            <TabPane prefHeight="505.0" prefWidth="798.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
                 <Tab closable="false" text="Machine">
                   <content>

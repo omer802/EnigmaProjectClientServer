@@ -23,7 +23,7 @@ import util.http.HttpClientUtil;
 import java.io.IOException;
 import java.net.URL;
 
-import static client.AlliesConstants.MAIN_PAGE_FXML_RESOURCE_LOCATION;
+import static client.constants.AlliesConstants.MAIN_PAGE_FXML_RESOURCE_LOCATION;
 
 
 public class AlliesLoginController {
@@ -89,6 +89,7 @@ public class AlliesLoginController {
                         primaryStage.setScene(alliesScene);
                         primaryStage.show();
                         alliesController.setUserName(userName);
+                        alliesController.startServerUpdateTimer();
                     });
                 }
             }
@@ -118,7 +119,7 @@ public class AlliesLoginController {
             Parent UBoatScreen = fxmlLoader.load(alliesScreenURL.openStream());
             alliesController = fxmlLoader.getController();
             alliesController.setPrimaryStage(primaryStage);
-            primaryStage.setTitle("UBoat Client");
+            primaryStage.setTitle("Allies Client");
             alliesScene = new Scene(UBoatScreen, 800,600);
             primaryStage.setMinHeight(300f);
             primaryStage.setMinWidth(400f);

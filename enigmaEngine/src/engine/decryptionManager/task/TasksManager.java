@@ -178,10 +178,8 @@ public class TasksManager extends Task<Boolean> {
     private void easyDifficultyLevel(CodeGenerator codeGenerator) throws InterruptedException {
         double numOfTasks = calculateAmountOfCodes()/missionSize;
         double leakageSizeTask = ((int)calculateAmountOfCodes())  % missionSize;
-        //System.out.println(numOfTasks);
-        //System.out.println(leakageSizeTask);
+
         if(leakageSizeTask>0) {
-            //System.out.println(leakageSizeTask);
             generateTaskAndPushToBlockingQueue(codeGenerator,leakageSizeTask);
             numOfTasks--;
         }

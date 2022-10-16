@@ -79,7 +79,7 @@
                                     <Insets top="5.0" />
                                  </padding>
                               </HBox>
-                              <HBox alignment="CENTER_RIGHT" prefHeight="45.0" prefWidth="512.0">
+                              <HBox alignment="BOTTOM_RIGHT" prefHeight="53.0" prefWidth="512.0">
                                  <children>
                                     <Button fx:id="readyButton" mnemonicParsing="false" onAction="#readyForContestAction" prefHeight="25.0" prefWidth="82.0" text="Ready!">
                                        <HBox.margin>
@@ -87,10 +87,16 @@
                                        </HBox.margin></Button>
                                  </children>
                               </HBox>
-                              <HBox alignment="CENTER_RIGHT" prefHeight="34.0" prefWidth="512.0">
+                              <HBox alignment="BOTTOM_RIGHT" prefHeight="23.0" prefWidth="512.0">
                                  <children>
-                                    <Label fx:id="labelIndication" minWidth="-Infinity" />
+                                    <Label fx:id="labelIndication" minWidth="-Infinity">
+                                       <padding>
+                                          <Insets right="8.0" />
+                                       </padding></Label>
                                  </children>
+                                 <padding>
+                                    <Insets bottom="8.0" top="8.0" />
+                                 </padding>
                               </HBox>
                            </children>
                         </VBox>

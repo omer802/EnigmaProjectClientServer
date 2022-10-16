@@ -41,7 +41,9 @@ public class UploadFileServlet extends HttpServlet {
             if (validator.getListOfExceptions().size() == 0) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 UBoat uBoat = ServletUtils.getUBoatByName(getServletContext(),usernameFromSession);
-                uBoat.makeContestActive();
+                uBoat.makeUBoatActive();
+                RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
+                System.out.println(registerManager.getContestInformation());
                 sendDTOConfigurationToClient(res,usernameFromSession);
 
             } else {
@@ -69,12 +71,15 @@ public class UploadFileServlet extends HttpServlet {
 
     // TODO: 10/10/2022 think how to make the enigma whitout sending battlefieldManager
     private xmlFileValidatorDTO validateAndUploadFile(InputStream xmlFileInputStream, String username) {
-        ApiEnigma api = ServletUtils.getEnigmaApi(getServletContext(),username);
+        UBoat uBoat = ServletUtils.getUBoatByName(getServletContext(),username);
         BattlefieldManager battlefieldManager = ServletUtils.getBattleFieldManager(getServletContext());
-        xmlFileValidatorDTO validator = api.readDataJavaFx(xmlFileInputStream,battlefieldManager);
+        xmlFileValidatorDTO validator = uBoat.getApi().readDataJavaFx(xmlFileInputStream,battlefieldManager);
         if (validator.getListOfExceptions().size() == 0) {
-            Battlefield battlefield = api.getBattleField();
+            // if there is no error update battlefield
+            Battlefield battlefield = uBoat.getApi().getBattleField();
             battlefieldManager.addBattlefield(battlefield);
+            uBoat.setBattlefield(battlefield);
+
         }
         return validator;
     }

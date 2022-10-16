@@ -118,11 +118,11 @@ public class UBoatLoginController {
         URL UBoatScreenURL = getClass().getResource(MAIN_PAGE_FXML_RESOURCE_LOCATION);
         fxmlLoader.setLocation(UBoatScreenURL);
         try {
-            Parent AlliesScreen = fxmlLoader.load(UBoatScreenURL.openStream());
+            Parent UBoatScreen = fxmlLoader.load(UBoatScreenURL.openStream());
             mainController = fxmlLoader.getController();
             mainController.setPrimaryStage(primaryStage);
-            primaryStage.setTitle("Allies Client");
-            UBoatScene = new Scene(AlliesScreen, 800,600);
+            primaryStage.setTitle("UBoat Client");
+            UBoatScene = new Scene(UBoatScreen, 800,600);
             primaryStage.setMinHeight(300f);
             primaryStage.setMinWidth(400f);
         }

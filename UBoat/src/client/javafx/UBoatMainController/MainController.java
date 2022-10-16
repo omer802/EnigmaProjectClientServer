@@ -10,10 +10,7 @@ import client.constants.ConstantsUBoat;
 import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -103,6 +100,8 @@ public class MainController {
     private BorderPane Contest;
     @FXML
     private ContestController ContestController;
+    @FXML
+    private Label userGreetingLabel;
 
     private List<ObjectProperty<String>> chosenRotorsList;
     private List<ObjectProperty<Character>> chosenPositions;
@@ -114,7 +113,7 @@ public class MainController {
     private SimpleBooleanProperty isConfig;
 
     private SimpleBooleanProperty isFileSelected;
-    private String userName;
+    private StringProperty userName;
     private String alphabet;
     UserConfigurationDTO userOriginalConfiguration;
     private SimpleIntegerProperty rotorsInUseAmount;
@@ -127,6 +126,7 @@ public class MainController {
     private SimpleStringProperty plugBoardToShow;
     private SimpleStringProperty errorMessageProperty = new SimpleStringProperty();
     private FileConfigurationDTOAdapter fileConfigurationDTOAdapter;
+
 
     public MainController(){
         this.chosenRotorsList = new ArrayList<>();
@@ -147,6 +147,9 @@ public class MainController {
     }
     @FXML
     public void initialize() {
+        this.userName = new SimpleStringProperty();
+        userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
+
         errorMessageLabel.textProperty().bind(errorMessageProperty);
 
         CheckBoxIsPluged.disableProperty().bind(isFileSelected.not());
@@ -164,7 +167,6 @@ public class MainController {
                 encryptedMessagesAmount);
 
         CodeAtMachineDetails.disableProperty().bind(isConfig.not());
-        //encryptDecrypt.disableProperty().bind(isConfig.not());
 
         setCodeButton.disableProperty().bind(isFileSelected.not());
         randomCodeButton.disableProperty().bind(isFileSelected.not());
@@ -194,7 +196,7 @@ public class MainController {
     private void sendFileToServerAndLoadMachineConfig(File selectedFile) throws IOException {
         RequestBody body =
                 new MultipartBody.Builder()
-                        .addFormDataPart(userName, selectedFile.getName(), RequestBody.create(selectedFile,
+                        .addFormDataPart(userName.getValue(), selectedFile.getName(), RequestBody.create(selectedFile,
                                 MediaType.parse("text/plain"))).build();
         Request request = new Request.Builder()
                 .url(ConstantsUBoat.UPLOAD_XML_FILE)
@@ -465,7 +467,7 @@ public class MainController {
         alert.showAndWait();
     }
     public String getUserName() {
-        return userName;
+        return userName.getValue();
     }
     public String getChosenPosition() {
         String positionsToReturn = chosenPositions.stream().
@@ -532,7 +534,7 @@ public class MainController {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName.set(userName);
     }
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;

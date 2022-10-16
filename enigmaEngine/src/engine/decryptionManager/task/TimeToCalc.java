@@ -26,7 +26,6 @@ public class TimeToCalc {
     }
 
     public void setTotalTimeTaskManager(long endTime) {
-        System.out.println("set total time now*********************");
         this.totalTimeTaskManager  = (endTime - startingTimeTaskManager);
     }
 

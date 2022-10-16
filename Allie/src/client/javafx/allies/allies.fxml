@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
@@ -9,6 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
@@ -16,7 +18,7 @@
    <content>
       <BorderPane minHeight="-Infinity" minWidth="-Infinity">
          <top>
-            <GridPane maxHeight="-Infinity" prefHeight="43.0" prefWidth="796.0">
+            <GridPane maxHeight="-Infinity" prefHeight="60.0" prefWidth="796.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="-Infinity" prefWidth="114.0" />
@@ -27,7 +29,8 @@
                <rowConstraints>
                   <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="NEVER" />
                   <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="54.0" minHeight="2.0" prefHeight="11.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="54.0" minHeight="2.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="54.0" minHeight="7.0" prefHeight="7.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
                   <Label alignment="TOP_LEFT" minWidth="-Infinity" prefHeight="26.0" prefWidth="167.0" text="Allies" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
@@ -38,11 +41,12 @@
                         <Insets left="130.0" />
                      </GridPane.margin>
                   </Label>
+                  <Label fx:id="userGreetingLabel" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
          </top>
          <center>
-            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <TabPane prefHeight="293.0" prefWidth="798.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
               <tabs>
                 <Tab text="Dashboard">
                   <content>
@@ -58,16 +62,25 @@
                                     <Font name="System Bold Italic" size="15.0" />
                                  </font>
                               </Label>
-                              <AnchorPane fx:id="teamAgentsTableView" layoutX="20.0" layoutY="99.0" prefHeight="200.0" prefWidth="200.0">
+                              <AnchorPane layoutX="20.0" layoutY="99.0" prefHeight="200.0" prefWidth="200.0">
                                  <children>
-                                    <fx:include source="../teamsAgentsData/teamsAgentsData.fxml" />
+                                    <fx:include fx:id="teamAgentsTableView" source="../teamsAgentsData/teamsAgentsData.fxml" />
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="teamsAgentsData" layoutX="337.0" layoutY="99.0" prefHeight="200.0" prefWidth="200.0">
+                              <AnchorPane fx:id="contestsData" layoutX="337.0" layoutY="99.0" prefHeight="200.0" prefWidth="200.0">
                                  <children>
-                                    <fx:include source="../contestsData/contestsData.fxml" />
+                                    <fx:include fx:id="contestsDataTableView" source="../contestsData/contestsData.fxml" />
                                  </children>
                               </AnchorPane>
+                              <HBox alignment="TOP_RIGHT" layoutX="662.0" layoutY="368.0" prefHeight="35.0" prefWidth="103.0">
+                                 <children>
+                                    <Button fx:id="Submit" mnemonicParsing="false" onAction="#setChosenContest" text="Submit!">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </HBox>
                            </children>
                         </AnchorPane>
                   </content>
