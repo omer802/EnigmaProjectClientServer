@@ -61,7 +61,7 @@ public class AlliesLoginController {
                 .parse(CommonConstants.LOGIN_PAGE)
                 .newBuilder()
                 .addQueryParameter("username", userName)
-                .addQueryParameter("client_type","Allies")
+                .addQueryParameter("client_type","Allie")
                 .build()
                 .toString();
 

@@ -114,5 +114,6 @@ public class contestsDataController implements Closeable {
     }
     public ContestInformationDTO getChosenContest(){
         return table.getSelectionModel().getSelectedItem();
+
     }
 }

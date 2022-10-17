@@ -1,12 +1,12 @@
-package registerManagers.genericManager;
+package registerManagers.Managers;
 
-import registerManagers.alliesManager.Allies;
+import registerManagers.clients.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GenericManager<T> {
+public class GenericManager<T extends User> {
     private final List<T> clientList;
 
     public GenericManager() {
@@ -29,5 +29,13 @@ public class GenericManager<T> {
 
     public boolean isClientExists(T client) {
         return clientList.contains(client);
+    }
+    public synchronized T getClientByName(String clientName){
+        List<T> clientList = getClients();
+        for (T client: clientList) {
+            if(client.getUserName().equals(clientName))
+                return client;
+        }
+        return null;
     }
 }

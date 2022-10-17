@@ -12,4 +12,5 @@ public class AlliesConstants {
     public final static int REFRESH_RATE = 500;
 
 
+    public static final String UPDATE_ALLIE_CHOSEN_CONTEST = FULL_SERVER_PATH +"/updateAllieContest" ;
 }

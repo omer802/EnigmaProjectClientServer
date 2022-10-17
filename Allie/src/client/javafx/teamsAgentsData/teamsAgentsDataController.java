@@ -21,13 +21,13 @@ public class teamsAgentsDataController implements Initializable {
     private TableColumn<AgentDetail, Integer> threadAmount;
 
     @FXML
-    private TableColumn<AgentDetail, Double> missionSize;
+    private TableColumn<AgentDetail, Double> missionAmount;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         agentName.setCellValueFactory(new PropertyValueFactory<AgentDetail,String>("agentName"));
         threadAmount.setCellValueFactory(new PropertyValueFactory<AgentDetail, Integer>("threadAmount"));
-        missionSize.setCellValueFactory(new PropertyValueFactory<AgentDetail, Double>("missionSize"));
+        missionAmount.setCellValueFactory(new PropertyValueFactory<AgentDetail, Double>("missionAmount"));
     }
     public void addAgent(AgentDetail agentDetail){
         table.getItems().add(agentDetail);

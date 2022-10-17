@@ -1,6 +1,6 @@
 package DTOS.decryptionManager;
 
-import registerManagers.UBoatManager.UBoat;
+import registerManagers.clients.UBoat;
 
 public class DecryptionManagerDTO {
     private String messageToDecipher;

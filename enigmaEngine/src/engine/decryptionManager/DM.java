@@ -7,7 +7,7 @@ import engine.decryptionManager.task.TasksManager;
 import engine.decryptionManager.task.TimeToCalc;
 import engine.enigma.Machine.EnigmaMachine;
 import keyboard.Keyboard;
-import registerManagers.UBoatManager.UBoat;
+import registerManagers.clients.UBoat;
 
 import java.math.BigInteger;
 

@@ -1,6 +1,6 @@
 package DTOS.UBoatsInformationDTO;
 
-import registerManagers.battleField.Battlefield;
+import registerManagers.battlefieldManager.Battlefield;
 
 import java.util.Objects;
 

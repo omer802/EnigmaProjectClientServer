@@ -7,14 +7,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import registerManagers.RegisterManager;
-import registerManagers.genericManager.GenericManager;
+import registerManagers.Managers.RegisterManager;
 import servltes.utils.ServletUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Set;
 
 @WebServlet(name = "contest data request", urlPatterns = "/contestsDataRequest")
 public class getContestsServlet extends HttpServlet {

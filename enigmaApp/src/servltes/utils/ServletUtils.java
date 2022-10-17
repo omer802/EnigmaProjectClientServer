@@ -1,15 +1,14 @@
 package servltes.utils;
 
 
-import DTOS.Configuration.UserConfigurationDTO;
 import engine.api.ApiEnigma;
-import registerManagers.RegisterManager;
-import registerManagers.UBoatManager.UBoat;
+import registerManagers.Managers.RegisterManager;
+import registerManagers.clients.UBoat;
 import registerManagers.battlefieldManager.BattlefieldManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
-import registerManagers.genericManager.GenericManager;
-import registerManagers.usersManager.ClientUser;
+import registerManagers.Managers.GenericManager;
+import registerManagers.Managers.ClientUser;
 
 import static servltes.constants.Constants.INT_PARAMETER_ERROR;
 

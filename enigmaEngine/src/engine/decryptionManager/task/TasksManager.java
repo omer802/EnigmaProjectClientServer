@@ -3,7 +3,6 @@ package engine.decryptionManager.task;
 import DTOS.decryptionManager.DecryptionManagerDTO;
 import dictionary.Dictionary;
 import engine.decryptionManager.CustomThreadPool.CustomThreadPoolExecutor;
-import engine.decryptionManager.DM;
 import engine.decryptionManager.MathCalculations.RotorsPermuter;
 import engine.decryptionManager.MathCalculations.CodeGenerator;
 import engine.decryptionManager.CustomThreadPool.ThreadFactoryBuilder;
@@ -11,7 +10,7 @@ import engine.decryptionManager.UpdateCandidateBlockingQueue.UpdateCandidateCons
 import engine.enigma.Machine.EnigmaMachine;
 import javafx.concurrent.Task;
 import keyboard.Keyboard;
-import registerManagers.UBoatManager.UBoat;
+import registerManagers.clients.UBoat;
 
 import java.util.ArrayList;
 import java.util.List;

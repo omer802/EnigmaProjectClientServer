@@ -2,7 +2,7 @@ package engine.LoadData;
 
 import DTOS.Validators.xmlFileValidatorDTO;
 import dictionary.Dictionary;
-import registerManagers.battleField.Battlefield;
+import registerManagers.battlefieldManager.Battlefield;
 import engine.decryptionManager.DM;
 import engine.enigma.*;
 import engine.enigma.Machine.EnigmaMachine;

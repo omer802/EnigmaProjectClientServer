@@ -1,11 +1,12 @@
-package registerManagers.battleField;
+package registerManagers.battlefieldManager;
 
 
-import registerManagers.UBoatManager.UBoat;
+import registerManagers.clients.UBoat;
+import registerManagers.clients.User;
 
 import java.util.Objects;
 
-public class Battlefield {
+public class Battlefield implements User {
 
 
     private UBoat.DifficultyLevel level;
@@ -43,5 +44,10 @@ public class Battlefield {
 
     public int getAmountOfAlliesNeededForContest() {
         return allies;
+    }
+
+    @Override
+    public String getUserName() {
+        return battleName;
     }
 }

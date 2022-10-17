@@ -74,11 +74,16 @@
                               </AnchorPane>
                               <HBox alignment="TOP_RIGHT" layoutX="662.0" layoutY="368.0" prefHeight="35.0" prefWidth="103.0">
                                  <children>
-                                    <Button fx:id="Submit" mnemonicParsing="false" onAction="#setChosenContest" text="Submit!">
+                                    <Button fx:id="Submit" mnemonicParsing="false" onAction="#setChosenContest" text="Sign">
                                        <font>
                                           <Font size="15.0" />
                                        </font>
                                     </Button>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" layoutX="7.0" layoutY="410.0" prefHeight="17.0" prefWidth="738.0">
+                                 <children>
+                                    <Label fx:id="errorMessageLabel" minWidth="-Infinity" prefHeight="17.0" />
                                  </children>
                               </HBox>
                            </children>

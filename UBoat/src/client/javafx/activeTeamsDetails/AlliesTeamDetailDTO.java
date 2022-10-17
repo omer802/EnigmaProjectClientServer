@@ -2,7 +2,7 @@ package client.javafx.activeTeamsDetails;
 
 
 
-public class TeamDetail {
+public class AlliesTeamDetailDTO {
 
 
 
@@ -10,7 +10,7 @@ public class TeamDetail {
     private Double missionSize;
     private String teamName;
 
-    public TeamDetail(String teamName, int agentAmount, double missionSize) {
+    public AlliesTeamDetailDTO(String teamName, int agentAmount, double missionSize) {
         this.teamName = teamName;
         this.agentAmount = agentAmount;
         this.missionSize = missionSize;

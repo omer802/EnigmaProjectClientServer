@@ -4,7 +4,7 @@ import DTOS.Configuration.FileConfigurationDTO;
 import DTOS.Configuration.UserConfigurationDTO;
 import client.javafx.Candidate.Candidate;
 import client.javafx.Candidate.candidateController;
-import client.javafx.activeTeamsDetails.TeamDetail;
+import client.javafx.activeTeamsDetails.AlliesTeamDetailDTO;
 import client.javafx.activeTeamsDetails.activeTeamsDetailsController;
 import dictionary.Dictionary;
 import dictionary.Trie;
@@ -46,7 +46,7 @@ public class ContestController {
 
 
     @FXML
-    private TableView<TeamDetail> activeTeamDetails;
+    private TableView<AlliesTeamDetailDTO> activeTeamDetails;
     @FXML
     private activeTeamsDetailsController activeTeamDetailsController;
 
@@ -310,7 +310,7 @@ public class ContestController {
                 encryptionResultProperty.set(encryptionResult);
                // Candidate candidate1 = new Candidate(encryptionResult,"1",configurationDTO.getCodeConfigurationString().toString());
                // candidateController.addCandidate(candidate1);
-               // TeamDetail teamDetail = new TeamDetail("omer team", 5,10);
+               // AlliesTeamDetailDTO teamDetail = new AlliesTeamDetailDTO("omer team", 5,10);
                // activeTeamDetailsController.addTeamToTable(teamDetail);
             }
             else{
@@ -351,5 +351,7 @@ public class ContestController {
 
         });
     }
+
+
 
 }

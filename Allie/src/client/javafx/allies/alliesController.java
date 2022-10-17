@@ -1,9 +1,11 @@
 package client.javafx.allies;
 
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
+import client.constants.AlliesConstants;
 import client.javafx.contestsData.contestsDataController;
 import client.javafx.teamsAgentsData.AgentDetail;
 import client.javafx.teamsAgentsData.teamsAgentsDataController;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -13,12 +15,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+import util.http.HttpClientUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static util.CommonConstants.GSON_INSTANCE;
 import static util.CommonConstants.MAX_AMOUNT_ERROR_TO_SHOW;
 
 public class alliesController {
@@ -35,6 +41,10 @@ public class alliesController {
     private TableView<ContestInformationDTO> contestsDataTableView;
     @FXML
     private contestsDataController contestsDataTableViewController;
+    @FXML
+    private Label errorMessageLabel;
+    private  StringProperty errorMessageProperty = new SimpleStringProperty();
+
     private SimpleStringProperty userName;
     private Stage primaryStage;
 
@@ -42,6 +52,7 @@ public class alliesController {
     private Button Submit;
     @FXML
     public void initialize() {
+        errorMessageLabel.textProperty().bind(errorMessageProperty);
         userName = new SimpleStringProperty();
         contestsDataTableViewController.setErrorHandlerMainController(this::alertShowException);
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
@@ -84,8 +95,44 @@ public class alliesController {
     @FXML
     void setChosenContest(ActionEvent event) {
         ContestInformationDTO chosenContest = contestsDataTableViewController.getChosenContest();
-        System.out.println(chosenContest.getBattlefieldName());
+        sendChosenContestToServer(chosenContest);
     }
+
+    private void sendChosenContestToServer(ContestInformationDTO chosenContest) {
+
+            String jsonChosenContestDTO = GSON_INSTANCE.toJson(chosenContest);
+            RequestBody body =
+                    new MultipartBody.Builder()
+                            .addFormDataPart("jsonChosenContestDTO", jsonChosenContestDTO)
+                            .build();
+            Request finalUrl = new Request.Builder()
+                    .url(AlliesConstants.UPDATE_ALLIE_CHOSEN_CONTEST)
+                    .post(body)
+                    .build();
+
+            HttpClientUtil.runAsync(finalUrl, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Platform.runLater(() ->
+                            alertShowException(new RuntimeException("Something went wrong:\n " + e.getMessage()))
+                    );
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (response.code() != 200) {
+                        String responseBody = response.body().string();
+                        Platform.runLater(() ->
+                                errorMessageProperty.set("Something went wrong: " + responseBody)
+                        );
+                    } else {
+                        Platform.runLater(() -> {
+                            errorMessageProperty.set("Set Contest successfully ");
+                        });
+                    }
+                }
+            });
+        }
+
 
 }
 

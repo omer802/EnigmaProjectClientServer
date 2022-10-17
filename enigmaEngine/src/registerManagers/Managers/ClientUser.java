@@ -1,22 +1,23 @@
-package registerManagers.usersManager;
+package registerManagers.Managers;
 
-import registerManagers.RegisterManager;
+import registerManagers.clients.Client;
+import registerManagers.clients.User;
+import registerManagers.mediators.Mediator;
 
 import java.util.Objects;
 
-public class ClientUser {
+public class ClientUser implements User {
     private String username;
 
     private RegisterManager.ClientType clientType;
+    private Mediator mediator;
 
     public ClientUser(RegisterManager.ClientType client, String username) {
         this.username = username;
         this.clientType = client;
     }
 
-    public String getUsername() {
-        return username;
-    }
+
 
     public RegisterManager.ClientType getClientType() {
         return clientType;
@@ -32,5 +33,11 @@ public class ClientUser {
     @Override
     public int hashCode() {
         return Objects.hash(username);
+    }
+
+
+    @Override
+    public String getUserName() {
+        return username;
     }
 }

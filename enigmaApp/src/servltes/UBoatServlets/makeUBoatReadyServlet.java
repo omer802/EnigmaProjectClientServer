@@ -5,7 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import registerManagers.RegisterManager;
+import registerManagers.Managers.RegisterManager;
 import servltes.utils.ServletUtils;
 import servltes.utils.SessionUtils;
 
@@ -19,6 +19,7 @@ public class makeUBoatReadyServlet extends HttpServlet {
         String usernameFromSession = SessionUtils.getUsername(req);
         RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
         registerManager.makeClientReady(usernameFromSession);
+        System.out.println("just falling here");
     }
 
 

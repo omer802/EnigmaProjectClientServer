@@ -1,9 +1,9 @@
 package servltes.login;
 
 
-import registerManagers.RegisterManager;
-import registerManagers.genericManager.GenericManager;
-import registerManagers.usersManager.ClientUser;
+import registerManagers.Managers.RegisterManager;
+import registerManagers.Managers.GenericManager;
+import registerManagers.Managers.ClientUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
                 response.getWriter().println("You cannot login without username");
             }
             if(userType == null || ((!userType.equals("UBoat"))&&
-                    (!userType.equals("Allies"))&& (!userType.equals("Agent")))) {
+                    (!userType.equals("Allie"))&& (!userType.equals("Agent")))) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().println("You cannot login without right client type");
 
@@ -49,7 +49,6 @@ public class LoginServlet extends HttpServlet {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
                 synchronized (this) {
-                    //System.out.println("the client in the system are: "+ userManager.getClients());
                     RegisterManager.ClientType client = RegisterManager.ClientType.valueOf(userType.toUpperCase());
                     ClientUser clientUser = new ClientUser(client,usernameFromParameter);
                     if (userManager.isClientExists(clientUser)) {

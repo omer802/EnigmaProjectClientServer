@@ -4,13 +4,13 @@ package client.javafx.teamsAgentsData;
 
 public class AgentDetail {
     private Integer threadAmount;
-    private Double missionSize;
+    private Double missionAmount;
     private String agentName;
 
     public AgentDetail(String teamName, int agentAmount, double missionSize) {
         this.agentName = teamName;
         this.threadAmount = agentAmount;
-        this.missionSize = missionSize;
+        this.missionAmount = missionSize;
     }
     public String getAgentName() {
         return agentName;
@@ -20,8 +20,8 @@ public class AgentDetail {
         return threadAmount;
     }
 
-    public double getMissionSize() {
-        return missionSize;
+    public double getMissionAmount() {
+        return missionAmount;
     }
 
 }

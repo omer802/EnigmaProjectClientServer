@@ -2,14 +2,12 @@ package servltes.UBoatServlets;
 
 import DTOS.Configuration.UserConfigurationDTO;
 import com.google.gson.Gson;
-import dictionary.Dictionary;
-import engine.api.ApiEnigma;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import registerManagers.UBoatManager.UBoat;
+import registerManagers.clients.UBoat;
 import servltes.utils.ServletUtils;
 import servltes.utils.SessionUtils;
 

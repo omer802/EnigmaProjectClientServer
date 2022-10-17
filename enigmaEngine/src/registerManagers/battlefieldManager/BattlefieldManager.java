@@ -1,9 +1,8 @@
 package registerManagers.battlefieldManager;
 
-import registerManagers.battleField.Battlefield;
-
 import java.util.*;
 
+// TODO: 10/17/2022 move this manger to be under UBoat Manager
 public class BattlefieldManager {
 
 

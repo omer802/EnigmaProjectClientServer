@@ -12,24 +12,24 @@ import java.util.ResourceBundle;
 public class activeTeamsDetailsController implements Initializable {
 
     @FXML
-    private TableView<TeamDetail> table;
+    private TableView<AlliesTeamDetailDTO> table;
 
     @FXML
-    private TableColumn<TeamDetail, String> teamName;
+    private TableColumn<AlliesTeamDetailDTO, String> teamName;
 
     @FXML
-    private TableColumn<TeamDetail, Integer> agentAmount;
+    private TableColumn<AlliesTeamDetailDTO, Integer> agentAmount;
 
     @FXML
-    private TableColumn<TeamDetail, Double> missionSize;
+    private TableColumn<AlliesTeamDetailDTO, Double> missionSize;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        teamName.setCellValueFactory(new PropertyValueFactory<TeamDetail,String>("teamName"));
-        agentAmount.setCellValueFactory(new PropertyValueFactory<TeamDetail, Integer>("agentAmount"));
-        missionSize.setCellValueFactory(new PropertyValueFactory<TeamDetail, Double>("missionSize"));
+        teamName.setCellValueFactory(new PropertyValueFactory<AlliesTeamDetailDTO,String>("teamName"));
+        agentAmount.setCellValueFactory(new PropertyValueFactory<AlliesTeamDetailDTO, Integer>("agentAmount"));
+        missionSize.setCellValueFactory(new PropertyValueFactory<AlliesTeamDetailDTO, Double>("missionSize"));
     }
-    public void addTeamToTable(TeamDetail teamDetail){
+    public void addTeamToTable(AlliesTeamDetailDTO teamDetail){
         table.getItems().add(teamDetail);
     }
 }
