@@ -2,6 +2,7 @@ package client.javafx.contestsData;
 
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import client.javafx.allies.alliesController;
+import client.javafx.contestPage.contestDataSmall.contestDataSmallController;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -9,15 +10,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.Closeable;
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -49,20 +48,36 @@ public class contestsDataController implements Closeable {
     @FXML
     private TableColumn<ContestInformationDTO, Integer> signedAllies;
 
+
+
+    private contestDataSmallController contestDataSmallController;
     private Timer timer;
     private TimerTask contestRefresher;
     private BooleanProperty autoUpdate;
-    private IntegerProperty totalCandidate;
+    private IntegerProperty amountOfContests;
     private alliesController mainController;
+
+    public ContestInformationDTO getChosenContestDTO() {
+        return chosenContestDTO;
+    }
+
+    public void setChosenContestDTO(ContestInformationDTO chosenContestDTO) {
+        this.chosenContestDTO = chosenContestDTO;
+    }
+
+    private ContestInformationDTO chosenContestDTO = null;
 
     private Consumer<Exception> httpRequestLoggerConsumer;
 
     public contestsDataController() {
         this.autoUpdate = new SimpleBooleanProperty(true);
-        this.totalCandidate = new SimpleIntegerProperty();
+        this.amountOfContests = new SimpleIntegerProperty();
     }
     public void setErrorHandlerMainController(Consumer<Exception> httpRequestLoggerConsumer){
         this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
+    }
+    public void setChosenContestController(client.javafx.contestPage.contestDataSmall.contestDataSmallController contestDataSmallController) {
+        this.contestDataSmallController = contestDataSmallController;
     }
 
 
@@ -95,14 +110,20 @@ public class contestsDataController implements Closeable {
             if (!contestInformationDTOList.equals(items)) {
                 items.clear();
                 items.addAll(contestInformationDTOList);
-                totalCandidate.set(contestInformationDTOList.size());
+                ContestInformationDTO contestInformationDTO = null;
+                if(chosenContestDTO != null){
+                contestInformationDTO = contestInformationDTOList.
+                        stream().filter(u -> u.getUBoatName().equals(chosenContestDTO.getUBoatName())).findFirst().get();
+                }
+                contestDataSmallController.setChosenContests(contestInformationDTO);
+                amountOfContests.set(contestInformationDTOList.size());
             }
         });
     }
     @Override
     public void close() {
         table.getItems().clear();
-        totalCandidate.set(0);
+        amountOfContests.set(0);
         if (contestRefresher != null && timer != null) {
             contestRefresher.cancel();
             timer.cancel();

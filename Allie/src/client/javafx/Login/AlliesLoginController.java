@@ -116,11 +116,11 @@ public class AlliesLoginController {
         URL alliesScreenURL = getClass().getResource(MAIN_PAGE_FXML_RESOURCE_LOCATION);
         fxmlLoader.setLocation(alliesScreenURL);
         try {
-            Parent UBoatScreen = fxmlLoader.load(alliesScreenURL.openStream());
+            Parent AllieScreenToShow = fxmlLoader.load(alliesScreenURL.openStream());
             alliesController = fxmlLoader.getController();
             alliesController.setPrimaryStage(primaryStage);
             primaryStage.setTitle("Allies Client");
-            alliesScene = new Scene(UBoatScreen, 800,600);
+            alliesScene = new Scene(AllieScreenToShow, 800,600);
             primaryStage.setMinHeight(300f);
             primaryStage.setMinWidth(400f);
         }

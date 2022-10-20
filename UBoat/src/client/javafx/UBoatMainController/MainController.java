@@ -1,13 +1,14 @@
 package client.javafx.UBoatMainController;
 
+import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import DTOS.ConfigrationsPropertyAdapter.FileConfigurationDTOAdapter;
 import DTOS.Configuration.FileConfigurationDTO;
 import DTOS.Configuration.UserConfigurationDTO;
 import client.javafx.Login.UBoatLoginController;
+import client.javafx.activeTeamsDetails.activeTeamsDetailsController;
 import client.javafx.contest.ContestController;
 import client.javafx.plugboard.PlugBoardUI;
 import client.constants.ConstantsUBoat;
-import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -21,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import util.http.HttpClientUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +104,7 @@ public class MainController {
     private ContestController ContestController;
     @FXML
     private Label userGreetingLabel;
-
+    // TODO: 10/17/2022 move to contest
     private List<ObjectProperty<String>> chosenRotorsList;
     private List<ObjectProperty<Character>> chosenPositions;
     private ObjectProperty<String> ReflectorOptions;
@@ -147,6 +149,7 @@ public class MainController {
     }
     @FXML
     public void initialize() {
+        ContestController.setErrorHandlerMainController(this::alertShowException);
         this.userName = new SimpleStringProperty();
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
 
@@ -206,9 +209,6 @@ public class MainController {
 
         Response response = HttpClientUtil.runSync(request);
 
-        //Call call = HttpClientUtil.getHttpClient().newCall(request);
-
-        //Response response = call.execute();
         if (response.code() != 200) {
             String responseBody = response.body().string();
             Platform.runLater(() ->
@@ -221,6 +221,7 @@ public class MainController {
                     String fileConfigurationDTOString = response.body().string();
                     FileConfigurationDTO fileConfigurationDTO = GSON_INSTANCE.fromJson(fileConfigurationDTOString, FileConfigurationDTO.class);
                     fetchStartingConfigurationFromServer(selectedFile.getAbsolutePath(), fileConfigurationDTO);
+                    ContestController.startListRefresher();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -245,7 +246,6 @@ public class MainController {
             ContestController.setBruteForceComponent(fileConfigurationDTO);
 
 
-        //BruteForceController.setBruteForceComponent();
 
     }
     public void initOriginalConfiguration(){
@@ -415,7 +415,6 @@ public class MainController {
         String codeConfigurationWithSeprator = originalConfigurationDTO.getCodeConfigurationString().toString();
         String[] build = codeConfigurationWithSeprator.replace(">","")
                 .split("<");
-        //System.out.println(build);
         chosenRotorsLabel.setText(build[1]);
 
         positionsAndNotchLabel.setText(build[2]);

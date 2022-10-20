@@ -4,14 +4,18 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.allies.alliesController">
@@ -50,7 +54,7 @@
               <tabs>
                 <Tab text="Dashboard">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <AnchorPane prefHeight="508.0" prefWidth="798.0">
                            <children>
                               <Label layoutX="93.0" layoutY="55.0" text="Team’s agents data">
                                  <font>
@@ -72,7 +76,7 @@
                                     <fx:include fx:id="contestsDataTableView" source="../contestsData/contestsData.fxml" />
                                  </children>
                               </AnchorPane>
-                              <HBox alignment="TOP_RIGHT" layoutX="662.0" layoutY="368.0" prefHeight="35.0" prefWidth="103.0">
+                              <HBox alignment="TOP_RIGHT" layoutX="670.0" layoutY="368.0" prefHeight="35.0" prefWidth="103.0">
                                  <children>
                                     <Button fx:id="Submit" mnemonicParsing="false" onAction="#setChosenContest" text="Sign">
                                        <font>
@@ -86,13 +90,80 @@
                                     <Label fx:id="errorMessageLabel" minWidth="-Infinity" prefHeight="17.0" />
                                  </children>
                               </HBox>
+                              <Button layoutX="717.0" layoutY="427.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="56.0" text="ready!" />
                            </children>
                         </AnchorPane>
                   </content>
                 </Tab>
                 <Tab text="Contest">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutY="-2.0" prefHeight="383.0" prefWidth="800.0">
+                                 <children>
+                                    <BorderPane prefHeight="510.0" prefWidth="800.0">
+                                       <bottom>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="81.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                                             <children>
+                                                <Label minWidth="-Infinity" text="Working on the string: " />
+                                                <Label minWidth="-Infinity" />
+                                             </children>
+                                          </HBox>
+                                       </bottom>
+                                       <top>
+                                          <VBox prefHeight="185.0" prefWidth="800.0" BorderPane.alignment="BOTTOM_LEFT">
+                                             <children>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="53.0" prefWidth="800.0">
+                                                   <children>
+                                                      <Label text="Mission SIze:">
+                                                         <padding>
+                                                            <Insets right="5.0" />
+                                                         </padding>
+                                                      </Label>
+                                                      <Spinner fx:id="SpinnerMissionSize" editable="true" prefHeight="25.0" prefWidth="91.0" />
+                                                   </children>
+                                                   <padding>
+                                                      <Insets left="10.0" />
+                                                   </padding>
+                                                </HBox>
+                                                <HBox prefHeight="115.0" prefWidth="800.0" spacing="52.0">
+                                                   <children>
+                                                      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="54.0" prefWidth="389.0">
+                                                         <children>
+                                                            <fx:include fx:id="chosenContest" source="../contestPage/contestDataSmall/contestDataSmall.fxml" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                      <HBox prefHeight="129.0" prefWidth="372.0" spacing="5.0">
+                                                         <children>
+                                                            <fx:include fx:id="participantTeams" source="../contestPage/teamsDetails/teamsDetails.fxml" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                       </top>
+                                       <center>
+                                          <HBox prefHeight="266.0" prefWidth="800.0" spacing="230.0" BorderPane.alignment="CENTER">
+                                             <children>
+                                                <TableView prefHeight="117.0" prefWidth="205.0">
+                                                  <columns>
+                                                    <TableColumn prefWidth="75.0" text="C1" />
+                                                    <TableColumn prefWidth="75.0" text="C2" />
+                                                  </columns>
+                                                </TableView>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                                                   <children>
+                                                      <fx:include source="../contestPage/candidate/candidate.fxml" />
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                          </HBox>
+                                       </center>
+                                    </BorderPane>
+                                 </children>
+                              </VBox>
+                           </children></AnchorPane>
                   </content>
                 </Tab>
               </tabs>

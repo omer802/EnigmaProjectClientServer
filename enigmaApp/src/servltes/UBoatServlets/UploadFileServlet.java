@@ -43,7 +43,6 @@ public class UploadFileServlet extends HttpServlet {
                 UBoat uBoat = ServletUtils.getUBoatByName(getServletContext(),usernameFromSession);
                 uBoat.makeUBoatActive();
                 RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
-                System.out.println(registerManager.getContestInformation());
                 sendDTOConfigurationToClient(res,usernameFromSession);
 
             } else {

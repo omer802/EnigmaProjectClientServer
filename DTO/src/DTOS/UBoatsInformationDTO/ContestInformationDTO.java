@@ -10,7 +10,14 @@ public class ContestInformationDTO {
     private String level;
     private String status;
     private int requiredAllies;
+
+    public void setSignedAllies(int signedAllies) {
+        this.signedAllies = signedAllies;
+    }
+
     private int signedAllies;
+    private String messageToDecode;
+
 
     public ContestInformationDTO(Battlefield battlefield, String UBoatName, boolean status, int signedAllies) {
         this.battlefieldName = battlefield.getBattleName();
@@ -49,11 +56,18 @@ public class ContestInformationDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ContestInformationDTO that = (ContestInformationDTO) o;
-        return Objects.equals(battlefieldName, that.battlefieldName) && Objects.equals(UBoatName, that.UBoatName);
+        return requiredAllies == that.requiredAllies && signedAllies == that.signedAllies && Objects.equals(UBoatName, that.UBoatName) && Objects.equals(level, that.level) && Objects.equals(status, that.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(battlefieldName, UBoatName);
+        return Objects.hash(UBoatName, level, status, requiredAllies, signedAllies);
+    }
+    public String getMessageToDecode() {
+        return messageToDecode;
+    }
+
+    public void setMessageToDecode(String messageToDecode) {
+        this.messageToDecode = messageToDecode;
     }
 }

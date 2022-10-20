@@ -1,6 +1,8 @@
 package registerManagers.Managers;
 
+import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
+import DTOS.agentInformationDTO.AgentInfoDTO;
 import engine.api.ApiEnigma;
 import registerManagers.battlefieldManager.Battlefield;
 import registerManagers.clients.Allie;
@@ -9,9 +11,11 @@ import registerManagers.clients.Agent;
 import registerManagers.mediators.Mediator;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class RegisterManager {
+
 
 
 
@@ -41,6 +45,23 @@ public class RegisterManager {
         alliesManager = new GenericManager<>();
         agentManager = new GenericManager<>();
     }
+    public List<AlliesDetailDTO> getSignedAllies(String userName) {
+        UBoat uBoat = getUBoatByName(userName);
+        return mediator.getUBoatSignedAllies(uBoat);
+    }
+
+    public List<AlliesDetailDTO> getParticipantAlliesInContest(String allieName) {
+        Allie allie = getAllieByName(allieName);
+        return mediator.ParticipantAlliesInContest(allie);
+    }
+
+    public List<AlliesDetailDTO> getAllAllies() {
+       return alliesManager.getClients()
+               .stream()
+               .map(Allie::getAllieDetailDTO).
+               collect(Collectors.toList());
+    }
+
     public void addUserByType(ClientUser clientUser){
         userManager.addClient(clientUser);
         String clientType = clientUser.getClientType().name();
@@ -51,10 +72,22 @@ public class RegisterManager {
             case "ALLIE":
                 addAllies(new Allie(clientUser.getUserName()));
                 break;
-            case "AGENT":
-                //
-                break;
         }
+    }
+    synchronized public void addAgentAncdCheckContestStatus(AgentInfoDTO agentDTO) {
+        Agent agent = new Agent(agentDTO);
+        agent.setMediator(mediator);
+        agentManager.addClient(agent);
+        Allie allie = getAllieByName(agent.getChosenAlliesName());
+        mediator.addAgentToAllie(agent,allie);
+
+    }
+    public boolean isAgentNeedToBeActive(AgentInfoDTO agentDTO){
+        Allie allie = getAllieByName(agentDTO.getAllieName());
+        Random random = new Random();
+        boolean what = random.nextBoolean();
+        return what;
+        //return allie.areInContest();
     }
     public List<ContestInformationDTO> getContestInformation(){
         List<UBoat> uBoatList = UBoatManager.getClients();
@@ -111,10 +144,12 @@ public class RegisterManager {
     }
 
     public void addUBoat(UBoat uboat){
+        uboat.setMediator(mediator);
         UBoatManager.addClient(uboat);
     }
-    public void addAllies(Allie allies){
-        alliesManager.addClient(allies);
+    public void addAllies(Allie allie){
+        allie.setMediator(mediator);
+        alliesManager.addClient(allie);
     }
 
     public void addBattleField(Battlefield battlefield){

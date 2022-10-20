@@ -1,25 +1,52 @@
 package registerManagers.clients;
 
+import DTOS.AllieInformationDTO.AlliesDetailDTO;
+import engine.decryptionManager.DM;
 import registerManagers.mediators.Mediator;
 
 import java.util.Objects;
 
 public class Allie implements Client,User {
-
-
-    public boolean isSigned() {
-        return signed;
+    public  enum AllieStatus{
+        IDLE, READY, IN_CONTEST
     }
-
     private boolean signed;
+    private AllieStatus allieStatus;
     private String name;
+    private int agentAmount;
+    private long missionSize;
     private UBoat uBoat;
     Mediator mediator;
+    private boolean isReady;
+    private DM dm;
+
+    public void setDm(DM dm) {
+        this.dm = dm;
+    }
 
     public Allie(String userName) {
-
+        this.allieStatus = AllieStatus.IDLE;
         this.name = userName;
         this.signed = false;
+        this.missionSize = 1;
+        this.agentAmount = 0;
+    }
+    public boolean canBeReady(){
+        return (agentAmount>0)&&(allieStatus.equals(AllieStatus.IDLE));
+    }
+    public void makeAllieReady(){
+        if(canBeReady())
+            allieStatus = AllieStatus.READY;
+    }
+    public boolean areInContest(){
+        return allieStatus.equals(AllieStatus.IN_CONTEST);
+    }
+
+    public void addOneToAgentAmount(){
+        agentAmount++;
+    }
+    public boolean isSigned() {
+        return signed;
     }
 
     public UBoat getUBoat() {
@@ -37,7 +64,7 @@ public class Allie implements Client,User {
 
     @Override
     public void startContest() {
-
+        allieStatus = AllieStatus.IN_CONTEST;
     }
 
 
@@ -64,6 +91,9 @@ public class Allie implements Client,User {
     }
     public void signInToContest(){
         this.signed = true;
+    }
+    public AlliesDetailDTO getAllieDetailDTO(){
+        return new AlliesDetailDTO(name,agentAmount,missionSize);
     }
 
 }

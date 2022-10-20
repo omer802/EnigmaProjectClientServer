@@ -1,7 +1,10 @@
 package client.javafx.allies;
 
+import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import client.constants.AlliesConstants;
+import client.javafx.contestPage.contestDataSmall.contestDataSmallController;
+import client.javafx.contestPage.teamsDetails.TeamsDetailsController;
 import client.javafx.contestsData.contestsDataController;
 import client.javafx.teamsAgentsData.AgentDetail;
 import client.javafx.teamsAgentsData.teamsAgentsDataController;
@@ -9,6 +12,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -42,6 +46,17 @@ public class alliesController {
     @FXML
     private contestsDataController contestsDataTableViewController;
     @FXML
+    private TableView<ContestInformationDTO> chosenContest;
+
+    @FXML
+    private contestDataSmallController chosenContestController;
+
+    @FXML
+    private TableView<AlliesDetailDTO> participantTeams;
+
+    @FXML
+    private TeamsDetailsController participantTeamsController;
+    @FXML
     private Label errorMessageLabel;
     private  StringProperty errorMessageProperty = new SimpleStringProperty();
 
@@ -55,6 +70,9 @@ public class alliesController {
         errorMessageLabel.textProperty().bind(errorMessageProperty);
         userName = new SimpleStringProperty();
         contestsDataTableViewController.setErrorHandlerMainController(this::alertShowException);
+        contestsDataTableViewController.setChosenContestController(chosenContestController);
+        //participantTeamsController.setErrorHandlerMainController(this::alertShowException);
+        //participantTeamsController.setChosenContestController(chosenContestController);
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
         contestsDataTableViewController.setMainController(this);
     }
@@ -67,9 +85,12 @@ public class alliesController {
         this.primaryStage = primaryStage;
     }
     public void alertShowException(Exception e){
-        List<Exception> exceptionList = new ArrayList<>();
+        Platform.runLater(() -> { List<Exception> exceptionList = new ArrayList<>();
         exceptionList.add(e);
         showListOfExceptions(exceptionList);
+        }
+        );
+
     }
 
     private void showListOfExceptions(List<Exception> exceptionList) {
@@ -93,9 +114,10 @@ public class alliesController {
     }
 
     @FXML
-    void setChosenContest(ActionEvent event) {
+    private void setChosenContest(ActionEvent event) {
         ContestInformationDTO chosenContest = contestsDataTableViewController.getChosenContest();
-        sendChosenContestToServer(chosenContest);
+        if(chosenContest!=null)
+            sendChosenContestToServer(chosenContest);
     }
 
     private void sendChosenContestToServer(ContestInformationDTO chosenContest) {
@@ -127,6 +149,9 @@ public class alliesController {
                     } else {
                         Platform.runLater(() -> {
                             errorMessageProperty.set("Set Contest successfully ");
+                            chosenContestController.setChosenContests(chosenContest);
+                            contestsDataTableViewController.setChosenContestDTO(chosenContest);
+                            participantTeamsController.startListRefresher();
                         });
                     }
                 }

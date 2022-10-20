@@ -12,14 +12,6 @@ import registerManagers.clients.UBoat;
 import java.math.BigInteger;
 
 public class DM {
-
-
-
-
-    // TODO: 9/10/2022 change from agents to tasks
-   /* public static enum DifficultyLevel{
-        EASY, MEDIUM, HARD, IMPOSSIBLE
-    }*/
     private int maxAgentAmount;
     private Dictionary dictionary;
 

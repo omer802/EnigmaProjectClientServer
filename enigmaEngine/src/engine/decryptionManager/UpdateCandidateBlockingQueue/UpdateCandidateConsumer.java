@@ -26,9 +26,7 @@ public class UpdateCandidateConsumer implements Runnable {
         try {
             final String threadName = Thread.currentThread().getName();
             AgentCandidatesList agentCandidateList;
-            //System.out.println("***************starting working queque candidate***********"+ threadName);
             while (Running) {
-                //System.out.println("Thread " + threadName + " is about to consume item");
                 agentCandidateList = blockingDeque.take();
                 if(agentCandidateList.isPoisonPill()){
                     break;
@@ -37,9 +35,7 @@ public class UpdateCandidateConsumer implements Runnable {
                     // TODO: 10/7/2022 update candidate diffrently
                     //uiAdapter.AddCandidateStringForDecoding(agentCandidateList);
                 }*/
-                //System.out.println("Thread " + threadName + " consumed item: " + agentCandidateList.getCandidates()+":"+ agentCandidateList.getAgentName());
             }
-                //System.out.println("consumer done********************************************");
 
         } catch (InterruptedException e) {
             System.out.println("Was interrupted !");

@@ -11,4 +11,5 @@ public class Constants {
     public static final String CHAT_VERSION_PARAMETER = "chatversion";
     
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
+
 }

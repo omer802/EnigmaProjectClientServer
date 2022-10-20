@@ -12,5 +12,7 @@ public class CommonConstants {
 
     public final static Gson GSON_INSTANCE = new Gson();
     public final static int MAX_AMOUNT_ERROR_TO_SHOW = 3;
+    public final static int REFRESH_RATE = 500;
+
 
 }

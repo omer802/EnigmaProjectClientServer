@@ -16,6 +16,13 @@ import static registerManagers.clients.UBoat.UBoatStatus.READY;
 public class UBoat implements Client,User {
 
     private Mediator mediator;
+
+    public boolean isAlliesCapacityFull() {
+        System.out.println(" allies signed " + alliesSignedAmount);
+        System.out.println("allies capacitiy "+  api.getBattleField().getAmountOfAlliesNeededForContest());
+        return alliesSignedAmount == api.getBattleField().getAmountOfAlliesNeededForContest();
+    }
+
     public static enum DifficultyLevel{
         EASY, MEDIUM, HARD, IMPOSSIBLE
     }
@@ -29,13 +36,10 @@ public class UBoat implements Client,User {
 
     Battlefield battlefield;
     private String name;
-    private boolean isActive;
-    private boolean isReady;
+
     UBoatStatus uBoatStatus;
     GameStatus gameStatus;
     private int alliesSignedAmount;
-
-
 
     private String encryptedString;
 
@@ -47,9 +51,6 @@ public class UBoat implements Client,User {
         this.api = new ApiEnigmaImp();
         this.uBoatStatus = UBoatStatus.WAITING_FOR_CONFIG;
         this.gameStatus = OFF;
-        this.isActive = false;
-        this.isReady = false;
-
     }
     @Override
     public void setMediator(Mediator mediator) {
@@ -95,6 +96,12 @@ public class UBoat implements Client,User {
         uBoatStatus = ACTIVE;
         gameStatus = WAITING;
     }
+    public void addOneToAlliesCounter(){
+        alliesSignedAmount++;
+    }
+    public void subOneFromAlliesCounter(){
+        alliesSignedAmount--;
+    }
 
     public synchronized void  makeUBoatReady() {
         uBoatStatus = READY;
@@ -112,7 +119,7 @@ public class UBoat implements Client,User {
         this.encryptedString = encryptedString;
     }
     public void setOriginalStringNotEncrypted(String originalStringNotEncrypted) {
-        this.originalStringNotEncrypted = new String(originalStringNotEncrypted);
+        this.originalStringNotEncrypted = originalStringNotEncrypted;
     }
 
     public String getOriginalStringNotEncrypted() {
@@ -141,6 +148,9 @@ public class UBoat implements Client,User {
         return Objects.equals(name, uBoat.name);
     }
 
+    public int getAlliesSignedAmount() {
+        return alliesSignedAmount;
+    }
     @Override
     public int hashCode() {
         return Objects.hash(name);

@@ -26,7 +26,7 @@ public class getContestsServlet extends HttpServlet {
             String json = gson.toJson(ContestsList);
             out.println(json);
             out.flush();
+        }
     }
-}
 
 }

@@ -2,6 +2,7 @@ package client.javafx.contestsData;
 
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import client.constants.AlliesConstants;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -24,7 +25,9 @@ public class ContestsRefresher extends TimerTask {
     private int requestNumber;
     private final BooleanProperty shouldUpdate;
 
-    public ContestsRefresher(BooleanProperty shouldUpdate, Consumer<Exception> httpRequestLoggerConsumer, Consumer<List<ContestInformationDTO>> ContestDataConsumer) {
+    public ContestsRefresher(BooleanProperty shouldUpdate,
+                             Consumer<Exception> httpRequestLoggerConsumer,
+                             Consumer<List<ContestInformationDTO>> ContestDataConsumer) {
         this.shouldUpdate = shouldUpdate;
         this.ContestsCounsumer = ContestDataConsumer;
         this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
@@ -45,15 +48,22 @@ public class ContestsRefresher extends TimerTask {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 httpRequestLoggerConsumer.accept(new RuntimeException
-                        ("Users Request # "+finalRequestNumber+e.getMessage()+" | Ended with failure..."));
+                        (e.getMessage()));
 
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String jsonArrayOfContests = response.body().string();
-                 ContestInformationDTO[] contestInformationDTO = GSON_INSTANCE.fromJson(jsonArrayOfContests, ContestInformationDTO[].class);
-                ContestsCounsumer.accept(Arrays.asList(contestInformationDTO));
+                String responseBody = response.body().string();
+                if(!response.isSuccessful()){
+                    httpRequestLoggerConsumer.accept(new RuntimeException(responseBody));
+                }
+                else {
+                    String jsonArrayOfContests = responseBody;
+                    ContestInformationDTO[] contestInformationDTO = GSON_INSTANCE.fromJson(jsonArrayOfContests, ContestInformationDTO[].class);
+                    ContestsCounsumer.accept(Arrays.asList(contestInformationDTO));
+                }
+
             }
         });
     }

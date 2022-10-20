@@ -17,5 +17,7 @@ public class ConstantsUBoat {
 
     public final static String RESET_CODE = FULL_SERVER_PATH + "/resetCode";
     public final static String ENCRYPT_MESSAGE = FULL_SERVER_PATH + "/encryptMessage";
+    public final static String GET_SIGNED_ALLIES = FULL_SERVER_PATH + "/getSignedAllies";
 
+    public final static int REFRESH_RATE = 500;
 }

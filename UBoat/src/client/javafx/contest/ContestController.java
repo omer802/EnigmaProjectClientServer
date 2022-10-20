@@ -4,13 +4,12 @@ import DTOS.Configuration.FileConfigurationDTO;
 import DTOS.Configuration.UserConfigurationDTO;
 import client.javafx.Candidate.Candidate;
 import client.javafx.Candidate.candidateController;
-import client.javafx.activeTeamsDetails.AlliesTeamDetailDTO;
+import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import client.javafx.activeTeamsDetails.activeTeamsDetailsController;
 import dictionary.Dictionary;
 import dictionary.Trie;
 import client.javafx.UBoatMainController.MainController;
 import client.constants.ConstantsUBoat;
-import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -24,9 +23,11 @@ import javafx.scene.layout.BorderPane;
 import keyboard.Keyboard;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import util.http.HttpClientUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static util.CommonConstants.GSON_INSTANCE;
 
@@ -46,7 +47,7 @@ public class ContestController {
 
 
     @FXML
-    private TableView<AlliesTeamDetailDTO> activeTeamDetails;
+    private TableView<AlliesDetailDTO> activeTeamDetails;
     @FXML
     private activeTeamsDetailsController activeTeamDetailsController;
 
@@ -79,6 +80,7 @@ public class ContestController {
     @FXML
     private Label labelIndication;
 
+
     private MainController mainController;
     public  SimpleBooleanProperty isConfig;
     private SimpleStringProperty encryptionResultProperty;
@@ -86,6 +88,7 @@ public class ContestController {
     private String encryptionResult;
     private Dictionary dictionary;
     private Keyboard keyboard;
+    private Consumer<Exception> httpRequestLoggerConsumer;
 
 
     @FXML
@@ -310,7 +313,7 @@ public class ContestController {
                 encryptionResultProperty.set(encryptionResult);
                // Candidate candidate1 = new Candidate(encryptionResult,"1",configurationDTO.getCodeConfigurationString().toString());
                // candidateController.addCandidate(candidate1);
-               // AlliesTeamDetailDTO teamDetail = new AlliesTeamDetailDTO("omer team", 5,10);
+               // AlliesDetailDTO teamDetail = new AlliesDetailDTO("omer team", 5,10);
                // activeTeamDetailsController.addTeamToTable(teamDetail);
             }
             else{
@@ -353,5 +356,14 @@ public class ContestController {
     }
 
 
+    public void startListRefresher() {
+        activeTeamDetailsController.startListRefresher();
 
+    }
+
+    public void setErrorHandlerMainController(Consumer<Exception> httpRequestLoggerConsumer) {
+        this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
+        activeTeamDetailsController.setErrorHandlerMainController(httpRequestLoggerConsumer);
+
+    }
 }

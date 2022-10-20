@@ -1,7 +1,6 @@
 package client.javafx.Login;
 
 import client.javafx.UBoatMainController.MainController;
-import client.constants.http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -20,6 +19,7 @@ import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import util.CommonConstants;
+import util.http.HttpClientUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -83,7 +83,6 @@ public class UBoatLoginController {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.code() != 200) {
                     String responseBody = response.body().string();
-                    //System.out.println(responseBody);
                     Platform.runLater(() ->
                             errorMessageProperty.set("Something went wrong: " + responseBody)
                     );

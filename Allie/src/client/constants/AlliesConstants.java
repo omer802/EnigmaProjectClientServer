@@ -13,4 +13,5 @@ public class AlliesConstants {
 
 
     public static final String UPDATE_ALLIE_CHOSEN_CONTEST = FULL_SERVER_PATH +"/updateAllieContest" ;
+    public static final String GET_PARTICIPANT_ALLIES =FULL_SERVER_PATH+ "/getSignedAllies" ;
 }

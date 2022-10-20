@@ -1,6 +1,9 @@
 package servltes.login;
 
 
+import DTOS.agentInformationDTO.AgentInfoDTO;
+import com.google.gson.Gson;
+import jakarta.servlet.annotation.MultipartConfig;
 import registerManagers.Managers.RegisterManager;
 import registerManagers.Managers.GenericManager;
 import registerManagers.Managers.ClientUser;
@@ -12,12 +15,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import servltes.utils.ServletUtils;
 import servltes.utils.SessionUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import static servltes.constants.Constants.CLIENT_TYPE;
 import static servltes.constants.Constants.USERNAME;
 
+
 @WebServlet(name = "login request", urlPatterns = "/loginRequest" )
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
 public class LoginServlet extends HttpServlet {
 
     // urls that starts with forward slash '/' are considered absolute
@@ -35,16 +44,18 @@ public class LoginServlet extends HttpServlet {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);
             String userType = request.getParameter(CLIENT_TYPE);
+            System.out.println(userType);
             if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().println("You cannot login without username");
             }
+
             if(userType == null || ((!userType.equals("UBoat"))&&
                     (!userType.equals("Allie"))&& (!userType.equals("Agent")))) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().println("You cannot login without right client type");
-
             }
+
              else {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
@@ -55,12 +66,17 @@ public class LoginServlet extends HttpServlet {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
 
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().println("The username already exists in the system");
+                        response.getWriter().println(errorMessage);
                     }
                     else {
                         //add the new user to the users list
-
-                        registerManager.addUserByType(clientUser);
+                        if(!(clientUser.getClientType().name().equals("AGENT")))
+                            registerManager.addUserByType(clientUser);
+                        else{
+                            boolean agentNeedToBeActive = addAgentToServerAndCheckContestStatus(request,response,registerManager);
+                            System.out.println(agentNeedToBeActive);
+                            response.getWriter().println(agentNeedToBeActive);
+                        }
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
@@ -75,7 +91,14 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-
+    private boolean addAgentToServerAndCheckContestStatus(HttpServletRequest request, HttpServletResponse response, RegisterManager registerManager) throws ServletException, IOException {
+        InputStream jsonAgentDTO = request.getParts().stream().findFirst().get().getInputStream();
+        BufferedReader AllieDTOStreamReader = new BufferedReader(new InputStreamReader(jsonAgentDTO, StandardCharsets.UTF_8));
+        Gson gson = new Gson();
+        AgentInfoDTO agentDTO = gson.fromJson(AllieDTOStreamReader, AgentInfoDTO.class);
+        registerManager.addAgentAncdCheckContestStatus(agentDTO);
+        return registerManager.isAgentNeedToBeActive(agentDTO);
+    }
 
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
