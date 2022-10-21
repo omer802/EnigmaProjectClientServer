@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.agentMainPage.AgentMainPageController">
+  <content>
+      <BorderPane minWidth="-Infinity">
+         <bottom>
+            <HBox BorderPane.alignment="CENTER" />
+         </bottom>
+         <top>
+            <GridPane maxHeight="-Infinity" prefHeight="146.0" prefWidth="698.0" BorderPane.alignment="CENTER">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+                  <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="114.0" minWidth="-Infinity" prefWidth="114.0" />
+                  <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="527.0" minWidth="45.0" prefWidth="45.0" />
+                  <ColumnConstraints hgrow="ALWAYS" maxWidth="527.0" minWidth="125.0" prefWidth="315.0" />
+                  <ColumnConstraints hgrow="ALWAYS" maxWidth="301.0" minWidth="15.0" prefWidth="229.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="NEVER" />
+                  <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="54.0" minHeight="2.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="54.0" minHeight="7.0" prefHeight="18.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="68.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="54.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label alignment="TOP_LEFT" minWidth="-Infinity" prefHeight="26.0" prefWidth="167.0" text="Agent" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets left="130.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Label fx:id="userGreetingLabel" minWidth="-Infinity" text="hellpo omer" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="allieNameLabel" text="allie blabla" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <AnchorPane prefHeight="98.0" prefWidth="476.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                     <children>
+                        <fx:include fx:id="contestInfo" source="ContestInfo/contestDataSmall.fxml" />
+                     </children>
+                  </AnchorPane>
+               </children>
+            </GridPane>
+         </top>
+         <center>
+            <BorderPane BorderPane.alignment="CENTER">
+               <left>
+                  <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="327.0" prefWidth="269.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <GridPane gridLinesVisible="true" layoutX="14.0" layoutY="78.0" maxHeight="171.0" minHeight="134.0" prefHeight="153.0" prefWidth="255.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="NEVER" maxWidth="152.0" minWidth="10.0" prefWidth="150.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                           </rowConstraints>
+                           <children>
+                              <Label prefHeight="20.0" prefWidth="91.0" text="Mission Feature">
+                                 <GridPane.margin>
+                                    <Insets left="5.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                 <children>
+                                    <Label text="Amount">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <Label text="Completed Missions" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets left="5.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label fx:id="missionFromServerAmountLabel" prefHeight="17.0" prefWidth="59.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="completedMissionAmountLabel" prefHeight="17.0" prefWidth="66.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Candidate" GridPane.rowIndex="4">
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="candidateAmountLabel" prefHeight="17.0" prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Missions In Queue" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="5.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label fx:id="amountOfMissionsInQueueLabel" prefHeight="17.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="5.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label layoutX="15.0" layoutY="107.0" GridPane.rowIndex="2" />
+                              <Label layoutX="15.0" layoutY="47.0" text="Missions From Server" GridPane.rowIndex="2">
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                        </GridPane>
+                        <Label layoutX="67.0" layoutY="14.0" text="Agent Progress">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="agentStatusLabel" layoutX="23.0" layoutY="53.0" minWidth="-Infinity" />
+                        <Label fx:id="errorMessageLabel" layoutX="23.0" layoutY="321.0" minWidth="-Infinity" />
+                     </children>
+                  </AnchorPane>
+               </left>
+               <right>
+                  <AnchorPane prefHeight="352.0" prefWidth="326.0" BorderPane.alignment="CENTER">
+                     <children>
+                      <AnchorPane layoutX="-51.0" layoutY="74.0" minHeight="0.0" minWidth="0.0" prefHeight="220.0" prefWidth="363.0">
+                           <children>
+                              <fx:include fx:id="candidates" source="candidate/candidate.fxml" />
+                           </children>
+                        </AnchorPane>
+                        <Label layoutX="77.0" layoutY="18.0" text="Agent Candidate">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </right>
+            </BorderPane>
+         </center>
+      </BorderPane>
+  </content>
+</ScrollPane>

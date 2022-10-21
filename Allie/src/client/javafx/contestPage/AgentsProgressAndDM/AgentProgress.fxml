@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+
+<TableView fx:id="table" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.contestPage.AgentsProgressAndDM.AgentProgressController">
+   <columns>
+      <TableColumn fx:id="agentName" editable="false" sortable="false" text="Agent Name" />
+      <TableColumn fx:id="AcceptedMissions" editable="false" prefWidth="99.0" sortable="false" text="Accepted Missions" />
+      <TableColumn fx:id="WaitingMissions" editable="false" prefWidth="90.0" sortable="false" text="Waiting Missions" />
+      <TableColumn fx:id="candidatesAmount" prefWidth="79.0" text="Candidates Amount" />
+   </columns>
+   <columnResizePolicy>
+      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+   </columnResizePolicy>
+</TableView>

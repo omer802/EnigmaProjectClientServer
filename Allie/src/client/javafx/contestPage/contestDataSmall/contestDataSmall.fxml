@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+
+<TableView fx:id="table" minHeight="-Infinity" minWidth="-Infinity" prefHeight="69.0" prefWidth="389.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.contestPage.contestDataSmall.contestDataSmallController">
+   <columns>
+      <TableColumn fx:id="battlefield" editable="false" minWidth="-Infinity" prefWidth="86.0" sortable="false" text="Battlefield" />
+      <TableColumn fx:id="UBoatName" editable="false" minWidth="-Infinity" prefWidth="59.0" sortable="false" text="UBoat" />
+      <TableColumn fx:id="status" editable="false" minWidth="-1.0" prefWidth="58.0" sortable="false" text="Status" />
+      <TableColumn fx:id="level" editable="false" prefWidth="54.0" sortable="false" text="Level" />
+      <TableColumn fx:id="requiredAllies" editable="false" prefWidth="69.0" sortable="false" text="Required Allies" />
+      <TableColumn fx:id="signedAllies" editable="false" prefWidth="61.0" sortable="false" text="Signed Allies" />
+   </columns>
+</TableView>
