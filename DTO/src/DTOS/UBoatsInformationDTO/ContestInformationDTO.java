@@ -10,13 +10,14 @@ public class ContestInformationDTO {
     private String level;
     private String status;
     private int requiredAllies;
+    private int signedAllies;
+    private String messageToDecode;
 
     public void setSignedAllies(int signedAllies) {
         this.signedAllies = signedAllies;
     }
 
-    private int signedAllies;
-    private String messageToDecode;
+
 
 
     public ContestInformationDTO(Battlefield battlefield, String UBoatName, boolean status, int signedAllies) {

@@ -14,7 +14,7 @@ public class Dictionary {
      public Set<String> getWordDictionary() {
         return wordDictionary;
     }
-    private Trie trie;
+    //private Trie trie;
      public boolean isWordsInDictionary(List<String> words){
         for (String word:words) {
             if(!wordDictionary.contains(word))
@@ -25,20 +25,23 @@ public class Dictionary {
 
 
     private Set<String> wordDictionary;
+
+    public String getExcludeChars() {
+        return excludeChars;
+    }
+
     private String excludeChars;
-    private String toCheckWhatHappenddHeree;
 
     public Dictionary(String words, String excludeChars) {
         this.excludeChars = excludeChars;
         createWordDictionary(words);
-        toCheckWhatHappenddHeree ="*************************************************************************************************";
     }
 
     private void createWordDictionary(String words) {
         String wordToClean = cleanStringFromExcludeChars(words);
         List<String> wordList = Arrays.asList(wordToClean.split(" "));
         this.wordDictionary = wordList.stream().collect(Collectors.toSet());
-        this.trie = new Trie(wordDictionary);
+        //this.trie = new Trie(wordDictionary);
 
     }
     public String cleanStringFromExcludeChars(String words) {
@@ -64,6 +67,6 @@ public class Dictionary {
          return true;
     }
     public Trie getTrie(){
-        return trie;
+        return new Trie(wordDictionary);
     }
 }

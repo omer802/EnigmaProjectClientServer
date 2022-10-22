@@ -2,6 +2,7 @@ package client.agentLogin;
 
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import contants.AgentConstants;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -61,7 +62,8 @@ public class AlliesRefresher extends TimerTask {
                     }
                     String jsonAlliesNameArray = responseBody;
                     AlliesDetailDTO[] AlliesInformationDTO = GSON_INSTANCE.fromJson(jsonAlliesNameArray, AlliesDetailDTO[].class);
-                    alliesNameConsumer.accept(Arrays.asList(AlliesInformationDTO));
+                    Platform.runLater(()-> alliesNameConsumer.accept(Arrays.asList(AlliesInformationDTO)));
+
                 }
 
             }

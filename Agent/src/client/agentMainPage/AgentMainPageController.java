@@ -142,8 +142,6 @@ public class AgentMainPageController {
                     Platform.runLater(() -> {
 
                             ConfigurationForAgentBruteForceDTO ConfigurationForAgentBruteForce = GSON_INSTANCE.fromJson(jsonMachineAndDictionary, ConfigurationForAgentBruteForceDTO.class);
-                        System.out.println(ConfigurationForAgentBruteForce.getMachine().getChosenRotors());
-                        System.out.println(ConfigurationForAgentBruteForce.getDictionary().getExcludeChars());
                         decipherManager = new AgentDecipherManager(ConfigurationForAgentBruteForce.getMachine(),
                                 ConfigurationForAgentBruteForce.getDictionary(),ConfigurationForAgentBruteForce.getMissionSize(),agentInfoDTO);
                     });

@@ -1,5 +1,6 @@
 package DTOS.decryptionManager;
 
+import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import registerManagers.clients.UBoat;
 
 public class DecryptionManagerDTO {
@@ -7,16 +8,19 @@ public class DecryptionManagerDTO {
     private UBoat.DifficultyLevel level;
     private Double missionSize;
 
-    private int amountOfAgentsForProcess;
-    private double missionAmount;
+    private double totalMissionAmount;
 
-    public DecryptionManagerDTO(String messageToDecipher, UBoat.DifficultyLevel difficulty, Double missionSize, int amountOfAgentsForProcess, Double missionAmount){
+    public DecryptionManagerDTO(String messageToDecipher, UBoat.DifficultyLevel difficulty, Double missionSize, Double missionAmount){
        this.messageToDecipher = messageToDecipher;
        this.level = difficulty;
        this.missionSize = missionSize;
-
-       this.amountOfAgentsForProcess = amountOfAgentsForProcess;
-       this.missionAmount = missionAmount;
+       this.totalMissionAmount = missionAmount;
+    }
+    public DecryptionManagerDTO(ContestInformationDTO contestInformationDTO, Double missionSize, Double totalMissionAmount){
+        this.messageToDecipher = contestInformationDTO.getMessageToDecode();
+        this.level = UBoat.DifficultyLevel.valueOf(contestInformationDTO.getLevel());
+        this.missionSize = missionSize;
+        this.totalMissionAmount = totalMissionAmount;
     }
     public String getMessageToDecipher() {
         return messageToDecipher;
@@ -30,11 +34,8 @@ public class DecryptionManagerDTO {
         return missionSize;
     }
 
-    public int getAmountOfAgentsForProcess() {
-        return amountOfAgentsForProcess;
-    }
 
-    public double getMissionAmount() {
-        return missionAmount;
+    public double getTotalMissionAmount() {
+        return totalMissionAmount;
     }
 }

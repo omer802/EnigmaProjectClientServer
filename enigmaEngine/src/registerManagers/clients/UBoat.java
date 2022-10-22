@@ -18,8 +18,6 @@ public class UBoat implements Client,User {
     private Mediator mediator;
 
     public boolean isAlliesCapacityFull() {
-        System.out.println(" allies signed " + alliesSignedAmount);
-        System.out.println("allies capacitiy "+  api.getBattleField().getAmountOfAlliesNeededForContest());
         return alliesSignedAmount == api.getBattleField().getAmountOfAlliesNeededForContest();
     }
 

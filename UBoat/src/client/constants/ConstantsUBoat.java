@@ -11,7 +11,7 @@ public class ConstantsUBoat {
     public final static String SEND_CODE_CONFIGURATION = FULL_SERVER_PATH + "/setCodeConfiguration";
 
     public final static String GENERATE_RANDOM_CODE_CONFIGURATION = FULL_SERVER_PATH + "/randomCode";
-    public final static String FETCH_Dictionary = FULL_SERVER_PATH + "/fetchDictionary";
+    public final static String FETCH_DICTIONARY = FULL_SERVER_PATH + "/fetchDictionary";
 
     public final static String MAKE_UBOAT_READY = FULL_SERVER_PATH + "/makeUBoatReady";
 

@@ -1,10 +1,14 @@
 package registerManagers.clients;
 
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
+import DTOS.UBoatsInformationDTO.ContestInformationDTO;
+import DTOS.decryptionManager.DecryptionManagerDTO;
 import engine.decryptionManager.DM;
+import engine.decryptionManager.task.MissionTask;
 import registerManagers.mediators.Mediator;
 
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
 
 public class Allie implements Client,User {
     public  enum AllieStatus{
@@ -15,13 +19,20 @@ public class Allie implements Client,User {
     private String name;
     private int agentAmount;
     private long missionSize;
-    private UBoat uBoat;
+    private ContestInformationDTO contestInformationDTO;
+    private String toDecode;
     Mediator mediator;
     private boolean isReady;
+    private double missionAmount;
+
     private DM dm;
 
-    public void setDm(DM dm) {
-        this.dm = dm;
+    // TODO: 10/21/2022 remove casting
+    public void startBruteForce(){
+        missionAmount = dm.calculateAmountOfTasks( missionSize, UBoat.DifficultyLevel.valueOf(contestInformationDTO.getLevel()));
+        contestInformationDTO.setMessageToDecode(toDecode);
+        DecryptionManagerDTO decryptionManagerDTO = new DecryptionManagerDTO(contestInformationDTO,(double)missionSize,missionAmount);
+        dm.DecipherMessage(decryptionManagerDTO);
     }
 
     public Allie(String userName) {
@@ -30,6 +41,15 @@ public class Allie implements Client,User {
         this.signed = false;
         this.missionSize = 1;
         this.agentAmount = 0;
+    }
+    public BlockingQueue<MissionTask> getBlockingQueue(){
+        return dm.getBlockingQueue();
+    }
+    public void setEncryptedString(String toDecode) {
+        this.toDecode = toDecode;
+    }
+    public DM getDm() {
+        return dm;
     }
     public boolean canBeReady(){
         return (agentAmount>0)&&(allieStatus.equals(AllieStatus.IDLE));
@@ -49,13 +69,8 @@ public class Allie implements Client,User {
         return signed;
     }
 
-    public UBoat getUBoat() {
-        return uBoat;
-    }
 
-    public void setUBoat(UBoat uBoat) {
-        this.uBoat = uBoat;
-    }
+
 
     @Override
     public void setMediator(Mediator mediator) {
@@ -87,13 +102,26 @@ public class Allie implements Client,User {
     }
 
     public void signOutFromContest() {
+        contestInformationDTO = null;
+        removeDM();
         this.signed = false;
     }
-    public void signInToContest(){
+    public void signInToContest(ContestInformationDTO contestInformationDTO, DM dm){
+        setDM(dm);
+        this.contestInformationDTO = contestInformationDTO;
         this.signed = true;
+    }
+    public void setDM(DM dm) {
+        this.dm = dm;
+    }
+    public void removeDM(){
+        this.dm = null;
     }
     public AlliesDetailDTO getAllieDetailDTO(){
         return new AlliesDetailDTO(name,agentAmount,missionSize);
+    }
+    public ContestInformationDTO getContestInformationDTO() {
+        return contestInformationDTO;
     }
 
 }

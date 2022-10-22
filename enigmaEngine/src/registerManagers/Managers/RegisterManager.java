@@ -3,7 +3,11 @@ package registerManagers.Managers;
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import DTOS.agentInformationDTO.AgentInfoDTO;
+import DTOS.enigmaComponentContainers.ConfigurationForAgentBruteForceDTO;
+import dictionary.Dictionary;
 import engine.api.ApiEnigma;
+import engine.decryptionManager.task.MissionTask;
+import engine.enigma.Machine.EnigmaMachine;
 import registerManagers.battlefieldManager.Battlefield;
 import registerManagers.clients.Allie;
 import registerManagers.clients.UBoat;
@@ -11,19 +15,19 @@ import registerManagers.clients.Agent;
 import registerManagers.mediators.Mediator;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
 public class RegisterManager {
 
-
+    // TODO: 10/20/2022 create dm and make it work with this  
 
 
     public static enum ClientType {
         UBOAT, ALLIE, AGENT
     }
 
-    public synchronized Mediator getMediator() {
+    synchronized public Mediator getMediator() {
         return mediator;
     }
 
@@ -44,6 +48,42 @@ public class RegisterManager {
         UBoatManager = new GenericManager<>();
         alliesManager = new GenericManager<>();
         agentManager = new GenericManager<>();
+    }
+    public ConfigurationForAgentBruteForceDTO fetchDictionaryAndMachineByAgentName(String agentUserName) {
+        mediator.startContest();
+        Agent agent = agentManager.getClientByName(agentUserName);
+        EnigmaMachine enigmaMachine = agent.getEnigmaMachine();
+        if(enigmaMachine == null){
+            throw new RuntimeException("Machine is not config at agent");
+        }
+        Dictionary dictionary = agent.getDictionary();
+        if(dictionary == null){
+            throw new RuntimeException("Dictionary is not config at agent");
+        }
+        startContest();
+        return new ConfigurationForAgentBruteForceDTO(enigmaMachine,dictionary);
+
+    }
+    public void startContest(){
+        List<Allie> allieList = alliesManager.getClients();
+        allieList.forEach(Allie::startBruteForce);
+    }
+    public BlockingQueue<MissionTask> getBlockingQueueByAgentName(String agentUserName){
+        Allie allie = getAllieByAgentName(agentUserName);
+        return allie.getBlockingQueue();
+    }
+    synchronized public ContestInformationDTO getContestFromAllieByAgentName(String agentName) {
+        Allie allie = getAllieByAgentName(agentName);
+        if(!allie.isSigned())
+            throw new RuntimeException("Error: allie is not signed to any contest");
+        ContestInformationDTO  contestInformationDTO = mediator.getContestInformationByAllie(allie);
+        if(contestInformationDTO == null)
+            throw new RuntimeException("Error: allie contest is null");
+        return contestInformationDTO;
+    }
+    public Allie getAllieByAgentName(String agentName){
+        Agent agent = agentManager.getClientByName(agentName);
+        return getAllieByName(agent.getChosenAlliesName());
     }
     public List<AlliesDetailDTO> getSignedAllies(String userName) {
         UBoat uBoat = getUBoatByName(userName);
@@ -84,10 +124,7 @@ public class RegisterManager {
     }
     public boolean isAgentNeedToBeActive(AgentInfoDTO agentDTO){
         Allie allie = getAllieByName(agentDTO.getAllieName());
-        Random random = new Random();
-        boolean what = random.nextBoolean();
-        return what;
-        //return allie.areInContest();
+        return allie.areInContest();
     }
     public List<ContestInformationDTO> getContestInformation(){
         List<UBoat> uBoatList = UBoatManager.getClients();
@@ -157,10 +194,13 @@ public class RegisterManager {
     }
     public void setChosenAllieContest(ContestInformationDTO chosenContestDTO, String AllieName) {
         Allie allie = alliesManager.getClientByName(AllieName);
-        synchronized (mediator) {
-            String uBoatName = chosenContestDTO.getUBoatName();
-            UBoat uBoat = getUBoatByName(uBoatName);
-            mediator.addContestToAllie(allie, uBoat);
+        String uBoatName = chosenContestDTO.getUBoatName();
+        UBoat uBoat = getUBoatByName(uBoatName);
+        try {
+            mediator.addContestToAllie(allie, uBoat, chosenContestDTO);
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
+
     }
 }

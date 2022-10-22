@@ -47,7 +47,9 @@ public class Mediator {
             UBoat uBoat = entry.getKey();
             EnigmaMachine enigmaMachine = uBoat.getApi().getMachine();
             Set<Allie> allieSet = entry.getValue();
+            String toDecode = uBoat.getEncryptedString();
             for (Allie allie: allieSet) {
+                allie.setEncryptedString(toDecode);
                 allie.getDm().setMachine(enigmaMachine.clone());
                 updateConfigurationInAgent(allie);
             }
@@ -102,7 +104,7 @@ public class Mediator {
         }
     }
 
-    public void addAgentToAllie(Agent agent, Allie allie) {
+    synchronized public void addAgentToAllie(Agent agent, Allie allie) {
 
         List<Agent> agentList = mapAllieToAgents.computeIfAbsent(allie, key -> new ArrayList<>());
         agentList.add(agent);
@@ -110,6 +112,10 @@ public class Mediator {
         // add connection between allie to chosen UBoat
         mapAgentToAllie.put(agent,allie);
         //check
-        mapAllieToAgents.get(allie).stream().map(Agent::getUserName).forEach(System.out::println);
     }
+    synchronized public ContestInformationDTO getContestInformationByAllie(Allie allie){
+        UBoat uBoat = mapAlliesToUBoat.get(allie);
+        return uBoat.getContestInformationDTO();
+    }
+
 }

@@ -2,13 +2,9 @@ package engine.decryptionManager.task;
 
 import DTOS.decryptionManager.DecryptionManagerDTO;
 import dictionary.Dictionary;
-import engine.decryptionManager.CustomThreadPool.CustomThreadPoolExecutor;
 import engine.decryptionManager.MathCalculations.RotorsPermuter;
 import engine.decryptionManager.MathCalculations.CodeGenerator;
-import engine.decryptionManager.CustomThreadPool.ThreadFactoryBuilder;
-import engine.decryptionManager.UpdateCandidateBlockingQueue.UpdateCandidateConsumer;
 import engine.enigma.Machine.EnigmaMachine;
-import javafx.concurrent.Task;
 import keyboard.Keyboard;
 import registerManagers.clients.UBoat;
 
@@ -18,7 +14,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-public class TasksManager extends Task<Boolean> {
+public class TasksManager implements Runnable {
     private Double missionSize;
 
     // TODO: 9/11/2022 change difficulty to enum
@@ -26,9 +22,10 @@ public class TasksManager extends Task<Boolean> {
     private String messageToDecode;
     private int possibleAmountOfCodes;
     private EnigmaMachine machine;
-    private CustomThreadPoolExecutor executor;
-    private BlockingQueue<Runnable> blockingQueue;
-    private int agentsAmount;
+
+
+
+    private BlockingQueue<MissionTask> blockingQueue;
     private int positionLength;
     private double totalMissionAmount;
     private AtomicLong totalMissionAmountToSend;
@@ -40,21 +37,20 @@ public class TasksManager extends Task<Boolean> {
     TimeToCalc timeToCalc;
     private final int[] missionCount;
 
-    BlockingDeque<AgentCandidatesList> candidateBlockingQueue;
-    private Thread blockingConsumer;
+   // BlockingDeque<AgentCandidatesList> candidateBlockingQueue;
+    //private Thread blockingConsumer;
     private Dictionary dictionary;
 
-    public TasksManager(DecryptionManagerDTO decryptionManagerDTO, EnigmaMachine machine, TimeToCalc timeToCalc, Dictionary dictionary) {
+    public TasksManager(DecryptionManagerDTO decryptionManagerDTO, EnigmaMachine machine, TimeToCalc timeToCalc, Dictionary dictionary, BlockingQueue<MissionTask> blockingQueue) {
         this.missionSize = decryptionManagerDTO.getMissionSize();
         this.difficulty = decryptionManagerDTO.getLevel();
-        this.agentsAmount = decryptionManagerDTO.getAmountOfAgentsForProcess();
         this.positionLength = machine.getRotorsAmountInUse();
         this.missionCount = new int[1];
         this.missionCount[0] = 1;
-        this.totalMissionAmount = decryptionManagerDTO.getMissionAmount();
+        this.totalMissionAmount = decryptionManagerDTO.getTotalMissionAmount();
         setMessageToDecipher(decryptionManagerDTO.getMessageToDecipher());
-        candidateBlockingQueue = new LinkedBlockingDeque<>();
-        setThreadPool(agentsAmount);
+        this.blockingQueue = blockingQueue;
+        //candidateBlockingQueue = new LinkedBlockingDeque<>();
         this.machine = machine;
         this.timeToCalc = timeToCalc;
         this.totalMissionAmountToSend = new AtomicLong((long) totalMissionAmount);
@@ -63,27 +59,23 @@ public class TasksManager extends Task<Boolean> {
     }
 
     @Override
-    protected Boolean call() throws Exception {
+    public void run() {
         //wait(1000 );
-        updateProgress(0, totalMissionAmount);
+        //updateProgress(0, totalMissionAmount);
         CodeGenerator codeGenerator = new CodeGenerator(positionLength);
-        executor.prestartAllCoreThreads();
-        UpdateCandidateConsumer candidateConsumer = new UpdateCandidateConsumer(candidateBlockingQueue);
-        blockingConsumer = new Thread(candidateConsumer, "AgentCandidatesList consumer thread");
-        blockingConsumer.start();
+        //UpdateCandidateConsumer candidateConsumer = new UpdateCandidateConsumer(candidateBlockingQueue);
+        //blockingConsumer = new Thread(candidateConsumer, "AgentCandidatesList consumer thread");
+       // blockingConsumer.start();
         try {
             generateMissionByLevel(difficulty, codeGenerator);
 
         } catch (InterruptedException e) {
         } finally {
-            executor.shutdown();
-            executor.awaitTermination(15, TimeUnit.MINUTES);
 
 
-            candidateConsumer.finish();
+            //candidateConsumer.finish();
             synchronized (timeToCalc) {
                 timeToCalc.notifyAll();
-                return Boolean.TRUE;
             }
         }
     }
@@ -111,11 +103,11 @@ public class TasksManager extends Task<Boolean> {
     public void setMessageToDecipher(String messageToDecipher){
         this.messageToDecode = messageToDecipher;
     }
-    public void setThreadPool(int agentsAmount){
+    public void createBlockingQueue(){
         this.blockingQueue =
-                new LinkedBlockingQueue<Runnable>(1000);
+                new LinkedBlockingQueue<MissionTask>(1000);
 
-        ThreadFactory customThreadFactory = new ThreadFactoryBuilder()
+        /*ThreadFactory customThreadFactory = new ThreadFactoryBuilder()
                 .setNamePrefix("Agent")
                 .setPriority(Thread.NORM_PRIORITY)
                 //set Uncaught exception to get the thread how throw UncaughtException
@@ -130,7 +122,7 @@ public class TasksManager extends Task<Boolean> {
                 }).build();
         this.executor =
                 new CustomThreadPoolExecutor(agentsAmount, agentsAmount, 1000, TimeUnit.MINUTES,
-                        this.blockingQueue, customThreadFactory);
+                        this.blockingQueue, customThreadFactory);*/
     }
 
     private void impossible(CodeGenerator codeGenerator) throws InterruptedException {
@@ -186,20 +178,23 @@ public class TasksManager extends Task<Boolean> {
 
         for (int i = 0; i <numOfTasks ; i++)
             generateTaskAndPushToBlockingQueue(codeGenerator,missionSize);
-
     }
 
     private void generateTaskAndPushToBlockingQueue(CodeGenerator codeGenerator, Double missionSize) throws InterruptedException {
         List<String> positionsList = codeGenerator.generateNextPositionsListForTask(missionSize);
-        MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,dictionary,
-                candidateBlockingQueue,totalMissionAmount, timeToCalc,totalMissionAmountToSend,()-> updateProgress(missionCount[0]++, totalMissionAmount)
-                );
+        System.out.println(positionsList);
+        MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,dictionary, timeToCalc);
 
 
         pushTaskToBlockingQueue(task);
     }
     private void pushTaskToBlockingQueue(MissionTask task) throws InterruptedException {
-            blockingQueue.put(task);
+        boolean insertToBlockingQueue = false;
+        while (!insertToBlockingQueue) {
+            synchronized (blockingQueue) {
+                insertToBlockingQueue = blockingQueue.offer(task);
+            }
+        }
     }
     public double calculateAmountOfCodes(){
         int alphabetSize = Keyboard.alphabet.length();

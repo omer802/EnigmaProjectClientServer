@@ -111,10 +111,18 @@ public class AgentLoginController {
     public void updateAllies(List<AlliesDetailDTO> alliesDetailDTOS) {
         ObservableList<String> items = alliesComboBox.getItems();
         List<String> allieNameList = alliesDetailDTOS.stream().map(AlliesDetailDTO::getTeamName).collect(Collectors.toList());
+        String allieChosenName = alliesComboBox.getSelectionModel().getSelectedItem();
         //commonUtilsFunctions.listEqualsIgnoreOrder(allieNameList,items);
         if (!allieNameList.equals(items)) {
             items.clear();
             items.addAll(allieNameList);
+            if(allieChosenName != null){
+                chosenAllieNameChoiceBox.set(allieChosenName);
+                alliesComboBox.getSelectionModel().select(allieChosenName);
+            }
+            else{
+                alliesComboBox.getSelectionModel().selectFirst();
+            }
         }
     }
 
@@ -194,7 +202,6 @@ public class AgentLoginController {
                         //if need to active start refresher
                         primaryStage.setScene(AgentScene);
                         primaryStage.show();
-                        System.out.println(needToProcess);
                         // primaryStage.setScene(alliesScene);
                         //primaryStage.show();
                         //alliesController.setUserName(userName);

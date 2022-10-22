@@ -21,7 +21,7 @@ public class ResetCodeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (PrintWriter out = resp.getWriter()) {
             String usernameFromSession = SessionUtils.getUsername(req);
-            ApiEnigma api = ServletUtils.getEnigmaApi(getServletContext(),usernameFromSession);
+            ApiEnigma api = ServletUtils.getEnigmaApi(getServletContext(),"usernameFromSession");
             api.resetPositions();
             UserConfigurationDTO userConfiguration = api.getOriginalConfiguration();
             Gson gson = new Gson();

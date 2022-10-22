@@ -44,7 +44,6 @@ public class LoginServlet extends HttpServlet {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);
             String userType = request.getParameter(CLIENT_TYPE);
-            System.out.println(userType);
             if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().println("You cannot login without username");
@@ -74,7 +73,6 @@ public class LoginServlet extends HttpServlet {
                             registerManager.addUserByType(clientUser);
                         else{
                             boolean agentNeedToBeActive = addAgentToServerAndCheckContestStatus(request,response,registerManager);
-                            System.out.println(agentNeedToBeActive);
                             response.getWriter().println(agentNeedToBeActive);
                         }
                         //set the username in a session so it will be available on each request

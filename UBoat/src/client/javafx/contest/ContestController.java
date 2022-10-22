@@ -203,7 +203,7 @@ public class ContestController {
     }
     public void fetchDictionary(){
         String finalUrl = HttpUrl
-                .parse(ConstantsUBoat.FETCH_Dictionary)
+                .parse(ConstantsUBoat.FETCH_DICTIONARY)
                 .newBuilder()
                 .build()
                 .toString();

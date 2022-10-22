@@ -8,6 +8,7 @@ import DTOS.StatisticsDTO.MachineStatisticsDTO;
 import DTOS.Validators.xmlFileValidatorDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
 import dictionary.Dictionary;
+import engine.decryptionManager.DM;
 import registerManagers.clients.UBoat;
 import registerManagers.battlefieldManager.Battlefield;
 import dictionary.Trie;
@@ -336,10 +337,13 @@ public class ApiEnigmaImp implements ApiEnigma {
         return enigma.getDecipher().getDictionary();
 
     }
-    public int getAmountOfAgents(){
-        return enigma.getDecipher().getAmountOfAgents();
-    }
-    public double calculateAmountOfTasks(Integer missionSize, UBoat.DifficultyLevel level){
+
+
+
+    /*public int getAmountOfAgents(){
+        //return enigma.getDecipher().getAmountOfAgents();
+    }*/
+    public double calculateAmountOfTasks(long missionSize, UBoat.DifficultyLevel level){
         return enigma.getDecipher().calculateAmountOfTasks(missionSize,level);
     }
     public void cancelCurrentTask(){
@@ -360,6 +364,16 @@ public class ApiEnigmaImp implements ApiEnigma {
     @Override
     public Battlefield getBattleField() {
         return enigma.getBattleField();
+    }
+
+    @Override
+    public DM getDM() {
+        return enigma.getDecipher();
+    }
+
+    @Override
+    public EnigmaMachine getMachine() {
+        return enigma.getMachine();
     }
 
 

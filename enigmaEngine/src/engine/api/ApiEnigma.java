@@ -8,6 +8,8 @@ import DTOS.StatisticsDTO.MachineStatisticsDTO;
 import DTOS.Validators.xmlFileValidatorDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
 import dictionary.Dictionary;
+import engine.decryptionManager.DM;
+import engine.enigma.Machine.EnigmaMachine;
 import registerManagers.clients.UBoat;
 import registerManagers.battlefieldManager.Battlefield;
 import dictionary.Trie;
@@ -98,9 +100,8 @@ public interface ApiEnigma {
     Trie getTrieFromDictionary();
     public Dictionary getDictionary();
 
-    int getAmountOfAgents();
 
-    double calculateAmountOfTasks(Integer missionSize, UBoat.DifficultyLevel level);
+    double calculateAmountOfTasks(long missionSize, UBoat.DifficultyLevel level);
     void cancelCurrentTask();
 
     void pauseCurrentTask();
@@ -109,6 +110,8 @@ public interface ApiEnigma {
     TimeToCalc getTimeToCalc();
 
     Battlefield getBattleField();
+    DM getDM();
+    EnigmaMachine getMachine();
 }
 
 

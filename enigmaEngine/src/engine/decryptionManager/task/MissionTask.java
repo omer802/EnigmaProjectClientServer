@@ -13,13 +13,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MissionTask implements Runnable{
 
 
-    private final double totalMissionAmount;
     private final TimeToCalc timeToCalc;
 
     public volatile static AtomicBoolean finish;
-    private volatile static AtomicLong missionAmountLeft;
     private EnigmaMachine machine;
-    // TODO: 9/11/2022 return positions to private 
+
+    public List<String> getPositions() {
+        return positions;
+    }
+
+    // TODO: 9/11/2022 return positions to private
     public List<String> positions;
     private String toDecode;
 
@@ -36,23 +39,21 @@ public class MissionTask implements Runnable{
     }
 
     public AgentCandidatesList candidatesList;
-    Runnable updateProgress;
+    //Runnable updateProgress;
     private Dictionary dictionary;
 
     public MissionTask(EnigmaMachine machine, List<String> positions,
-                       String toDecode, Dictionary dictionary, BlockingDeque<AgentCandidatesList> candidateBlockingQueue,
-                       double totalMissionAmount, TimeToCalc timeToCalc,
-                       AtomicLong totalMissionAmountToSend, Runnable updateProgress){
+                       String toDecode, Dictionary dictionary,
+                        TimeToCalc timeToCalc
+                       ){
         this.machine = machine;
         this.positions = positions;
         this.toDecode = toDecode;
-        this.candidateBlockingQueue = candidateBlockingQueue;
-        this.totalMissionAmount = totalMissionAmount;
+        //this.candidateBlockingQueue = candidateBlockingQueue;
         this.dictionary = dictionary;
         this.timeToCalc = timeToCalc;
-        this.updateProgress = updateProgress;
+        //this.updateProgress = updateProgress;
         finish = new AtomicBoolean(false);
-        missionAmountLeft = totalMissionAmountToSend;
     }
 
     public void setMachinePositions(String positions){
@@ -68,14 +69,14 @@ public class MissionTask implements Runnable{
         if (!candidatesList.isEmpty()) {
             candidatesList.setDuration();
         }
-        updateTime();
+        //updateTime();
 
 
     }
 
     private void updateTime(){
         synchronized (timeToCalc){
-            updateProgress.run();
+            //updateProgress.run();
             long totalTime = System.nanoTime() - StartingTime;
             timeToCalc.addTimeToAverageMissionTime(totalTime);
             timeToCalc.updateTotalTasksTime();
@@ -84,7 +85,6 @@ public class MissionTask implements Runnable{
 
     private void exectuteMission(List<String> positions) {
         for (String position : positions){
-            //processPosition(position);
             processPosition(position);
 
             }

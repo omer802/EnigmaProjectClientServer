@@ -4,6 +4,7 @@ import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import contants.AgentConstants;
 import dictionary.Dictionary;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -17,9 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import util.http.HttpClientUtil;
 
 import java.io.IOException;
+import java.util.Timer;
 import java.util.function.Consumer;
 
 import static util.CommonConstants.GSON_INSTANCE;
+import static util.CommonConstants.REFRESH_RATE;
 
 public class contestDataController {
     @FXML
@@ -45,6 +48,9 @@ public class contestDataController {
     @FXML
     private TableColumn<ContestInformationDTO, Integer> signedAllies;
     private ContestInformationDTO chosenContest;
+    private SimpleBooleanProperty shouldUpdate = new SimpleBooleanProperty(true);
+    private Timer timer;
+    private ContestRefresher contestRefresher;
 
     @FXML
     public void initialize() {
@@ -67,9 +73,15 @@ public class contestDataController {
         ObservableList<ContestInformationDTO> items = table.getItems();
         items.clear();
     }
+    public void startContestRefresher(){
+
+    }
 
     public void fetchContestFromServer(Consumer<String> alertException){
-        String finalUrl = HttpUrl
+        this.contestRefresher  = new ContestRefresher(shouldUpdate,alertException,this::setChosenContests);
+        timer = new Timer();
+        timer.schedule(contestRefresher, REFRESH_RATE,REFRESH_RATE);
+        /*String finalUrl = HttpUrl
                 .parse(AgentConstants.GET_CHOSEN_CONTEST)
                 .newBuilder()
                 .build()
@@ -99,6 +111,6 @@ public class contestDataController {
                 }
             }
         });
-
+*/
     }
 }

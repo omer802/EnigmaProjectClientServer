@@ -19,7 +19,6 @@ public class makeUBoatReadyServlet extends HttpServlet {
         String usernameFromSession = SessionUtils.getUsername(req);
         RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
         registerManager.makeClientReady(usernameFromSession);
-        System.out.println("just falling here");
     }
 
 
