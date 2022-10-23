@@ -3,7 +3,9 @@ package engine.decryptionManager.task;
 import DTOS.Configuration.UserConfigurationDTO;
 import dictionary.Dictionary;
 import engine.enigma.Machine.EnigmaMachine;
+import keyboard.Keyboard;
 
+import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -13,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MissionTask implements Runnable{
 
 
-    private final TimeToCalc timeToCalc;
+    //private final TimeToCalc timeToCalc;
 
     public volatile static AtomicBoolean finish;
     private EnigmaMachine machine;
@@ -31,6 +33,7 @@ public class MissionTask implements Runnable{
     }
 
     BlockingDeque<AgentCandidatesList> candidateBlockingQueue;
+    Keyboard keyboard;
     private long StartingTime;
 
 
@@ -43,15 +46,14 @@ public class MissionTask implements Runnable{
     private Dictionary dictionary;
 
     public MissionTask(EnigmaMachine machine, List<String> positions,
-                       String toDecode, Dictionary dictionary,
-                        TimeToCalc timeToCalc
+                       String toDecode, Dictionary dictionary
                        ){
         this.machine = machine;
         this.positions = positions;
         this.toDecode = toDecode;
         //this.candidateBlockingQueue = candidateBlockingQueue;
         this.dictionary = dictionary;
-        this.timeToCalc = timeToCalc;
+        //this.timeToCalc = timeToCalc;
         //this.updateProgress = updateProgress;
         finish = new AtomicBoolean(false);
     }
@@ -75,16 +77,17 @@ public class MissionTask implements Runnable{
     }
 
     private void updateTime(){
-        synchronized (timeToCalc){
+        /*synchronized (timeToCalc){
             //updateProgress.run();
             long totalTime = System.nanoTime() - StartingTime;
             timeToCalc.addTimeToAverageMissionTime(totalTime);
             timeToCalc.updateTotalTasksTime();
-        }
+        }*/
     }
 
     private void exectuteMission(List<String> positions) {
         for (String position : positions){
+            System.out.println("in threaddd pollllll*****************"+position);
             processPosition(position);
 
             }
@@ -101,9 +104,10 @@ public class MissionTask implements Runnable{
     public String decipher(String position)
     {
         machine.setPositions(position);
+        System.out.println("in dechper");
         String decryptionResult = machine.encodeString(toDecode);
         List<String> words = splitDecryptionToWords(decryptionResult);
-        //System.out.println(position);
+        System.out.println(position);
         if(dictionary.isWordsInDictionary(words)) {
             return decryptionResult;
         }
@@ -118,13 +122,13 @@ public class MissionTask implements Runnable{
     // TODO: 9/14/2022 maybe update in after execute 
     public void updateCandidate(String words) {
         String threadName = Thread.currentThread().getName();
-        //System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.println("-------------------------------------------------------------------------------------------");
         UserConfigurationDTO configurationDTO = new UserConfigurationDTO(machine);
         // candidateBlockingQueue.put(threadName+ ":" +words);
 
        // System.out.println(configurationDTO.getCodeConfigurationString());
         StringBuilder currConfig = configurationDTO.getCodeConfigurationString();
-        //System.out.println(words);
-        candidatesList.addCandidate(words,currConfig.toString());
+        System.out.println(words);
+        //candidatesList.addCandidate(words,currConfig.toString());
     }
 }

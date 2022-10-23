@@ -1,6 +1,7 @@
 package engine.decryptionManager;
 
 import DTOS.decryptionManager.DecryptionManagerDTO;
+import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import dictionary.Dictionary;
 import dictionary.Trie;
 import engine.decryptionManager.task.MissionTask;
@@ -24,11 +25,11 @@ public class DM implements Cloneable {
     private EnigmaMachine machine;
     private TasksManager tasksCreator;
 
-    public BlockingQueue<MissionTask> getBlockingQueue() {
+    public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueue() {
         return blockingQueue;
     }
 
-    private BlockingQueue<MissionTask> blockingQueue;
+    private BlockingQueue<AgentTaskConfigurationDTO> blockingQueue;
     public DM(Dictionary dictionary, EnigmaMachine machine){
         this.dictionary = dictionary;
         this.machine = machine;
@@ -37,7 +38,7 @@ public class DM implements Cloneable {
     public void DecipherMessage(DecryptionManagerDTO decryptionManagerDTO){
 
         this.missionSize = decryptionManagerDTO.getMissionSize();
-        this.blockingQueue = new LinkedBlockingQueue<MissionTask>(1000);
+        this.blockingQueue = new LinkedBlockingQueue<AgentTaskConfigurationDTO>(1000);
 
         // TODO: 9/16/2022 add check if agents amount ok
             this.timeToCalc = new TimeToCalc(System.currentTimeMillis());

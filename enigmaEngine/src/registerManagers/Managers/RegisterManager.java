@@ -3,6 +3,7 @@ package registerManagers.Managers;
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import DTOS.agentInformationDTO.AgentInfoDTO;
+import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import DTOS.enigmaComponentContainers.ConfigurationForAgentBruteForceDTO;
 import dictionary.Dictionary;
 import engine.api.ApiEnigma;
@@ -52,12 +53,15 @@ public class RegisterManager {
     public ConfigurationForAgentBruteForceDTO fetchDictionaryAndMachineByAgentName(String agentUserName) {
         mediator.startContest();
         Agent agent = agentManager.getClientByName(agentUserName);
-        EnigmaMachine enigmaMachine = agent.getEnigmaMachine();
+        Allie allie = getAllieByAgentName(agentUserName);
+        EnigmaMachine enigmaMachine = allie.getDm().getMachine().clone();
         if(enigmaMachine == null){
+            System.out.println("Machine is not config at agent");
             throw new RuntimeException("Machine is not config at agent");
         }
         Dictionary dictionary = agent.getDictionary();
         if(dictionary == null){
+            System.out.println("Dictionary is not config at agent");
             throw new RuntimeException("Dictionary is not config at agent");
         }
         startContest();
@@ -68,7 +72,7 @@ public class RegisterManager {
         List<Allie> allieList = alliesManager.getClients();
         allieList.forEach(Allie::startBruteForce);
     }
-    public BlockingQueue<MissionTask> getBlockingQueueByAgentName(String agentUserName){
+    public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueueByAgentName(String agentUserName){
         Allie allie = getAllieByAgentName(agentUserName);
         return allie.getBlockingQueue();
     }

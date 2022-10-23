@@ -14,7 +14,7 @@
 
 <BorderPane fx:id="bruteForceBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="507.0" prefHeight="475.0" prefWidth="798.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.contest.ContestController">
    <top>
-      <BorderPane prefHeight="216.0" prefWidth="813.0">
+      <BorderPane fx:id="encryptionBorderPane" prefHeight="216.0" prefWidth="813.0">
          <left>
             <ScrollPane fx:id="scrollPaneEncryptDecrypt" prefHeight="197.0" prefWidth="521.0" BorderPane.alignment="CENTER">
                <content>

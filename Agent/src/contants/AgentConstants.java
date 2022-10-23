@@ -10,6 +10,7 @@ public class AgentConstants {
     public static final String GET_POSSIBLES_ALLIES = FULL_SERVER_PATH + "/getAllAllies";
     public static final String GET_CHOSEN_CONTEST = FULL_SERVER_PATH + "/allieContest";
     public static final String GET_ENIGMA_AND_DICTIONARY_FROM_ALLIE = FULL_SERVER_PATH + "/fetchDictionaryAndMachine";
+    public static final String GET_MISSIONS = FULL_SERVER_PATH +  "/fetchMissionsRequest";
 
 
 

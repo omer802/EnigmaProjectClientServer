@@ -1,6 +1,8 @@
 package engine.decryptionManager.task;
 
+import DTOS.Configuration.UserConfigurationDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
+import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import dictionary.Dictionary;
 import engine.decryptionManager.MathCalculations.RotorsPermuter;
 import engine.decryptionManager.MathCalculations.CodeGenerator;
@@ -25,7 +27,7 @@ public class TasksManager implements Runnable {
 
 
 
-    private BlockingQueue<MissionTask> blockingQueue;
+    private BlockingQueue<AgentTaskConfigurationDTO> blockingQueue;
     private int positionLength;
     private double totalMissionAmount;
     private AtomicLong totalMissionAmountToSend;
@@ -41,7 +43,7 @@ public class TasksManager implements Runnable {
     //private Thread blockingConsumer;
     private Dictionary dictionary;
 
-    public TasksManager(DecryptionManagerDTO decryptionManagerDTO, EnigmaMachine machine, TimeToCalc timeToCalc, Dictionary dictionary, BlockingQueue<MissionTask> blockingQueue) {
+    public TasksManager(DecryptionManagerDTO decryptionManagerDTO, EnigmaMachine machine, TimeToCalc timeToCalc, Dictionary dictionary, BlockingQueue<AgentTaskConfigurationDTO> blockingQueue) {
         this.missionSize = decryptionManagerDTO.getMissionSize();
         this.difficulty = decryptionManagerDTO.getLevel();
         this.positionLength = machine.getRotorsAmountInUse();
@@ -65,24 +67,20 @@ public class TasksManager implements Runnable {
         CodeGenerator codeGenerator = new CodeGenerator(positionLength);
         //UpdateCandidateConsumer candidateConsumer = new UpdateCandidateConsumer(candidateBlockingQueue);
         //blockingConsumer = new Thread(candidateConsumer, "AgentCandidatesList consumer thread");
-       // blockingConsumer.start();
-        try {
-            generateMissionByLevel(difficulty, codeGenerator);
+        // blockingConsumer.start();
 
-        } catch (InterruptedException e) {
-        } finally {
+        generateMissionByLevel(difficulty, codeGenerator);
 
-
-            //candidateConsumer.finish();
-            synchronized (timeToCalc) {
-                timeToCalc.notifyAll();
-            }
+        //candidateConsumer.finish();
+        synchronized (timeToCalc) {
+            timeToCalc.notifyAll();
         }
     }
 
 
 
-    private void generateMissionByLevel(UBoat.DifficultyLevel difficulty, CodeGenerator codeGenerator) throws InterruptedException {
+
+    private void generateMissionByLevel(UBoat.DifficultyLevel difficulty, CodeGenerator codeGenerator)  {
         switch (difficulty) {
             case EASY:
                 easyDifficultyLevel(codeGenerator);
@@ -105,7 +103,7 @@ public class TasksManager implements Runnable {
     }
     public void createBlockingQueue(){
         this.blockingQueue =
-                new LinkedBlockingQueue<MissionTask>(1000);
+                new LinkedBlockingQueue<AgentTaskConfigurationDTO>(1000);
 
         /*ThreadFactory customThreadFactory = new ThreadFactoryBuilder()
                 .setNamePrefix("Agent")
@@ -125,7 +123,7 @@ public class TasksManager implements Runnable {
                         this.blockingQueue, customThreadFactory);*/
     }
 
-    private void impossible(CodeGenerator codeGenerator) throws InterruptedException {
+    private void impossible(CodeGenerator codeGenerator)  {
         List<String> possibleRotors = machine.getPossibleRotors();
         List<int[]> possibleRotorsIndex = codeGenerator.generateNChooseK(possibleRotors.size(),machine.getRotorsAmountInUse());
         for (int[] indexArray: possibleRotorsIndex) {
@@ -137,7 +135,7 @@ public class TasksManager implements Runnable {
 
     }
     //in this level we dont have the reflector, position, and location of rotors in the slots
-    private void hardDifficultyLevel(CodeGenerator codeGenerator) throws InterruptedException {
+    private void hardDifficultyLevel(CodeGenerator codeGenerator)  {
         List <String> chosenRotors = machine.getChosenRotors();
         RotorsPermuter permuter = new RotorsPermuter(chosenRotors.size());
         int[] indexList = permuter.getNext();
@@ -156,7 +154,7 @@ public class TasksManager implements Runnable {
         return chosenRotorsToReturn;
     }
     //in this level we dont have the reflector and the positions
-    private void mediumDifficultyLevel(CodeGenerator codeGenerator) throws InterruptedException {
+    private void mediumDifficultyLevel(CodeGenerator codeGenerator) {
         List<String> reflectorList = machine.getPossibleReflectors();
         for (String reflector:
              reflectorList) {
@@ -166,7 +164,7 @@ public class TasksManager implements Runnable {
     }
 
     //in this level we dont have the positions
-    private void easyDifficultyLevel(CodeGenerator codeGenerator) throws InterruptedException {
+    private void easyDifficultyLevel(CodeGenerator codeGenerator)  {
         double numOfTasks = calculateAmountOfCodes()/missionSize;
         double leakageSizeTask = ((int)calculateAmountOfCodes())  % missionSize;
 
@@ -180,19 +178,23 @@ public class TasksManager implements Runnable {
             generateTaskAndPushToBlockingQueue(codeGenerator,missionSize);
     }
 
-    private void generateTaskAndPushToBlockingQueue(CodeGenerator codeGenerator, Double missionSize) throws InterruptedException {
+    private void generateTaskAndPushToBlockingQueue(CodeGenerator codeGenerator, Double missionSize)  {
         List<String> positionsList = codeGenerator.generateNextPositionsListForTask(missionSize);
+        String startingPosition = positionsList.get(0);
+        AgentTaskConfigurationDTO agentTaskConfiguration =
+                new AgentTaskConfigurationDTO(new UserConfigurationDTO(machine), startingPosition,missionSize,messageToDecode);
+
         System.out.println(positionsList);
-        MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,dictionary, timeToCalc);
+        //MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,dictionary, timeToCalc);
 
 
-        pushTaskToBlockingQueue(task);
+        pushTaskToBlockingQueue(agentTaskConfiguration);
     }
-    private void pushTaskToBlockingQueue(MissionTask task) throws InterruptedException {
+    private void pushTaskToBlockingQueue(AgentTaskConfigurationDTO agentTaskConfiguration)  {
         boolean insertToBlockingQueue = false;
         while (!insertToBlockingQueue) {
             synchronized (blockingQueue) {
-                insertToBlockingQueue = blockingQueue.offer(task);
+                insertToBlockingQueue = blockingQueue.offer(agentTaskConfiguration);
             }
         }
     }

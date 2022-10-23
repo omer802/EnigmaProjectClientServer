@@ -50,13 +50,13 @@ public class SignedAlliesRefresher extends TimerTask {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String jsonArrayOfContests =response.body().string();
                 if (response.code() != 200) {
                     if(response.code() == 204){
 
                     }
                 } else {
 
-                        String jsonArrayOfContests = response.body().string();
                         AlliesDetailDTO[] contestInformationDTO = GSON_INSTANCE.fromJson(jsonArrayOfContests, AlliesDetailDTO[].class);
                        // if(contestInformationDTO!=null) {
                             AlliesDataConsumer.accept(Arrays.asList(contestInformationDTO));

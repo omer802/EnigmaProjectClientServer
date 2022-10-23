@@ -25,6 +25,7 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import util.http.HttpClientUtil;
 
+import javax.swing.event.ChangeListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -80,6 +81,8 @@ public class ContestController {
     @FXML
     private Label labelIndication;
 
+    @FXML
+    private BorderPane encryptionBorderPane;
 
     private MainController mainController;
     public  SimpleBooleanProperty isConfig;
@@ -88,16 +91,21 @@ public class ContestController {
     private String encryptionResult;
     private Dictionary dictionary;
     private Keyboard keyboard;
+
     private Consumer<Exception> httpRequestLoggerConsumer;
 
 
     @FXML
     private void initialize() {
+        readyButton.setDisable(true);
         bruteForceBorderPane.disableProperty().bind(isConfig.not());
+        //encryptionBorderPane.disableProperty().bind(isConfig.not());
+        //candidate.disableProperty().bind(isConfig.not());
         EncryptDecryptResultLabel.textProperty().bind(Bindings.format("%s", encryptionResultProperty));
         codeConfigurationLabel.textProperty().bind(Bindings.format("%s", codeConfiguration));
 
     }
+
     public ContestController(){
         this.encryptionResultProperty = new SimpleStringProperty("");
         this.isBruteForceProcess = new SimpleBooleanProperty();
@@ -181,6 +189,7 @@ public class ContestController {
                             //System.out.println(jsonConfigurationDTOString);
                             UserConfigurationDTO configurationDTO = GSON_INSTANCE.fromJson(jsonConfigurationDTOString, UserConfigurationDTO.class);
                             updateCurrentConfiguration(configurationDTO);
+                            readyButton.setDisable(false);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

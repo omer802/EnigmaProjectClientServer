@@ -3,6 +3,7 @@ package registerManagers.clients;
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
+import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import engine.decryptionManager.DM;
 import engine.decryptionManager.task.MissionTask;
 import registerManagers.mediators.Mediator;
@@ -42,7 +43,7 @@ public class Allie implements Client,User {
         this.missionSize = 1;
         this.agentAmount = 0;
     }
-    public BlockingQueue<MissionTask> getBlockingQueue(){
+    public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueue(){
         return dm.getBlockingQueue();
     }
     public void setEncryptedString(String toDecode) {

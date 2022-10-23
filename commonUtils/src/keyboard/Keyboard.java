@@ -40,6 +40,9 @@ public class Keyboard implements Serializable {
     public static char getCharFromAlphabet(int index){
         return alphabet.charAt(index);
     }
+    public static int getIndexByCharFromAlphabet(char ch){
+        return alphabet.indexOf(ch);
+    }
     public static int keyboardSize() {
         return alphabet.length();
     }

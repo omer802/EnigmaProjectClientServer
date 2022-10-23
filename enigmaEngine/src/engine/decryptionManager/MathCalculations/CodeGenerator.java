@@ -3,6 +3,7 @@ package engine.decryptionManager.MathCalculations;
 
 import keyboard.Keyboard;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +20,22 @@ public class CodeGenerator {
         currentPosition = new String();
         positionsIndex = new ArrayList<>();
         for (int i = 0; i < positionLength; i++) {
-            currentPosition+= Keyboard.getCharFromAlphabet(0);
+            currentPosition += Keyboard.getCharFromAlphabet(0);
             positionsIndex.add(0);
 
         }
+    }
+    public List<String> generatePositionsGivenStartAndSize(String start, double taskSize){
+        currentPosition = start;
+        for (int i = 0; i < positionLength; i++) {
+            char currentChar = start.charAt(i);
+             int index = Keyboard.getIndexByCharFromAlphabet(currentChar);
+             positionsIndex.set(i,index);
+        }
+        List<String> toReturn = generateNextPositionsListForTask(taskSize);
+        System.out.println(toReturn);
+        return toReturn;
+
     }
     public List<String> generateNextPositionsListForTask(Double taskSize){
         List<String> positionsList = new ArrayList<>();
@@ -35,7 +48,7 @@ public class CodeGenerator {
     private String getAdvancedPosition(){
         String advancedPosition = new String();
         for (int i = 0; i <positionLength; i++) {
-            int indexInKeyBoard = positionsIndex.get(i)%Keyboard.keyboardSize();
+            int indexInKeyBoard = positionsIndex.get(i) % Keyboard.keyboardSize();
             advancedPosition+= Keyboard.getCharFromAlphabet(indexInKeyBoard);
         }
         advanceIndexPositionsList();
@@ -53,7 +66,7 @@ public class CodeGenerator {
                 isFirstPosition = false;
             }
             //if covered all character at alphabet advance next position. (its like counting at alphabet size base)
-            if (positionIndex==0) {
+            if (positionIndex == 0) {
                 positionsIndex.set(i,positionIndex);
                 int nextPositionValue = positionsIndex.get(i-1);
                 positionsIndex.set(i-1,(nextPositionValue+1) % Keyboard.keyboardSize());

@@ -16,10 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import miniEngine.AgentDecipherManager;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.HttpUrl;
-import okhttp3.Response;
+import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import util.http.HttpClientUtil;
 
@@ -113,16 +110,25 @@ public class AgentMainPageController {
         contestInfoController.fetchContestFromServer((errorMessage) ->
                 Platform.runLater(() ->
                         this.errorMessage.set(errorMessage)));
-        fetchMachineAndDictionaryFromAllie();
-        //}
+        boolean haveConfiguration = false;
+
+        try {
+            fetchMachineAndDictionaryFromAllie();
+        } catch (Exception e) {
+            this.errorMessage.set("problem in server, cant get data of machine and dictionary");
+        }
     }
 
-    private void fetchMachineAndDictionaryFromAllie() {
+
+
+
+    private void fetchMachineAndDictionaryFromAllie()  {
         String finalUrl = HttpUrl
                 .parse(AgentConstants.GET_ENIGMA_AND_DICTIONARY_FROM_ALLIE)
                 .newBuilder()
                 .build()
                 .toString();
+
 
         HttpClientUtil.runAsync(finalUrl, new Callback() {
 
@@ -130,20 +136,29 @@ public class AgentMainPageController {
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Platform.runLater(() ->{
                     errorMessage.set("faild call :Something went wrong:" +e.getMessage());
+                    System.out.println("badddddddddddddd");
                 });
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String jsonMachineAndDictionary = response.body().string();
+                String jsonConfigurationForAgentBruteForceDTO = response.body().string();
                 if (response.code() != 200) {
-                    errorMessage.set("Something went wrong: "+ jsonMachineAndDictionary);
+                    System.out.println(response.code());
+                    System.out.println("badddddddddddddd wahhtaattttt");
+
+                    errorMessage.set("Something went wrong: "+ jsonConfigurationForAgentBruteForceDTO);
                 } else {
                     Platform.runLater(() -> {
-
-                            ConfigurationForAgentBruteForceDTO ConfigurationForAgentBruteForce = GSON_INSTANCE.fromJson(jsonMachineAndDictionary, ConfigurationForAgentBruteForceDTO.class);
-                        decipherManager = new AgentDecipherManager(ConfigurationForAgentBruteForce.getMachine(),
-                                ConfigurationForAgentBruteForce.getDictionary(),ConfigurationForAgentBruteForce.getMissionSize(),agentInfoDTO);
+                        errorMessage.set("");
+                        ConfigurationForAgentBruteForceDTO configurationForAgentBruteForce = GSON_INSTANCE.fromJson(jsonConfigurationForAgentBruteForceDTO, ConfigurationForAgentBruteForceDTO.class);
+                        decipherManager = new AgentDecipherManager(configurationForAgentBruteForce.getMachine(),
+                                configurationForAgentBruteForce.getDictionary(),
+                                configurationForAgentBruteForce.getMissionSize(), agentInfoDTO, missionAmount,
+                                (responseBody) ->
+                                        Platform.runLater(() ->
+                                                errorMessage.set(responseBody)),configurationForAgentBruteForce.getAlphabet());
+                        decipherManager.tryRun();
                     });
                 }
             }

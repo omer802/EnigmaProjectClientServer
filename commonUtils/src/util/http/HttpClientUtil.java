@@ -3,15 +3,26 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class HttpClientUtil {
 
     private final static SimpleCookieManager simpleCookieManager = new SimpleCookieManager();
-    private final static OkHttpClient HTTP_CLIENT =
-            new OkHttpClient.Builder()
-                    .cookieJar(simpleCookieManager)
-                    .followRedirects(false)
-                    .build();
+
+    static
+    {
+         HTTP_CLIENT =
+                new OkHttpClient.Builder()
+                        .cookieJar(simpleCookieManager)
+                        .followRedirects(false)
+                        .build();
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+    }
+    private final static OkHttpClient HTTP_CLIENT;
+
+
 
     public static void setCookieManagerLoggingFacility(Consumer<String> logConsumer) {
         simpleCookieManager.setLogData(logConsumer);
