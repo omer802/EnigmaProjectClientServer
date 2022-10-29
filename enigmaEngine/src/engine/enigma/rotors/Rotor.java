@@ -28,7 +28,7 @@ public class Rotor implements Serializable {
 
      }
      public void setPosition(char charToPosition){
-          if(!Keyboard.isCharacterInRange(charToPosition))
+          if(Keyboard.isCharacterInRange(charToPosition))
                throw new IllegalArgumentException("You are trying to enter a character that does not exist on the keyboard");
 
           for (int i = 0; i < PairOfDataArray.size() ; i++) {

@@ -1,39 +1,80 @@
 package registerManagers.clients;
 
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
+import DTOS.AllieInformationDTO.DMProgressDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
+import DTOS.agentInformationDTO.CandidateDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
 import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import engine.decryptionManager.DM;
-import engine.decryptionManager.task.MissionTask;
 import registerManagers.mediators.Mediator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Allie implements Client,User {
-    public  enum AllieStatus{
-        IDLE, READY, IN_CONTEST
+
+
+
+
+    public enum AllieStatus{
+        IDLE, READY, IN_CONTEST,FINISHED_CONTEST
     }
     private boolean signed;
+
+    public AllieStatus getAllieStatus() {
+        return allieStatus;
+    }
+
     private AllieStatus allieStatus;
     private String name;
     private int agentAmount;
+
+
+
     private long missionSize;
     private ContestInformationDTO contestInformationDTO;
+
+    public String getStringToDecode() {
+        return toDecode;
+    }
+
     private String toDecode;
     Mediator mediator;
     private boolean isReady;
     private double missionAmount;
 
+    public AtomicLong getPulledMissionsAmount() {
+        return pulledMissionsAmount;
+    }
+
+    private AtomicLong pulledMissionsAmount;
+    private AtomicLong atomicMissionAmount;
+
     private DM dm;
 
+    public List<CandidateDTO> getCandidateList() {
+        return candidateList;
+    }
+
+    private List<CandidateDTO> candidateList;
+
+
+
+
+
+
     // TODO: 10/21/2022 remove casting
-    public void startBruteForce(){
+    synchronized public void startBruteForce(){
         missionAmount = dm.calculateAmountOfTasks( missionSize, UBoat.DifficultyLevel.valueOf(contestInformationDTO.getLevel()));
+        pulledMissionsAmount = new AtomicLong(Math.round(missionAmount));
         contestInformationDTO.setMessageToDecode(toDecode);
         DecryptionManagerDTO decryptionManagerDTO = new DecryptionManagerDTO(contestInformationDTO,(double)missionSize,missionAmount);
         dm.DecipherMessage(decryptionManagerDTO);
+        allieStatus = AllieStatus.IN_CONTEST;
     }
 
     public Allie(String userName) {
@@ -42,6 +83,7 @@ public class Allie implements Client,User {
         this.signed = false;
         this.missionSize = 1;
         this.agentAmount = 0;
+        candidateList = new ArrayList<>();
     }
     public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueue(){
         return dm.getBlockingQueue();
@@ -53,11 +95,17 @@ public class Allie implements Client,User {
         return dm;
     }
     public boolean canBeReady(){
-        return (agentAmount>0)&&(allieStatus.equals(AllieStatus.IDLE));
+        return (agentAmount>0)&&(!allieStatus.equals(AllieStatus.FINISHED_CONTEST));
     }
     public void makeAllieReady(){
         if(canBeReady())
             allieStatus = AllieStatus.READY;
+    }
+    public void setMissionSize(long missionSize) {
+        this.missionSize = missionSize;
+    }
+    public boolean isReady(){
+        return allieStatus.equals(AllieStatus.READY);
     }
     public boolean areInContest(){
         return allieStatus.equals(AllieStatus.IN_CONTEST);
@@ -72,7 +120,6 @@ public class Allie implements Client,User {
 
 
 
-
     @Override
     public void setMediator(Mediator mediator) {
         this.mediator = mediator;
@@ -80,7 +127,7 @@ public class Allie implements Client,User {
 
     @Override
     public void startContest() {
-        allieStatus = AllieStatus.IN_CONTEST;
+
     }
 
 
@@ -102,11 +149,7 @@ public class Allie implements Client,User {
         return Objects.hash(name);
     }
 
-    public void signOutFromContest() {
-        contestInformationDTO = null;
-        removeDM();
-        this.signed = false;
-    }
+
     public void signInToContest(ContestInformationDTO contestInformationDTO, DM dm){
         setDM(dm);
         this.contestInformationDTO = contestInformationDTO;
@@ -124,5 +167,40 @@ public class Allie implements Client,User {
     public ContestInformationDTO getContestInformationDTO() {
         return contestInformationDTO;
     }
+    public long getMissionSize() {
+        return missionSize;
+    }
+    synchronized public void addCandidate(Agent agent, CandidateDTO candidateDTO) {
+     //   List<CandidateDTO> copyCandidateDTOS = new ArrayList<>();
+      //  for (CandidateDTO candidate: candidatesDTO) {
+            try {
+                CandidateDTO candidateDTOClone = candidateDTO.clone();
+                //copyCandidateDTOS.add(candidateDTOClone);
+                candidateDTOClone.setHowFind(agent.getUserName());
+                this.candidateList.add(candidateDTOClone);
+
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+     //   }
+      //  copyCandidateDTOS.forEach(candidate -> candidate.setHowFind(agent.getUserName()));
+       // this.candidateList.addAll(copyCandidateDTOS);
+
+    }
+    public DMProgressDTO getDMProgress(){
+        return dm.getDMProgressDTO();
+
+    }
+    public void terminateContest() {
+        allieStatus = AllieStatus.FINISHED_CONTEST;
+        dm.stopTaskCreator();
+        //signOutFromContest();
+    }
+    public void signOutFromContest() {
+        contestInformationDTO = null;
+        //removeDM();
+        this.signed = false;
+    }
+
 
 }

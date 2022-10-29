@@ -1,16 +1,18 @@
-package engine.decryptionManager.task;
+package miniEngine;
 
 import DTOS.Configuration.UserConfigurationDTO;
+import DTOS.agentInformationDTO.CandidateDTO;
+import client.contest.PropertiesToUpdate;
 import dictionary.Dictionary;
+import engine.decryptionManager.task.AgentCandidatesList;
 import engine.enigma.Machine.EnigmaMachine;
 import keyboard.Keyboard;
 
-import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class MissionTask implements Runnable{
 
@@ -45,33 +47,42 @@ public class MissionTask implements Runnable{
     //Runnable updateProgress;
     private Dictionary dictionary;
 
+    private CountDownLatch cdl;
+    BlockingDeque<CandidateDTO> candidateQueue;
+    PropertiesToUpdate propertiesToUpdate;
     public MissionTask(EnigmaMachine machine, List<String> positions,
-                       String toDecode, Dictionary dictionary
-                       ){
+                       String toDecode, Dictionary dictionary,
+                       CountDownLatch cdl, BlockingDeque<CandidateDTO> candidateQueue, PropertiesToUpdate propertiesToUpdate){
         this.machine = machine;
         this.positions = positions;
         this.toDecode = toDecode;
         //this.candidateBlockingQueue = candidateBlockingQueue;
         this.dictionary = dictionary;
+        this.cdl = cdl;
         //this.timeToCalc = timeToCalc;
         //this.updateProgress = updateProgress;
         finish = new AtomicBoolean(false);
+        this.candidateQueue = candidateQueue;
+        this.propertiesToUpdate = propertiesToUpdate;
+
     }
 
-    public void setMachinePositions(String positions){
-        machine.setPositions(positions);
-    }
 
     @Override
     public void run() {
         this.StartingTime = System.nanoTime();
         String threadName = Thread.currentThread().getName();
         this.candidatesList = new AgentCandidatesList(StartingTime, threadName);
+        System.out.println(positions);
         exectuteMission(positions);
         if (!candidatesList.isEmpty()) {
             candidatesList.setDuration();
         }
-        //updateTime();
+        synchronized (propertiesToUpdate){
+            propertiesToUpdate.addOneToCompletedMissions();
+        }
+        cdl.countDown();
+        updateTime();
 
 
     }
@@ -87,7 +98,6 @@ public class MissionTask implements Runnable{
 
     private void exectuteMission(List<String> positions) {
         for (String position : positions){
-            System.out.println("in threaddd pollllll*****************"+position);
             processPosition(position);
 
             }
@@ -104,11 +114,11 @@ public class MissionTask implements Runnable{
     public String decipher(String position)
     {
         machine.setPositions(position);
-        System.out.println("in dechper");
         String decryptionResult = machine.encodeString(toDecode);
         List<String> words = splitDecryptionToWords(decryptionResult);
-        System.out.println(position);
+      //  System.out.println(position);
         if(dictionary.isWordsInDictionary(words)) {
+            System.out.println("found!");
             return decryptionResult;
         }
         else
@@ -128,7 +138,15 @@ public class MissionTask implements Runnable{
 
        // System.out.println(configurationDTO.getCodeConfigurationString());
         StringBuilder currConfig = configurationDTO.getCodeConfigurationString();
-        System.out.println(words);
+        System.out.println("*****************************"+words);
+        synchronized (candidateQueue) {
+            CandidateDTO candidate = new CandidateDTO(words,currConfig.toString());
+            boolean isPused = candidateQueue.offer(candidate);
+            System.out.println(isPused);
+        }
+        synchronized (propertiesToUpdate){
+            propertiesToUpdate.addOneToCandidateAmount();
+        }
         //candidatesList.addCandidate(words,currConfig.toString());
     }
 }

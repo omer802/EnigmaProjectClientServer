@@ -1,13 +1,14 @@
 package engine.decryptionManager;
 
+import DTOS.AllieInformationDTO.DMProgressDTO;
 import DTOS.decryptionManager.DecryptionManagerDTO;
 import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import dictionary.Dictionary;
 import dictionary.Trie;
-import engine.decryptionManager.task.MissionTask;
 import engine.decryptionManager.task.TasksManager;
 import engine.decryptionManager.task.TimeToCalc;
 import engine.enigma.Machine.EnigmaMachine;
+import javafx.beans.property.SimpleLongProperty;
 import keyboard.Keyboard;
 import registerManagers.clients.UBoat;
 
@@ -24,7 +25,8 @@ public class DM implements Cloneable {
     private Double missionSize;
     private EnigmaMachine machine;
     private TasksManager tasksCreator;
-
+    private long totalAmountOfMissions;
+    private SimpleLongProperty generatedMissionsAmount;
     public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueue() {
         return blockingQueue;
     }
@@ -33,6 +35,7 @@ public class DM implements Cloneable {
     public DM(Dictionary dictionary, EnigmaMachine machine){
         this.dictionary = dictionary;
         this.machine = machine;
+        generatedMissionsAmount = new SimpleLongProperty();
 
     }
     public void DecipherMessage(DecryptionManagerDTO decryptionManagerDTO){
@@ -42,7 +45,7 @@ public class DM implements Cloneable {
 
         // TODO: 9/16/2022 add check if agents amount ok
             this.timeToCalc = new TimeToCalc(System.currentTimeMillis());
-            this.tasksCreator = new TasksManager(decryptionManagerDTO,machine.clone(),timeToCalc,dictionary,blockingQueue);
+            this.tasksCreator = new TasksManager(decryptionManagerDTO,machine.clone(),timeToCalc,dictionary,blockingQueue, generatedMissionsAmount);
 
         new Thread(tasksCreator,"Manager tasks thread ").start();
     }
@@ -52,8 +55,8 @@ public class DM implements Cloneable {
     public TimeToCalc getTimeToCalc(){
         return tasksCreator.getTimeToCalc();
     }
-    public void cancelCurrentTask(){
-        //System.out.println("cancal!");
+    public void stopTaskCreator(){
+        tasksCreator.setActiveContest(false);
     }
     public String cleanStringFromExcludeChars(String words){
         return dictionary.cleanStringFromExcludeChars(words);
@@ -100,6 +103,7 @@ public class DM implements Cloneable {
                 amountOfMission = calculateAmountOfTasksImpossibleLevel(missionSize);
                 break;
         }
+        totalAmountOfMissions = Math.round(Math.ceil(amountOfMission));
         return amountOfMission;
     }
     //calculate the amount of options to choose k rotors from n rotors in machine
@@ -141,5 +145,8 @@ public class DM implements Cloneable {
         dm.setDictionary(dictionary);
         //dm.setMaxAgentAmount(maxAgentAmount);
         return dm;
+    }
+    public DMProgressDTO getDMProgressDTO(){
+        return new DMProgressDTO(totalAmountOfMissions,generatedMissionsAmount.getValue());
     }
 }

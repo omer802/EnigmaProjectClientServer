@@ -12,7 +12,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -77,6 +76,7 @@ public class TeamsDetailsController {
                 items.clear();
                 items.addAll(contestInformationDTOList);
 
+
                 //participantTeamsInContest.set(contestInformationDTOList.size());
 
             }
@@ -87,6 +87,11 @@ public class TeamsDetailsController {
     public void setChosenContestController(contestDataSmallController chosenContestController) {
         this.chosenContestController = chosenContestController;
     }
+    public void terminateTeamDetailRefresher(){
+        timer.cancel();
+    }
+
+
     /*public void setAlliesDetailDTOChosenContest(AlliesDetailDTO alliesDetailDTO){
         this.alliesDetailDTOChosenContest = alliesDetailDTO;
     }

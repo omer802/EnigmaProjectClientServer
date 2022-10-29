@@ -193,19 +193,19 @@ public class AgentLoginController {
                             errorMessageProperty.set("Something went wrong: " + responseBody)
                     );
                 } else {
-                    String needToActiveResponse = response.body().string();
+                    String needToWaitResponse = response.body().string();
 
                     Platform.runLater(() -> {
                         mainPageController.setAgentInfo(agentInfoDTO);
-                        boolean needToProcess = needToActiveResponse.equals("true");
-                        mainPageController.updateAgentStatus(needToProcess);
+                        boolean needToWait = needToWaitResponse.equals("true");
+                        mainPageController.updateAgentStatus(needToWait);
                         //if need to active start refresher
                         primaryStage.setScene(AgentScene);
                         primaryStage.show();
                         // primaryStage.setScene(alliesScene);
                         //primaryStage.show();
                         //alliesController.setUserName(userName);
-                        //alliesController.startServerUpdateTimer();
+                       // alliesController.startServerUpdateTimer();
                     });
                 }
             }

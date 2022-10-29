@@ -2,11 +2,14 @@ package registerManagers.clients;
 
 import DTOS.Configuration.UserConfigurationDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
+import DTOS.agentInformationDTO.CandidateDTO;
 import engine.api.ApiEnigma;
 import engine.api.ApiEnigmaImp;
 import registerManagers.battlefieldManager.Battlefield;
 import registerManagers.mediators.Mediator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static registerManagers.clients.UBoat.GameStatus.*;
@@ -21,20 +24,30 @@ public class UBoat implements Client,User {
         return alliesSignedAmount == api.getBattleField().getAmountOfAlliesNeededForContest();
     }
 
+    public void finishContest() {
+        gameStatus  = FINISH_CONTEST_WAITING;
+    }
+
+
+
+
     public static enum DifficultyLevel{
         EASY, MEDIUM, HARD, IMPOSSIBLE
     }
     public  enum GameStatus{
-        OFF,WAITING, ACTIVE_GAME, HAVE_ENOUGH_FOR_CONTEST
+        OFF,WAITING,WAITING_AND_READY, ACTIVE_GAME, HAVE_ENOUGH_FOR_CONTEST,FINISH_CONTEST_WAITING,FINISH
     }
-    public  enum UBoatStatus{
+    public enum UBoatStatus{
         WAITING_FOR_CONFIG, ACTIVE, READY
     }
+
     private ApiEnigma api;
 
     Battlefield battlefield;
     private String name;
-
+    public GameStatus getContestStatus() {
+        return gameStatus;
+    }
     UBoatStatus uBoatStatus;
     GameStatus gameStatus;
     private int alliesSignedAmount;
@@ -44,11 +57,25 @@ public class UBoat implements Client,User {
     private String originalStringNotEncrypted;
 
 
+    private List<CandidateDTO> candidateList;
+
+    public CandidateDTO getWinner() {
+        return winner;
+    }
+
+    public void setWinner(CandidateDTO winner) {
+        this.winner = winner;
+    }
+
+    private CandidateDTO winner;
+
+
     public UBoat(String UBoatName) {
         this.name = UBoatName;
         this.api = new ApiEnigmaImp();
         this.uBoatStatus = UBoatStatus.WAITING_FOR_CONFIG;
         this.gameStatus = OFF;
+        this.candidateList = new ArrayList<>();
     }
     @Override
     public void setMediator(Mediator mediator) {
@@ -57,7 +84,15 @@ public class UBoat implements Client,User {
 
     @Override
     public void startContest() {
-
+        if (canStartContest()){
+            gameStatus = ACTIVE_GAME;
+        }
+    }
+    public boolean isActiveContest(){
+        return gameStatus.equals(ACTIVE_GAME);
+    }
+    public boolean canStartContest(){
+        return api.getBattleField().getAmountOfAlliesNeededForContest() == alliesSignedAmount && uBoatStatus.equals(READY);
     }
     public String getUserName() {
         return name;
@@ -101,12 +136,15 @@ public class UBoat implements Client,User {
         alliesSignedAmount--;
     }
 
-    public synchronized void  makeUBoatReady() {
+    synchronized public void makeUBoatReady() {
         uBoatStatus = READY;
-        if (battlefield.getAmountOfAlliesNeededForContest() == alliesSignedAmount)
-            gameStatus = ACTIVE_GAME;
-        else
-            gameStatus = WAITING;
+        /*if (battlefield.getAmountOfAlliesNeededForContest() == alliesSignedAmount)
+            gameStatus = HAVE_ENOUGH_FOR_CONTEST;
+        else*/
+            gameStatus = WAITING_AND_READY;
+    }
+    public boolean isReady(){
+        return uBoatStatus.equals(READY);
     }
 
     public String getEncryptedString() {
@@ -134,9 +172,18 @@ public class UBoat implements Client,User {
     public Battlefield getBattlefield() {
         return api.getBattleField();
     }
+    public void addCandidate(Allie allie, CandidateDTO candidatesDTO) {
+        //List<CandidateDTO> copyCandidateList = new ArrayList<>(candidatesDTO);
+        //candidatesDTO.forEach(candidate -> candidate.setHowFind(allie.getUserName()));
+        candidatesDTO.setHowFind(allie.getUserName());
+        this.candidateList.add(candidatesDTO);
+    }
 
     public void setBattlefield(Battlefield battlefield) {
 
+    }
+    public List<CandidateDTO> getCandidateList() {
+        return candidateList;
     }
     @Override
     public boolean equals(Object o) {
@@ -153,4 +200,11 @@ public class UBoat implements Client,User {
     public int hashCode() {
         return Objects.hash(name);
     }
+
+    public boolean isDecodingCorrect(CandidateDTO candidatesDTO){
+        System.out.println(originalStringNotEncrypted);
+       // candidatesDTO.stream().map(CandidateDTO::getCandidateString).forEach(System.out::println);
+        return candidatesDTO.getCandidateString().equals(originalStringNotEncrypted);
+    }
+
 }

@@ -56,7 +56,7 @@ public class contestDataSmallController {
     }
 
     public void updateAmountOfSignedTeam(int newValue) {
-      /*  System.out.println(newValue+1);
+      /*
         if(table.getItems().get(0)!=null) {
             // table.getItems().get(0).setSignedAllies(newValue+1);
             ContestInformationDTO contestInfo = table.getItems().get(0);
@@ -64,5 +64,7 @@ public class contestDataSmallController {
             contestInfo.setSignedAllies(newValue+1);
             table.getItems().add(contestInfo);*/
     }
+
+
 }
 

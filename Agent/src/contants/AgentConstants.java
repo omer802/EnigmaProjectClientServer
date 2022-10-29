@@ -12,6 +12,8 @@ public class AgentConstants {
     public static final String GET_ENIGMA_AND_DICTIONARY_FROM_ALLIE = FULL_SERVER_PATH + "/fetchDictionaryAndMachine";
     public static final String GET_MISSIONS = FULL_SERVER_PATH +  "/fetchMissionsRequest";
 
+    public static final String UPDATE_CANDIDATE = FULL_SERVER_PATH +  "/updateCandidate";
+
 
 
 }

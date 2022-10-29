@@ -2,7 +2,7 @@ package client.javafx.contest;
 
 import DTOS.Configuration.FileConfigurationDTO;
 import DTOS.Configuration.UserConfigurationDTO;
-import client.javafx.Candidate.Candidate;
+import DTOS.agentInformationDTO.CandidateDTO;
 import client.javafx.Candidate.candidateController;
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
 import client.javafx.activeTeamsDetails.activeTeamsDetailsController;
@@ -19,30 +19,33 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import keyboard.Keyboard;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import registerManagers.clients.UBoat;
+import util.CommonConstants;
 import util.http.HttpClientUtil;
 
-import javax.swing.event.ChangeListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
 import java.util.function.Consumer;
 
 import static util.CommonConstants.GSON_INSTANCE;
+import static util.CommonConstants.REFRESH_RATE;
 
 public class ContestController {
 
     private  SimpleStringProperty encryptionTextFiled;
-    private SimpleBooleanProperty isBruteForceProcess;
     @FXML
     private BorderPane bruteForceBorderPane;
 
     @FXML
     private ScrollPane scrollPaneEncryptDecrypt;
     @FXML
-    private TableView<Candidate> candidate;
+    private TableView<CandidateDTO> candidate;
     @FXML
     private candidateController candidateController;
 
@@ -80,9 +83,14 @@ public class ContestController {
     private Button readyButton;
     @FXML
     private Label labelIndication;
+    private SimpleStringProperty contestStatus;
 
     @FXML
     private BorderPane encryptionBorderPane;
+    @FXML
+    private AnchorPane contestButtonsAnchorPane;
+    @FXML
+    private Button logoutButton;
 
     private MainController mainController;
     public  SimpleBooleanProperty isConfig;
@@ -92,25 +100,36 @@ public class ContestController {
     private Dictionary dictionary;
     private Keyboard keyboard;
 
-    private Consumer<Exception> httpRequestLoggerConsumer;
+    private Consumer<Exception> httpRequestErrorLoggerConsumer;
 
+    private SimpleBooleanProperty inActiveContest;
+    private SimpleBooleanProperty isReady;
+    ContestStatusRefresher contestStatusRefresher;
+    private Timer contestStatusRefresherTimer;
+    private UBoat.GameStatus gameStatus;
 
     @FXML
     private void initialize() {
-        readyButton.setDisable(true);
+        this.inActiveContest = new SimpleBooleanProperty(false);
+        this.isReady = new SimpleBooleanProperty(false);
         bruteForceBorderPane.disableProperty().bind(isConfig.not());
+        readyButton.disableProperty().bind(isReady);
+        ProcessButton.disableProperty().bind(isReady);
+        logoutButton.visibleProperty().bind(inActiveContest);
         //encryptionBorderPane.disableProperty().bind(isConfig.not());
         //candidate.disableProperty().bind(isConfig.not());
         EncryptDecryptResultLabel.textProperty().bind(Bindings.format("%s", encryptionResultProperty));
         codeConfigurationLabel.textProperty().bind(Bindings.format("%s", codeConfiguration));
+        labelIndication.textProperty().bind(Bindings.format("%s",contestStatus));
+        gameStatus = UBoat.GameStatus.OFF;
 
     }
 
     public ContestController(){
         this.encryptionResultProperty = new SimpleStringProperty("");
-        this.isBruteForceProcess = new SimpleBooleanProperty();
         this.codeConfiguration = new SimpleStringProperty("");
         this.encryptionTextFiled = new SimpleStringProperty("");
+        this.contestStatus = new SimpleStringProperty("To start contest press ready");
         this.isConfig = new SimpleBooleanProperty();
     }
 
@@ -189,7 +208,6 @@ public class ContestController {
                             //System.out.println(jsonConfigurationDTOString);
                             UserConfigurationDTO configurationDTO = GSON_INSTANCE.fromJson(jsonConfigurationDTOString, UserConfigurationDTO.class);
                             updateCurrentConfiguration(configurationDTO);
-                            readyButton.setDisable(false);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -320,7 +338,7 @@ public class ContestController {
             if (configurationDTO.getEncryptedMessage() != null) {
                 encryptionResult = configurationDTO.getEncryptedMessage();
                 encryptionResultProperty.set(encryptionResult);
-               // Candidate candidate1 = new Candidate(encryptionResult,"1",configurationDTO.getCodeConfigurationString().toString());
+               // CandidateDTO candidate1 = new CandidateDTO(encryptionResult,"1",configurationDTO.getCodeConfigurationString().toString());
                // candidateController.addCandidate(candidate1);
                // AlliesDetailDTO teamDetail = new AlliesDetailDTO("omer team", 5,10);
                // activeTeamDetailsController.addTeamToTable(teamDetail);
@@ -335,7 +353,7 @@ public class ContestController {
     @FXML
     void readyForContestAction(ActionEvent event){
         String finalUrl = HttpUrl
-                .parse(ConstantsUBoat.MAKE_UBOAT_READY)
+                .parse(CommonConstants.MAKE_CLIENT_READY)
                 .newBuilder()
                 .build()
                 .toString();
@@ -355,24 +373,104 @@ public class ContestController {
                     handleErrorFromServer(response);
                 } else {
                     Platform.runLater(() -> {
-                        labelIndication.setText("Waiting For allies to join contest");
-
-                        });
+                        isReady.set(true);
+                        startContestStatusRefresher();
+                    });
                     }
                 }
 
         });
     }
 
+    private void startContestStatusRefresher() {
+        contestStatusRefresher = new ContestStatusRefresher(isReady, httpRequestErrorLoggerConsumer,this::updateCurrentState);
+        contestStatusRefresherTimer = new Timer();
+        contestStatusRefresherTimer.schedule(contestStatusRefresher,REFRESH_RATE,REFRESH_RATE);
+        // check for starting contest and if contest get the candidates
+        candidateController.startCandidateRefresher();
+    }
+    public void updateCurrentState(UBoat.GameStatus gameStatus){
+        this.gameStatus = gameStatus;
+        switch (gameStatus){
+            case WAITING_AND_READY:
+                isReady.set(true);
+                contestStatus.set("Ready, Waiting for allies...");
+                break;
+            case ACTIVE_GAME:
+                inActiveContest.set(true);
+                contestStatus.set("In active game...");
+                break;
+            case FINISH_CONTEST_WAITING:// TODO: 10/28/2022 change to active in server 
+                /// fetching winner
+                isReady.set(false);
+                inActiveContest.set(false);
+                contestStatus.set("finished...");
+                getWinnerFromSever();
+                contestStatus.set("To start contest press ready");
+        }
+    }
+    private void getWinnerFromSever() {
+        HttpClientUtil.runAsync(CommonConstants.GET_WINNER, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                httpRequestErrorLoggerConsumer.accept(new RuntimeException("faild call :Something went wrong: " + e.getMessage()));
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String winnerResponse = response.body().string();
+                System.out.println(winnerResponse);
+                if(winnerResponse==null){
+                    return;
+                }
+                if (!response.isSuccessful()) {
+                    httpRequestErrorLoggerConsumer.accept(new RuntimeException("Something went wrong:" + winnerResponse));
+                } else {
+                    Platform.runLater(() -> {
+                        CandidateDTO candidatesDTO = GSON_INSTANCE.fromJson(winnerResponse, CandidateDTO.class);
+                        StringBuilder sb = new StringBuilder();
+
+                        Alert winnerAlert = new Alert(Alert.AlertType.INFORMATION);
+                        winnerAlert.setTitle("UBoat Message: We Have A Winner!");
+                        sb.append("The Winner is: "+ candidatesDTO.getHowFind()+"\n");
+                        sb.append("Found in the following code: "+ candidatesDTO.getCode());
+                        winnerAlert.setHeaderText(sb.toString());
+                        winnerAlert.showAndWait();
+                        cleanContestData();
+
+                    });
+
+                }
+            }
+        });
+    }
+
+
+
 
     public void startListRefresher() {
+        gameStatus = UBoat.GameStatus.WAITING;
         activeTeamDetailsController.startListRefresher();
 
     }
 
     public void setErrorHandlerMainController(Consumer<Exception> httpRequestLoggerConsumer) {
-        this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
+        this.httpRequestErrorLoggerConsumer = httpRequestLoggerConsumer;
         activeTeamDetailsController.setErrorHandlerMainController(httpRequestLoggerConsumer);
+        candidateController.setErrorHandlerMainController(httpRequestLoggerConsumer,this.inActiveContest);
+
+    }
+
+    public void setActiveContestProperty(SimpleBooleanProperty inActiveContest) {
+        inActiveContest.bind(this.inActiveContest);
+    }
+    
+
+    private void cleanContestData() {
+        candidateController.terminateCandidateRefresher();
+        contestStatusRefresherTimer.cancel();
+        candidateController.cleanCandidateTable();
 
     }
 }

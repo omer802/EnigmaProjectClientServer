@@ -72,7 +72,7 @@ public class LoginServlet extends HttpServlet {
                         if(!(clientUser.getClientType().name().equals("AGENT")))
                             registerManager.addUserByType(clientUser);
                         else{
-                            boolean agentNeedToBeActive = addAgentToServerAndCheckContestStatus(request,response,registerManager);
+                            boolean agentNeedToBeActive = addAgentToServerAndCheckContestStatus(request,response,registerManager,clientUser);
                             response.getWriter().println(agentNeedToBeActive);
                         }
                         //set the username in a session so it will be available on each request
@@ -89,12 +89,12 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private boolean addAgentToServerAndCheckContestStatus(HttpServletRequest request, HttpServletResponse response, RegisterManager registerManager) throws ServletException, IOException {
+    private boolean addAgentToServerAndCheckContestStatus(HttpServletRequest request, HttpServletResponse response, RegisterManager registerManager, ClientUser clientUser) throws ServletException, IOException {
         InputStream jsonAgentDTO = request.getParts().stream().findFirst().get().getInputStream();
         BufferedReader AllieDTOStreamReader = new BufferedReader(new InputStreamReader(jsonAgentDTO, StandardCharsets.UTF_8));
         Gson gson = new Gson();
         AgentInfoDTO agentDTO = gson.fromJson(AllieDTOStreamReader, AgentInfoDTO.class);
-        registerManager.addAgentAncdCheckContestStatus(agentDTO);
+        registerManager.addAgentAndCheckContestStatus(agentDTO,clientUser);
         return registerManager.isAgentNeedToBeActive(agentDTO);
     }
 

@@ -13,7 +13,7 @@ public class ConstantsUBoat {
     public final static String GENERATE_RANDOM_CODE_CONFIGURATION = FULL_SERVER_PATH + "/randomCode";
     public final static String FETCH_DICTIONARY = FULL_SERVER_PATH + "/fetchDictionary";
 
-    public final static String MAKE_UBOAT_READY = FULL_SERVER_PATH + "/makeUBoatReady";
+    public final static String MAKE_CLIENT_READY = FULL_SERVER_PATH + "/makeClientReady";
 
     public final static String RESET_CODE = FULL_SERVER_PATH + "/resetCode";
     public final static String ENCRYPT_MESSAGE = FULL_SERVER_PATH + "/encryptMessage";

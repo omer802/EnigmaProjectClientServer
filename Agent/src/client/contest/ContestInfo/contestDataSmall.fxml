@@ -3,7 +3,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 
-<TableView fx:id="table" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="412.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.agentMainPage.ContestInfo.contestDataController">
+<TableView fx:id="table" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="412.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.contest.ContestInfo.contestDataController">
    <columns>
       <TableColumn fx:id="battlefield" editable="false" minWidth="-Infinity" prefWidth="97.0" sortable="false" text="Battlefield" />
       <TableColumn fx:id="UBoatName" editable="false" minWidth="-Infinity" prefWidth="58.0" sortable="false" text="UBoat" />

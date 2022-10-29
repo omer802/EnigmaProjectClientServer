@@ -1,13 +1,16 @@
 package registerManagers.Managers;
 
+import DTOS.AllieInformationDTO.AgentAndDMProgressDTO;
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
+import DTOS.AllieInformationDTO.DMProgressDTO;
 import DTOS.UBoatsInformationDTO.ContestInformationDTO;
 import DTOS.agentInformationDTO.AgentInfoDTO;
+import DTOS.agentInformationDTO.AgentProgressDTO;
+import DTOS.agentInformationDTO.CandidateDTO;
 import DTOS.enigmaComponentContainers.AgentTaskConfigurationDTO;
 import DTOS.enigmaComponentContainers.ConfigurationForAgentBruteForceDTO;
 import dictionary.Dictionary;
 import engine.api.ApiEnigma;
-import engine.decryptionManager.task.MissionTask;
 import engine.enigma.Machine.EnigmaMachine;
 import registerManagers.battlefieldManager.Battlefield;
 import registerManagers.clients.Allie;
@@ -15,13 +18,86 @@ import registerManagers.clients.UBoat;
 import registerManagers.clients.Agent;
 import registerManagers.mediators.Mediator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class RegisterManager {
 
-    // TODO: 10/20/2022 create dm and make it work with this  
+    public List<AgentInfoDTO> getSingedAgentToAllieByAllieName(String allieName) {
+        Allie allie = getAllieByName(allieName);
+        List<AgentInfoDTO> agentInfoDTOList = mediator.getAgentsSignedToAllieDTOList(allie);
+        if(agentInfoDTOList == null)
+            agentInfoDTOList = new ArrayList<>();
+        return agentInfoDTOList;
+    }
+
+    public void addCandidateFromAgent(String agentUser, List<CandidateDTO> candidatesDTO) {
+        Agent agent = agentManager.getClientByName(agentUser);
+        mediator.addCandidatesFromAgent(agent,candidatesDTO);
+    }
+
+    public List<CandidateDTO> getAllieCandidates(String allieUsername) {
+        Allie allie = alliesManager.getClientByName(allieUsername);
+        List<CandidateDTO> candidateList = allie.getCandidateList();
+        if(candidateList==null)
+            candidateList =  new ArrayList<>();
+       return candidateList;
+    }
+
+    public List<CandidateDTO> getUBoatCandidates(String UBoatUsername) {
+        UBoat uBoat = UBoatManager.getClientByName(UBoatUsername);
+        List<CandidateDTO> candidateList = uBoat.getCandidateList();
+        if(candidateList==null)
+            candidateList = new ArrayList<>();
+        return candidateList;
+    }
+
+    synchronized public Allie.AllieStatus getContestStatusByAgent(String usernameFromSession) {
+        Allie allie = getAllieByAgentName(usernameFromSession);
+        return allie.getAllieStatus();
+    }
+
+    public void updateAgentProgress(String agentUsername, AgentProgressDTO agentProgressDTO) {
+        Agent agent = agentManager.getClientByName(agentUsername);
+        agent.updateProgress(agentProgressDTO);
+    }
+    public List<AgentProgressDTO> pullAgentsProgress(){
+        return null;
+    }
+
+    public AgentAndDMProgressDTO getAgentsAndDMProgressFromAllie(String allieUsername) {
+        Allie allie = alliesManager.getClientByName(allieUsername);
+        List<AgentProgressDTO> agentProgressDTOS = mediator.getAgentsProgressAtAllie(allie);
+        long totalFinishMissionsAmount = agentProgressDTOS.stream().mapToLong(AgentProgressDTO::getCompletedMissionsAmount).sum();
+        DMProgressDTO dmProgressDTO = allie.getDMProgress();
+        dmProgressDTO.setFinishedMissionsByAgents(totalFinishMissionsAmount);
+        AgentAndDMProgressDTO agentAndDMProgressDTO = new AgentAndDMProgressDTO(dmProgressDTO,agentProgressDTOS);
+        agentAndDMProgressDTO.setStringToHack(allie.getStringToDecode());
+        return agentAndDMProgressDTO;
+
+    }
+
+    public void finishContestInAllieByAgentName(String agentUserName) {
+        Allie allie = getAllieByAgentName(agentUserName);
+        allie.terminateContest();
+    }
+
+    public UBoat.GameStatus getContestStatusByUBoat(String uBoatUsername) {
+        UBoat uBoat = getUBoatByName(uBoatUsername);
+        UBoat.GameStatus uBoatStatus = uBoat.getContestStatus();
+        return uBoatStatus;
+    }
+
+    public Allie.AllieStatus getContestStatusByAllie(String  allieUserName) {
+        Allie allie = getAllieByName(allieUserName);
+        return allie.getAllieStatus();
+    }
+
+
+    // TODO: 10/20/2022 create dm and make it work with this
 
 
     public static enum ClientType {
@@ -51,7 +127,7 @@ public class RegisterManager {
         agentManager = new GenericManager<>();
     }
     public ConfigurationForAgentBruteForceDTO fetchDictionaryAndMachineByAgentName(String agentUserName) {
-        mediator.startContest();
+        //mediator.startContest();
         Agent agent = agentManager.getClientByName(agentUserName);
         Allie allie = getAllieByAgentName(agentUserName);
         EnigmaMachine enigmaMachine = allie.getDm().getMachine().clone();
@@ -61,17 +137,16 @@ public class RegisterManager {
         }
         Dictionary dictionary = agent.getDictionary();
         if(dictionary == null){
-            System.out.println("Dictionary is not config at agent");
             throw new RuntimeException("Dictionary is not config at agent");
         }
-        startContest();
+        //startContest();
         return new ConfigurationForAgentBruteForceDTO(enigmaMachine,dictionary);
 
     }
-    public void startContest(){
+  /*  public void startContest(){
         List<Allie> allieList = alliesManager.getClients();
         allieList.forEach(Allie::startBruteForce);
-    }
+    }*/
     public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueueByAgentName(String agentUserName){
         Allie allie = getAllieByAgentName(agentUserName);
         return allie.getBlockingQueue();
@@ -79,7 +154,7 @@ public class RegisterManager {
     synchronized public ContestInformationDTO getContestFromAllieByAgentName(String agentName) {
         Allie allie = getAllieByAgentName(agentName);
         if(!allie.isSigned())
-            throw new RuntimeException("Error: allie is not signed to any contest");
+            throw new RuntimeException("allie is not signed to any contest");
         ContestInformationDTO  contestInformationDTO = mediator.getContestInformationByAllie(allie);
         if(contestInformationDTO == null)
             throw new RuntimeException("Error: allie contest is null");
@@ -118,7 +193,8 @@ public class RegisterManager {
                 break;
         }
     }
-    synchronized public void addAgentAncdCheckContestStatus(AgentInfoDTO agentDTO) {
+    synchronized public void addAgentAndCheckContestStatus(AgentInfoDTO agentDTO, ClientUser clientUser) {
+        userManager.addClient(clientUser);
         Agent agent = new Agent(agentDTO);
         agent.setMediator(mediator);
         agentManager.addClient(agent);
@@ -141,17 +217,47 @@ public class RegisterManager {
         }
         return contestInformationDTOS;
     }
-    public void makeClientReady(String usernameFromSession) {
+    synchronized public void makeClientReady(String usernameFromSession) {
         ClientType clientType = getTypeByName(usernameFromSession);
-        switch (clientType){
+        switch (clientType) {
             case UBOAT:
                 UBoat UBoat = getUBoatByName(usernameFromSession);
                 UBoat.makeUBoatReady();
-
-
+                if (UBoat.isAlliesCapacityFull())
+                    mediator.startContestIfAllAlliesAndUBoatsReady(UBoat);
+                break;
+            case ALLIE:
+                Allie allie = getAllieByName(usernameFromSession);
+                if (allie.canBeReady()) {
+                    allie.makeAllieReady();
+                    if (allie.isSigned()) {
+                        mediator.startContestIfAllAlliesAndUBoatsReady(allie);
+                    }
+                }
+                break;
         }
-
     }
+    public void startContestIfAllAlliesAndUBoatsReady(){
+        /*if(needToStartContest()){
+            mediator.startContest();
+            startContest();
+        }*/
+    }
+
+    /*public boolean needToStartContest() {
+        List<UBoat> uBoatList = UBoatManager.getClients();
+        for (UBoat uBoat: uBoatList) {
+            if(!uBoat.canStartContest())
+                return false;
+        }
+        List<Allie> allieList = alliesManager.getClients();
+        for (Allie allie: allieList) {
+            if(allie.isReady())
+                return false;
+        }
+        return true;
+    }*/
+
     public ClientType getTypeByName(String username) {
          List<ClientUser> clientUsers = userManager.getClients();
 
@@ -196,6 +302,27 @@ public class RegisterManager {
     public void addBattleField(Battlefield battlefield){
         battlefieldManager.addClient(battlefield);
     }
+    synchronized public CandidateDTO getWinnerByClientType(String username, ClientType clientType) {
+        CandidateDTO winner = null;
+        switch (clientType){
+            case UBOAT:
+                UBoat uBoat = getUBoatByName(username);
+                winner = uBoat.getWinner();
+                break;
+            case ALLIE:
+                Allie allie = getAllieByName(username);
+                winner = mediator.getWinnerByAllie(allie);
+                break;
+            case AGENT:
+                Agent agent = agentManager.getClientByName(username);
+                winner = mediator.getWinnerByAgent(agent);
+
+        }
+        return winner;
+
+
+    }
+
     public void setChosenAllieContest(ContestInformationDTO chosenContestDTO, String AllieName) {
         Allie allie = alliesManager.getClientByName(AllieName);
         String uBoatName = chosenContestDTO.getUBoatName();
@@ -206,5 +333,15 @@ public class RegisterManager {
             e.printStackTrace();
         }
 
+    }
+
+    public void updateMissionSizeByAllieName(String usernameFromSession, int missionSize) {
+        Allie allie = getAllieByName(usernameFromSession);
+        allie.setMissionSize(missionSize);
+
+    }
+    public AtomicLong getTotalTaskAmount(String agentName){
+        Allie allie = getAllieByAgentName(agentName);
+        return allie.getPulledMissionsAmount();
     }
 }

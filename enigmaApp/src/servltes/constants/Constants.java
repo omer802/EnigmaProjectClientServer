@@ -11,6 +11,8 @@ public class Constants {
     public static final String CHAT_VERSION_PARAMETER = "chatversion";
     public static final String MISSION_AMOUNT_PARAMETER = "missionAmount";
 
+    public static final String MISSION_SIZE_PARAMETER = "missionSize";
+
 
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
 

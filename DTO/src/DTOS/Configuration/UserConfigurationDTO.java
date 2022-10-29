@@ -7,6 +7,7 @@ import engine.enigma.reflector.Reflectors;
 import engine.enigma.rotors.RotatingRotor;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 public class UserConfigurationDTO implements Serializable {
@@ -149,4 +150,7 @@ public class UserConfigurationDTO implements Serializable {
         this.encryptedMessage = encryptedMessage;
     }
 
+    public void reverseRotorsList() {
+        Collections.reverse(chosenRotorsWithOrder);
+    }
 }

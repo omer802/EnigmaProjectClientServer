@@ -114,10 +114,7 @@ public class ApiEnigmaImp implements ApiEnigma {
         String encodeInformation = enigma.getMachine().encodeString(data);
         UserConfigurationDTO config = getCurrentConfiguration();
         config.setEncryptedMessage(encodeInformation);
-        //UpdateCode(config);
-        //updateStatisticsProperty();
-        //System.out.println("-----------------");
-        //System.out.println(statistics.getValue());
+
         return config;
 
     }
@@ -347,7 +344,7 @@ public class ApiEnigmaImp implements ApiEnigma {
         return enigma.getDecipher().calculateAmountOfTasks(missionSize,level);
     }
     public void cancelCurrentTask(){
-        enigma.getDecipher().cancelCurrentTask();
+        enigma.getDecipher().stopTaskCreator();
     }
     public void pauseCurrentTask(){
 

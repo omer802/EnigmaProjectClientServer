@@ -128,6 +128,8 @@ public class MainController {
     private SimpleStringProperty plugBoardToShow;
     private SimpleStringProperty errorMessageProperty = new SimpleStringProperty();
     private FileConfigurationDTOAdapter fileConfigurationDTOAdapter;
+    private SimpleBooleanProperty inActiveContest;
+
 
 
     public MainController(){
@@ -139,6 +141,7 @@ public class MainController {
         this.encryptedMessagesAmount = new SimpleIntegerProperty(0);
         this.isFileSelected = new SimpleBooleanProperty(false);
         this.isConfig = new SimpleBooleanProperty(false);
+        this.inActiveContest = new SimpleBooleanProperty(false);
         this.chosenRotors = new SimpleStringProperty();
         this.NotchAndLetterAtPeekPaneStartingPosition = new SimpleStringProperty();
         this.chosenReflector = new SimpleStringProperty();
@@ -149,7 +152,7 @@ public class MainController {
     }
     @FXML
     public void initialize() {
-        ContestController.setErrorHandlerMainController(this::alertShowException);
+        ContestController.setActiveContestProperty(inActiveContest);
         this.userName = new SimpleStringProperty();
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
 
@@ -161,7 +164,7 @@ public class MainController {
         InUseRotorsAmountLabel.textProperty().bind(Bindings.format("%,d", rotorsInUseAmount));
         ReflectorsAmountLabel.textProperty().bind(Bindings.format("%,d",reflectorsAmount));
         encryptedMessagesAmountLabel.textProperty().bind(Bindings.format("%,d",encryptedMessagesAmount));
-
+        loadFileButton.disableProperty().bind(isFileSelected);
         rotorsAmountLabel.visibleProperty().bind(isFileSelected);
         InUseRotorsAmountLabel.visibleProperty().bind(isFileSelected);
         ReflectorsAmountLabel.visibleProperty().bind(isFileSelected);
@@ -175,6 +178,7 @@ public class MainController {
         randomCodeButton.disableProperty().bind(isFileSelected.not());
         machineDetailsFlowPane.disableProperty().bind(isFileSelected.not());
         CheckBoxIsPluged.disableProperty().bind(isFileSelected.not());
+        ContestController.setErrorHandlerMainController(this::alertShowException);
 
         ContestController.setMainPageController(this);
 
@@ -222,6 +226,7 @@ public class MainController {
                     FileConfigurationDTO fileConfigurationDTO = GSON_INSTANCE.fromJson(fileConfigurationDTOString, FileConfigurationDTO.class);
                     fetchStartingConfigurationFromServer(selectedFile.getAbsolutePath(), fileConfigurationDTO);
                     ContestController.startListRefresher();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

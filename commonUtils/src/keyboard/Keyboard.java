@@ -28,11 +28,11 @@ public class Keyboard implements Serializable {
             ABCToIndex.put(alphabet.charAt(i),i);
         }
     }
-    public static boolean isCharacterInRange(char ch){ return alphabet.contains(Character.toString(ch));}
+    public static boolean isCharacterInRange(char ch){ return !alphabet.contains(Character.toString(ch));}
 
     public static boolean isStringInRange(String str){
         for (int i = 0; i <str.length() ; i++) {
-            if(!isCharacterInRange(str.charAt(i)))
+            if(isCharacterInRange(str.charAt(i)))
                 return false;
         }
         return true;

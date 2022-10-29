@@ -102,14 +102,22 @@
                                        <top>
                                           <VBox prefHeight="185.0" prefWidth="800.0" BorderPane.alignment="BOTTOM_LEFT">
                                              <children>
-                                                <HBox alignment="CENTER_LEFT" prefHeight="53.0" prefWidth="800.0">
+                                                <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity" prefHeight="58.0" prefWidth="807.0">
                                                    <children>
                                                       <Label text="Mission SIze:">
                                                          <padding>
                                                             <Insets right="5.0" />
                                                          </padding>
                                                       </Label>
-                                                      <Spinner fx:id="SpinnerMissionSize" editable="true" prefHeight="25.0" prefWidth="91.0" />
+                                                      <Spinner fx:id="SpinnerMissionSize" editable="true" prefHeight="25.0" prefWidth="95.0">
+                                                         <HBox.margin>
+                                                            <Insets right="10.0" />
+                                                         </HBox.margin></Spinner>
+                                                      <Button fx:id="updateMissionSize" mnemonicParsing="false" onAction="#updateMissionSizeAction" text="Update!">
+                                                         <HBox.margin>
+                                                            <Insets right="10.0" />
+                                                         </HBox.margin></Button>
+                                                      <Button fx:id="readyButton" mnemonicParsing="false" onAction="#makeAllieReadyAction" text="Ready!" />
                                                       <Label fx:id="stringToHackLabel">
                                                          <HBox.margin>
                                                             <Insets left="170.0" />
@@ -123,36 +131,41 @@
                                                       <Insets left="10.0" />
                                                    </padding>
                                                 </HBox>
-                                                <HBox prefHeight="84.0" prefWidth="800.0" spacing="52.0">
+                                                <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="152.0" prefWidth="807.0">
                                                    <children>
-                                                      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="54.0" prefWidth="389.0">
+                                                      <HBox layoutX="4.0" layoutY="12.0" prefHeight="121.0" prefWidth="800.0" spacing="52.0">
                                                          <children>
-                                                            <fx:include fx:id="chosenContest" source="../contestPage/contestDataSmall/contestDataSmall.fxml" />
-                                                         </children>
-                                                      </AnchorPane>
-                                                      <HBox prefHeight="129.0" prefWidth="372.0" spacing="5.0">
-                                                         <children>
-                                                            <fx:include fx:id="participantTeams" source="../contestPage/teamsDetails/teamsDetails.fxml" />
+                                                            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="54.0" prefWidth="389.0">
+                                                               <children>
+                                                                  <fx:include fx:id="chosenContest" source="../contestPage/contestDataSmall/contestDataSmall.fxml" />
+                                                               </children>
+                                                            </AnchorPane>
+                                                            <HBox prefHeight="129.0" prefWidth="372.0" spacing="5.0">
+                                                               <children>
+                                                                  <fx:include fx:id="participantTeams" source="../contestPage/teamsDetails/teamsDetails.fxml" />
+                                                               </children>
+                                                            </HBox>
                                                          </children>
                                                       </HBox>
+                                                      <Label fx:id="contestErrorLabel" layoutX="186.0" layoutY="-8.0" minWidth="-Infinity" />
                                                    </children>
-                                                </HBox>
+                                                </AnchorPane>
                                              </children>
                                           </VBox>
                                        </top>
                                        <bottom>
-                                          <AnchorPane prefHeight="296.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                                          <AnchorPane prefHeight="252.0" prefWidth="807.0" BorderPane.alignment="CENTER">
                                              <children>
-                                                <HBox layoutX="4.0" layoutY="17.0" prefHeight="263.0" prefWidth="800.0" spacing="230.0">
+                                                <HBox layoutX="7.0" layoutY="33.0" prefHeight="263.0" prefWidth="800.0" spacing="230.0">
                                                    <children>
-                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="263.0" prefWidth="180.0">
                                                          <children>
-                                                            <fx:include source="../contestPage/AgentsProgressAndDM/AgentProgress.fxml" />
+                                                            <fx:include fx:id="agentAndDMProgress" source="../contestPage/AgentsProgressAndDM/AgentProgress.fxml" />
                                                          </children>
                                                       </AnchorPane>
                                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="154.0" prefWidth="227.0">
                                                          <children>
-                                                            <fx:include source="../contestPage/candidate/candidate.fxml" />
+                                                            <fx:include fx:id="candidates" source="../contestPage/candidate/candidate.fxml" />
                                                          </children>
                                                       </AnchorPane>
                                                    </children>
@@ -163,12 +176,6 @@
                                     </BorderPane>
                                  </children>
                               </VBox>
-                              <HBox alignment="CENTER_LEFT" layoutX="-283.0" layoutY="416.0" prefHeight="81.0" prefWidth="800.0">
-                                 <children>
-                                    <Label minWidth="-Infinity" text="Working on the string: " />
-                                    <Label minWidth="-Infinity" />
-                                 </children>
-                              </HBox>
                            </children></AnchorPane>
                   </content>
                 </Tab>

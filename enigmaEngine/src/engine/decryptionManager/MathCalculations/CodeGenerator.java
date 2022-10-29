@@ -33,7 +33,6 @@ public class CodeGenerator {
              positionsIndex.set(i,index);
         }
         List<String> toReturn = generateNextPositionsListForTask(taskSize);
-        System.out.println(toReturn);
         return toReturn;
 
     }
