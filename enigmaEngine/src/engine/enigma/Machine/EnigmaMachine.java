@@ -24,7 +24,6 @@ public class EnigmaMachine implements Serializable, Cloneable {
         return keyboard;
     }
 
-    // TODO: 10/11/2022 make keyboard real object only in enigmaMachineClass and get from this class the alphabet
     private Keyboard keyboard;
 
     public static int getTheNumberOfStringsEncrypted() {
@@ -65,8 +64,6 @@ public class EnigmaMachine implements Serializable, Cloneable {
         long timeToEncode = System.nanoTime() - startTime;
         addEncryptionToStatistics(toEncode,encodeResult,timeToEncode);
         return encodeResult;
-        //statistics.addEncryptionToStatistics(toEncode,encodeResult,timeToEncode);
-        //return encodeResult;
     }
     public void addEncryptionToStatistics(String input, String output, long processingTime){
         addOneToCountOfDataEncrypted();
@@ -152,9 +149,6 @@ public class EnigmaMachine implements Serializable, Cloneable {
         return reflectors;
     }
 
-    /*here we create dto object and send it to the method selectInitialCodeConfiguration
-     in the machine*/
-    //הגרלת רשימת סטרינגים של
     public void automaticInitialCodeConfiguration() {
         List<String> chosenRotors = generateRotorsConfigurationRandomly();
         String chosenPositions =  generatePositionsConfigurationRandomly();

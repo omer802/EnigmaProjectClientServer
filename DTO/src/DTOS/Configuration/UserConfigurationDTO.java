@@ -65,7 +65,6 @@ public class UserConfigurationDTO implements Serializable {
         return chosenRotorsWithOrder;
     }
     public String getChosenRotorsWithOrderWithSeprator(){
-        //chosenRotorsWithOrder.
         return chosenRotorsWithOrder.stream().map(r->r.toString()).reduce("", String::concat);
     }
     private void setRotorsStartingPosition(final EnigmaMachine machineInput){

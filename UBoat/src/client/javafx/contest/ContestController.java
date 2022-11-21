@@ -131,8 +131,6 @@ public class ContestController {
         readyButton.disableProperty().bind(canBeReady.not());
         ProcessButton.disableProperty().bind(isReady);
         logoutButton.visibleProperty().bind(canShowLogout);
-        //encryptionBorderPane.disableProperty().bind(isConfig.not());
-        //candidate.disableProperty().bind(isConfig.not());
         EncryptDecryptResultLabel.textProperty().bind(Bindings.format("%s", encryptionResultProperty));
         codeConfigurationLabel.textProperty().bind(Bindings.format("%s", codeConfiguration));
         labelIndication.textProperty().bind(Bindings.format("%s",contestStatus));
@@ -357,10 +355,6 @@ public class ContestController {
             if (configurationDTO.getEncryptedMessage() != null) {
                 encryptionResult = configurationDTO.getEncryptedMessage();
                 encryptionResultProperty.set(encryptionResult);
-               // CandidateDTO candidate1 = new CandidateDTO(encryptionResult,"1",configurationDTO.getCodeConfigurationString().toString());
-               // candidateController.addCandidate(candidate1);
-               // AlliesDetailDTO teamDetail = new AlliesDetailDTO("omer team", 5,10);
-               // activeTeamDetailsController.addTeamToTable(teamDetail);
             }
             else{
                 encryptionResultProperty.set("");
@@ -524,7 +518,6 @@ public class ContestController {
                             Platform.runLater(() -> httpRequestErrorLoggerConsumer.accept(new RuntimeException("Something went wrong:" + winnerResponse)));
                         } else {
                             Platform.runLater(() -> {
-                                //maybe make ready again
                                 // move to before contest page
 
                             });

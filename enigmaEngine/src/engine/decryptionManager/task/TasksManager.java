@@ -91,12 +91,6 @@ public class TasksManager implements Runnable {
         } catch (RuntimeException e) {
             return;
         }
-
-        //UpdateCandidateConsumer candidateConsumer = new UpdateCandidateConsumer(candidateBlockingQueue);
-        //blockingConsumer = new Thread(candidateConsumer, "AgentCandidatesList consumer thread");
-        // blockingConsumer.start();
-
-
     }
 
 

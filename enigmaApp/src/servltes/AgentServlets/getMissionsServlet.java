@@ -44,7 +44,6 @@ public class getMissionsServlet extends HttpServlet {
             BlockingQueue<AgentTaskConfigurationDTO> blockingQueue = registerManager.getBlockingQueueByAgentName(agentUserName);
             List<AgentTaskConfigurationDTO> missionTaskList = new ArrayList<>();
             AtomicLong atomicMissionAmount = registerManager.getTotalTaskAmount(agentUserName);
-            //4 new line of if and else
               UBoat uBoat = registerManager.getUBoatByAgentName(agentUserName);
               if (!uBoat.isActiveContest()) {
                       registerManager.finishContestInAllieByAgentName(agentUserName);
@@ -67,7 +66,7 @@ public class getMissionsServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 out.println(jsonTasks);
                 out.flush();
-           // }
+
         }
 
     }

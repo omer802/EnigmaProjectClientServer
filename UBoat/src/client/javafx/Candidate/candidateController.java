@@ -51,7 +51,6 @@ public class candidateController implements Initializable {
 
     }
 
-    // TODO: 10/24/2022 change to version like saw in class
     public void updateCandidates(List<CandidateDTO> candidates){
         if(candidates != null) {
             Platform.runLater(() -> {
@@ -70,7 +69,6 @@ public class candidateController implements Initializable {
             timer = new Timer();
             timer.schedule(candidateRefresher, REFRESH_RATE, REFRESH_RATE);
             isInRefresh = true;
-            // }
 
         }
     }

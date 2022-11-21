@@ -28,7 +28,6 @@ import static client.constants.ConstantsUBoat.MAIN_PAGE_FXML_RESOURCE_LOCATION;
 
 public class UBoatLoginController {
 
-    // TODO: 10/15/2022 think how to create generic login page
     private Scene UBoatScene;
     private MainController mainController;
     @FXML

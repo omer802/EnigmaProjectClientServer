@@ -71,7 +71,6 @@ public class UploadFileServlet extends HttpServlet {
         }
     }
 
-    // TODO: 10/10/2022 think how to make the enigma whitout sending battlefieldManager
     private xmlFileValidatorDTO validateAndUploadFile(InputStream xmlFileInputStream, String username) {
         UBoat uBoat = ServletUtils.getUBoatByName(getServletContext(),username);
         BattlefieldManager battlefieldManager = ServletUtils.getBattleFieldManager(getServletContext());

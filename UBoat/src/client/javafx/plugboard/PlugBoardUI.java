@@ -13,11 +13,9 @@ public class PlugBoardUI {
 
 
     public static int amountOfCharacterSelected;
-    // TODO: 9/1/2022 move this to property
     private static LinkedHashMap<ToggleButton,ToggleButton> plugBoardPairs;
     private static ToggleButton CurrentToggleButtonPressedWaitForPair;
 
-    // TODO: 9/1/2022 make it return in order that you made in ui
     public static String getConnections(){
         List<ToggleButton> listToggleButtonKeys =  plugBoardPairs.keySet().stream().collect(Collectors.toList());
         String stringOfConnections = new String();

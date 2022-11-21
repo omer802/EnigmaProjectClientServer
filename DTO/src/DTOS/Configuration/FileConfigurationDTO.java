@@ -12,7 +12,6 @@ public class FileConfigurationDTO {
 
 
     private int countOfRotorsInUse;
-    //private List<NotchAndLetterAtPeekPane> NotchAndIds;
     private final int countOfReflectors;
 
     private int numberOfMessageEncrypted;
@@ -32,7 +31,6 @@ public class FileConfigurationDTO {
 
 
     public FileConfigurationDTO(final EnigmaMachine machineInput) {
-        //setPairOfNotchAndRotorId(machineInput);
         this.countOfRotors = machineInput.getRotorsObject().getRotorsAmount();
         this.countOfRotorsInUse = machineInput.getRotorsAmountInUse();
         this.countOfReflectors = machineInput.getReflectorsObject().getReflectorsAmount();

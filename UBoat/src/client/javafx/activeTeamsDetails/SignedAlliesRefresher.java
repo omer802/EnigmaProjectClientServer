@@ -58,9 +58,7 @@ public class SignedAlliesRefresher extends TimerTask {
                 } else {
 
                         AlliesDetailDTO[] contestInformationDTO = GSON_INSTANCE.fromJson(jsonArrayOfContests, AlliesDetailDTO[].class);
-                       // if(contestInformationDTO!=null) {
-                            AlliesDataConsumer.accept(Arrays.asList(contestInformationDTO));
-                       // }
+                        AlliesDataConsumer.accept(Arrays.asList(contestInformationDTO));
                 }
             }
         });

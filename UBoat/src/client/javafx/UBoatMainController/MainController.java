@@ -104,7 +104,6 @@ public class MainController {
     private ContestController ContestController;
     @FXML
     private Label userGreetingLabel;
-    // TODO: 10/17/2022 move to contest
     private List<ObjectProperty<String>> chosenRotorsList;
     private List<ObjectProperty<Character>> chosenPositions;
     private ObjectProperty<String> ReflectorOptions;
@@ -246,7 +245,6 @@ public class MainController {
         isFileSelected.set(true);
         isConfig.set(false);
         CheckBoxIsPluged.setSelected(false);
-        // TODO: 10/11/2022 change this name to beeter name 
         fileConfigurationDTOAdapter.setDataFromFileDTO(fileConfigurationDTO);
         if(ContestController!=null)
             ContestController.setBruteForceComponent(fileConfigurationDTO);
@@ -321,7 +319,6 @@ public class MainController {
         chosenPositions = new ArrayList<>();
         for (int i = 1; i <= countOfRotors; i++) {
             ChoiceBox choiceBox = getChoiceBox(addToList);
-            // TODO: 9/1/2022 chenge to choicebox
             ObjectProperty<Character> chosenRotorProperty = choiceBox.valueProperty();
             chosenPositions.add(chosenRotorProperty);
             addToHBox.getChildren().add(choiceBox);
@@ -361,7 +358,6 @@ public class MainController {
         this.HBoxListOfPositions.getChildren().clear();
         this.HBoxReflectorChoice.getChildren().clear();
         this.FlowPaneAlphabet.getChildren().clear();
-        //codeConfigurationController.makeEmptyLayout();
     }
     @FXML
     void setCodeListener(ActionEvent event) {
@@ -369,17 +365,15 @@ public class MainController {
         UserConfigurationDTO UserConfiguration = getUserConfigurationDTO();
         if(UserConfiguration == null)
             return;
-        if(CheckBoxIsPluged.isSelected()) {// TODO: 9/1/2022 make it a property list
+        if(CheckBoxIsPluged.isSelected()) {
             //check if plugBoard initial succeed
             if(!setPlugBoard(UserConfiguration))
                 return;
         }
-        //api.selectInitialCodeConfiguration(Specification);
         sendCodeConfigurationToServer(UserConfiguration);
 
 
 
-        // TODO: 9/5/2022  think how to bind statitsics to encrypted decrypted
 
     }
 
@@ -413,7 +407,6 @@ public class MainController {
         if(userConfiguration == null){
         }
         setOriginalConfiguration(userConfiguration);
-        //setCurrentConfiguration();todo add this also after implement servlet
         isConfig.set(true);
     }
     public void setOriginalConfiguration(UserConfigurationDTO originalConfigurationDTO){

@@ -8,13 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 public class Dictionary {
-
-    // TODO: 9/14/2022 convert from static to public and put every task with this dicitonary 
-    // TODO: 10/11/2022 think if its ok to put dictionary and trie in util like this
      public Set<String> getWordDictionary() {
         return wordDictionary;
     }
-    //private Trie trie;
      public boolean isWordsInDictionary(List<String> words){
         for (String word:words) {
             if(!wordDictionary.contains(word))
@@ -41,7 +37,6 @@ public class Dictionary {
         String wordToClean = cleanStringFromExcludeChars(words);
         List<String> wordList = Arrays.asList(wordToClean.split(" "));
         this.wordDictionary = wordList.stream().collect(Collectors.toSet());
-        //this.trie = new Trie(wordDictionary);
 
     }
     public String cleanStringFromExcludeChars(String words) {

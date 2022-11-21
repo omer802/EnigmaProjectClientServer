@@ -79,7 +79,6 @@ public class codeConfigurationController {
 
     }
 
-    // TODO: 9/3/2022 change to property action on file selected
     public void makeEmptyLayout() {
         chosenRotors.set("");
         NotchAndLetterAtPeekPaneStartingPosition.set("");
@@ -99,7 +98,6 @@ public class codeConfigurationController {
     }
 
 
-    // TODO: 9/5/2022 change to more algant way
 
     public void BindCodeConfiguration(codeConfigurationController controller){
         this.chosenRotors.bind(controller.chosenRotorsProperty());

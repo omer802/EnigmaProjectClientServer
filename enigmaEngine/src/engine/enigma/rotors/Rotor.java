@@ -14,7 +14,6 @@ public class Rotor implements Serializable {
 
      public char startingPositionCharacter;
      protected int position;
-     // TODO: 8/7/2022 replace position index to method
      public int startingPositionIndex;
      protected List<pairOfData> PairOfDataArray;
      public Rotor( String id, List<pairOfData> setPairArray) {
@@ -42,7 +41,6 @@ public class Rotor implements Serializable {
           return startingPositionIndex;
      }
 
-     //לאחד לפונקציה אחת את ימים ושמאל ולמנוע שכפול קוד
      public int convertRightToLeft(int index) {
           int indexWithPosition = (index + position) % PairOfDataArray.size();
           Character inputChar = PairOfDataArray.get(indexWithPosition).getRight();

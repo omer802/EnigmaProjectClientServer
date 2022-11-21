@@ -277,7 +277,6 @@ public class ApiEnigmaImp implements ApiEnigma {
             userConfigurationDTOAdapter.setPlugBoardToShow("");
 
         userConfigurationDTOAdapter.setFullConfiguration(originalConfiguration.toString());
-      // dataEncryption("AAA");
     }
 
     public void setStatisticsProperty(StringProperty statisticsProperty){
@@ -327,12 +326,6 @@ public class ApiEnigmaImp implements ApiEnigma {
         return enigma.getDecipher().getDictionary();
 
     }
-
-
-
-    /*public int getAmountOfAgents(){
-        //return enigma.getDecipher().getAmountOfAgents();
-    }*/
     public double calculateAmountOfTasks(long missionSize, UBoat.DifficultyLevel level){
         return enigma.getDecipher().calculateAmountOfTasks(missionSize,level);
     }

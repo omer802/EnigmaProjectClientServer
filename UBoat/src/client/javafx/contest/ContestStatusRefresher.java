@@ -30,7 +30,6 @@ public class ContestStatusRefresher extends TimerTask {
     @Override
     public void run() {
         if (!isReadyOrInContest.getValue()) {
-            //replace with cancel
             return;
         }
 
