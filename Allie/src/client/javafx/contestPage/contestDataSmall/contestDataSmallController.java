@@ -19,11 +19,9 @@ public class contestDataSmallController {
     @FXML
     private TableColumn<ContestInformationDTO, String> UBoatName;
 
-    // TODO: 10/14/2022 replace status with enum
     @FXML
     private TableColumn<ContestInformationDTO, String> status;
 
-    // TODO: 10/14/2022 same as above
     @FXML
     private TableColumn<ContestInformationDTO, String> level;
 
@@ -32,6 +30,7 @@ public class contestDataSmallController {
 
     @FXML
     private TableColumn<ContestInformationDTO, Integer> signedAllies;
+    private ContestInformationDTO contestInformationDTOList;
 
     @FXML
     public void initialize() {
@@ -48,23 +47,17 @@ public class contestDataSmallController {
         ObservableList<ContestInformationDTO> items = table.getItems();
         items.clear();
         items.add(contestInformationDTOList);
+        this.contestInformationDTOList = contestInformationDTOList;
+    }
+    public ContestInformationDTO getChosenContest(){
+        return contestInformationDTOList;
     }
 
     public void removeContest() {
         ObservableList<ContestInformationDTO> items = table.getItems();
         items.clear();
+        this.contestInformationDTOList = null;
+
     }
-
-    public void updateAmountOfSignedTeam(int newValue) {
-      /*
-        if(table.getItems().get(0)!=null) {
-            // table.getItems().get(0).setSignedAllies(newValue+1);
-            ContestInformationDTO contestInfo = table.getItems().get(0);
-            //table.getItems().removeAll();
-            contestInfo.setSignedAllies(newValue+1);
-            table.getItems().add(contestInfo);*/
-    }
-
-
 }
 

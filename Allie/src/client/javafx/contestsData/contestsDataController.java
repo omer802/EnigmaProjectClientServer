@@ -34,11 +34,9 @@ public class contestsDataController implements Closeable {
     @FXML
     private TableColumn<ContestInformationDTO, String> UBoatName;
 
-    // TODO: 10/14/2022 replace status with enum
     @FXML
     private TableColumn<ContestInformationDTO, String> status;
 
-    // TODO: 10/14/2022 same as above
     @FXML
     private TableColumn<ContestInformationDTO, String> level;
 
@@ -63,6 +61,9 @@ public class contestsDataController implements Closeable {
 
     public void setChosenContestDTO(ContestInformationDTO chosenContestDTO) {
         this.chosenContestDTO = chosenContestDTO;
+    }
+    public void removeChosenContestDTO(){
+        this.chosenContestDTO = null;
     }
 
     private ContestInformationDTO chosenContestDTO = null;
@@ -106,17 +107,26 @@ public class contestsDataController implements Closeable {
 
     private void updateContests(List<ContestInformationDTO> contestInformationDTOList) {
         Platform.runLater(() -> {
-            ObservableList<ContestInformationDTO> items = table.getItems();
-            if (!contestInformationDTOList.equals(items)) {
-                items.clear();
-                items.addAll(contestInformationDTOList);
-                ContestInformationDTO contestInformationDTO = null;
-                if(chosenContestDTO != null){
-                contestInformationDTO = contestInformationDTOList.
-                        stream().filter(u -> u.getUBoatName().equals(chosenContestDTO.getUBoatName())).findFirst().get();
+            if(contestInformationDTOList!=null) {
+                ObservableList<ContestInformationDTO> items = table.getItems();
+                if (contestInformationDTOList.size() > 0) {
+                    if (!contestInformationDTOList.equals(items)) {
+                        items.clear();
+                        items.addAll(contestInformationDTOList);
+                        Optional<ContestInformationDTO> contestInformationDTO;
+                        if (chosenContestDTO != null) {
+                            contestInformationDTO = contestInformationDTOList.
+                                    stream().filter(u -> u.getUBoatName().equals(chosenContestDTO.getUBoatName())).findFirst();
+                            if (contestInformationDTO.isPresent()) {
+                                contestDataSmallController.setChosenContests(contestInformationDTO.get());
+                                amountOfContests.set(contestInformationDTOList.size());
+                        }
+
+                        }
+                    }
+                } else{
+                    items.clear();
                 }
-                contestDataSmallController.setChosenContests(contestInformationDTO);
-                amountOfContests.set(contestInformationDTOList.size());
             }
         });
     }

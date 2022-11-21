@@ -6,6 +6,7 @@ import DTOS.agentInformationDTO.AgentInfoDTO;
 import DTOS.agentInformationDTO.CandidateDTO;
 import client.constants.AlliesConstants;
 import client.javafx.contestPage.AgentsProgressAndDM.AgentProgressController;
+import client.javafx.contestPage.IsUBoatLogoutRefresher;
 import client.javafx.contestPage.candidate.CandidateController;
 import client.javafx.contestPage.contestDataSmall.contestDataSmallController;
 import client.javafx.contestPage.teamsDetails.TeamsDetailsController;
@@ -74,27 +75,31 @@ public class alliesController {
     private AnchorPane agentAndDMProgress;
     @FXML
     private AgentProgressController agentAndDMProgressController;
+    @FXML
+    private Tab dashboardTab;
+    @FXML
+    private Tab contestTab;
 
 
     @FXML
     private Label contestErrorLabel;
-    private SimpleStringProperty contestStatusAndErrorsProperty = new SimpleStringProperty();
-    private SimpleStringProperty errorUpdateMissionProperty = new SimpleStringProperty();
+    private final SimpleStringProperty contestStatusAndErrorsProperty = new SimpleStringProperty("Press ready to start game");
+    private final SimpleStringProperty errorUpdateMissionProperty = new SimpleStringProperty();
     @FXML
     private Label errorMessageLabel;
     @FXML
     private Label stringToHackLabel;
     private SimpleStringProperty stringToHack = new SimpleStringProperty("");
-    private  StringProperty errorMessageProperty = new SimpleStringProperty();
+    private final StringProperty errorMessageProperty = new SimpleStringProperty();
 
     private SimpleStringProperty userName;
     private Stage primaryStage;
-    private SimpleBooleanProperty isActiveContest = new SimpleBooleanProperty(false);
-    private SimpleBooleanProperty isReady = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty isActiveContest = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty isReady = new SimpleBooleanProperty(false);
     @FXML
     private Spinner<Integer> SpinnerMissionSize;
     private int missionSize = 1;
-    private SimpleBooleanProperty shouldUpdate = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty shouldUpdate = new SimpleBooleanProperty(true);
     private SimpleIntegerProperty agentAmount =new SimpleIntegerProperty(0);
     private Allie.AllieStatus allieStatus;
     @FXML
@@ -103,8 +108,15 @@ public class alliesController {
     private Button readyButton;
     @FXML
     private Button updateMissionSize;
-    private Timer timer;
+    private Timer timerContestStatusRefresher;
     private boolean isFirstConfig = true;
+    private SimpleBooleanProperty isSigned = new SimpleBooleanProperty(false);
+    @FXML
+    private TabPane tabPaneManager;
+    private SimpleBooleanProperty UBoatLogoutAction = new SimpleBooleanProperty(false);
+
+    private Timer isLogoutTimer;
+    private IsUBoatLogoutRefresher isUBoatLogoutRefresher;
     @FXML
     public void initialize() {
         contestErrorLabel.textProperty().bind(contestStatusAndErrorsProperty);
@@ -114,13 +126,22 @@ public class alliesController {
         contestsDataTableViewController.setChosenContestController(chosenContestController);
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
         stringToHackLabel.textProperty().bind(Bindings.concat("string to hack: ", stringToHack));
-        stringToHackLabel.visibleProperty().bind(isActiveContest);
+        stringToHackLabel.setVisible(false);
         contestsDataTableViewController.setMainController(this);
         candidatesController.setErrorHandlerMainController(this::alertShowException);
         candidatesController.setActiveContestAndAgentsAmountProperty(isActiveContest);
         agentAndDMProgressController.setStringToHackAndActiveContestProperty(isActiveContest,stringToHack,this::alertShowException);
         readyButton.disableProperty().bind(isReady);
         updateMissionSize.disableProperty().bind(isReady);
+
+        dashboardTab.disableProperty().bind(isSigned);
+        contestTab.disableProperty().bind(isSigned.not());
+        isSigned.addListener((observable, oldValue, newValue) ->{
+            if(newValue){
+                tabPaneManager.getSelectionModel().select(contestTab);
+            }else
+                tabPaneManager.getSelectionModel().select(dashboardTab);
+        });
 
         setSpinner();
     }
@@ -147,7 +168,6 @@ public class alliesController {
                 if (event.getCode() == KeyCode.ENTER) {
 
                     try {
-                        // yes, using exception for control is a bad solution ;-)
                         Integer.parseInt(SpinnerMissionSize.getEditor().textProperty().get());
                     }
                     catch (NumberFormatException e) {
@@ -162,6 +182,7 @@ public class alliesController {
 
         };
         SpinnerMissionSize.getEditor().addEventHandler(KeyEvent.KEY_PRESSED, enterKeyEventHandler);
+
     }
 
     public void setUserName(String userName) {
@@ -233,46 +254,80 @@ public class alliesController {
 
             });
         }
-        ///make allie ready and if ready do this:
-        //check if allie in contest and if so do this:
-
     }
     public void startContestRefresher(){
+
         candidatesController.startCandidateRefresher();
         isFirstConfig = true;
         ContestStatusRefresher contestStatusRefresher = new ContestStatusRefresher(isReady,this::alertShowException,this::updateCurrentState);
-        timer = new Timer();
-        timer.schedule(contestStatusRefresher,REFRESH_RATE,REFRESH_RATE);
+        timerContestStatusRefresher = new Timer();
+        timerContestStatusRefresher.schedule(contestStatusRefresher,REFRESH_RATE,REFRESH_RATE);
     }
-    //        IDLE, READY, IN_CONTEST,FINISHED_CONTEST
     public void updateCurrentState(Allie.AllieStatus allieStatus){
         this.allieStatus = allieStatus;
-        System.out.println(allieStatus.name());
         switch (allieStatus){
             case IDLE:
                 break;
-            case  READY:
-                isReady.set(true);
+            case READY:
+                Platform.runLater(()->{isReady.set(true);
                 contestStatusAndErrorsProperty.set("Ready, Waiting for contest to start...");
+                });
                 break;
             case IN_CONTEST:
                 if(isFirstConfig) {
-                    contestStatusAndErrorsProperty.set("In active game...");
-                    isActiveContest.set(true);
-                    isFirstConfig = false;
+                    Platform.runLater(()-> {
+                        contestStatusAndErrorsProperty.set("In active game...");
+                        stringToHackLabel.setVisible(true);
+                        isActiveContest.set(true);
+                        isFirstConfig = false;
+                    });
                 }
                 break;
             case FINISHED_CONTEST:
-                isReady.set(false);
-                isActiveContest.set(false);
-                contestStatusAndErrorsProperty.set("finished...");
-                getWinnerFromSever();
-                contestStatusAndErrorsProperty.set("");
+                Platform.runLater(()-> {
+                    stringToHackLabel.setVisible(true);
+                    finishGame();
+                });
                 break;
         }
     }
+    private void finishGame(){
+        isReady.set(false);
+        isActiveContest.set(false);
+        contestStatusAndErrorsProperty.set("finished...");
+        try {
+            getWinnerFromSever();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        contestStatusAndErrorsProperty.set("Press ready to start game");
+    }
+    private void signoutFromUBoat(){
+        HttpClientUtil.runAsync(CommonConstants.REST_CONTEST, new Callback() {
 
-    private void getWinnerFromSever() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        alertShowException(new RuntimeException("failed call :Something went wrong: " + e.getMessage()));
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        String winnerResponse = response.body().string();
+                        if (!response.isSuccessful()) {
+                            alertShowException(new RuntimeException("Something went wrong:" + winnerResponse));
+                        } else {
+                            Platform.runLater(() -> {
+                              // move to before contest page
+
+                            });
+                        }
+                    }
+                }
+        );
+    }
+
+    private void getWinnerFromSever() throws IOException {
+
         HttpClientUtil.runAsync(CommonConstants.GET_WINNER, new Callback() {
 
                     @Override
@@ -283,8 +338,9 @@ public class alliesController {
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                         String winnerResponse = response.body().string();
-                        System.out.println(winnerResponse);
-                        if (winnerResponse == null) {
+                        if (winnerResponse.equals("null")) {
+                            cleanContestData();
+                            signoutFromUBoat();
                             return;
                         }
                         if (!response.isSuccessful()) {
@@ -293,14 +349,15 @@ public class alliesController {
                             Platform.runLater(() -> {
                                 CandidateDTO candidatesDTO = GSON_INSTANCE.fromJson(winnerResponse, CandidateDTO.class);
                                 StringBuilder sb = new StringBuilder();
-
                                 Alert winnerAlert = new Alert(Alert.AlertType.INFORMATION);
-                                winnerAlert.setTitle("Allie Message: We Have A Winner!");
+                                winnerAlert.setTitle( "Message from Allie " + userName.getValue() +": finish contest message");
                                 sb.append("The Winner is: " + candidatesDTO.getHowFind() + "\n");
-                                sb.append("Found in the following code: " + candidatesDTO.getCode());
-                                winnerAlert.setHeaderText(sb.toString());
+                                sb.append("The string found in the following code: \n" + candidatesDTO.getCode());
+                                winnerAlert.setHeaderText("Message");
+                                winnerAlert.setContentText(sb.toString());
                                 winnerAlert.showAndWait();
                                 cleanContestData();
+                                signoutFromUBoat();
 
                             });
                         }
@@ -308,14 +365,20 @@ public class alliesController {
                 }
         );
     }
+
     private void cleanContestData() {
+        isSigned.set(false);
+        stringToHackLabel.setVisible(false);
         candidatesController.terminateCandidateRefresher();
+        agentAndDMProgressController.terminateAgentAndDMProgressRefresher();
         candidatesController.clearCandidateTable();
-        timer.cancel();
-        errorMessageProperty.set("To start contest press ready");
+        timerContestStatusRefresher.cancel();
+        errorMessageProperty.set("Select contest");
+        contestsDataTableViewController.removeChosenContestDTO();
         chosenContestController.removeContest();
         participantTeamsController.terminateTeamDetailRefresher();
-        //agentAndDMProgressController.clearProgress();
+        agentAndDMProgressController.clearProgress();
+        isLogoutTimer.cancel();
 
     }
 
@@ -326,7 +389,6 @@ public class alliesController {
         teamAgentsTableViewController
                 .startSignedAgentsRefresher((errorMessage)->errorMessageProperty.set(errorMessage),
                         shouldUpdate,agentAmount);
-        agentAndDMProgressController.startProgressRefresher();
 
     }
 
@@ -363,7 +425,7 @@ public class alliesController {
                     if (response.code() != 200) {
                         String responseBody = response.body().string();
                         Platform.runLater(() ->
-                                errorMessageProperty.set("Something went wrong: " + responseBody)
+                                errorMessageProperty.set("Something went wrong: wala" + responseBody)
                         );
                     } else {
                         Platform.runLater(() -> {
@@ -371,12 +433,69 @@ public class alliesController {
                             chosenContestController.setChosenContests(chosenContest);
                             contestsDataTableViewController.setChosenContestDTO(chosenContest);
                             participantTeamsController.startListRefresher();
+                            agentAndDMProgressController.startProgressRefresher();
+                            startLogoutRefresher();
+                            isSigned.set(true);
 
                         });
                     }
                 }
             });
         }
+
+    private void startLogoutRefresher() {
+        isUBoatLogoutRefresher = new IsUBoatLogoutRefresher(this::uBoatLogoutAction,this::alertShowException);
+        isLogoutTimer = new Timer();
+        isLogoutTimer.schedule(isUBoatLogoutRefresher,REFRESH_RATE,REFRESH_RATE);
+    }
+    public void uBoatLogoutAction(boolean isLogout){
+       if(isLogout){
+           Platform.runLater(()->{ ContestInformationDTO contestInformationDTO = chosenContestController.getChosenContest();
+               Alert logoutMessage = new Alert(Alert.AlertType.INFORMATION);
+               logoutMessage.setTitle( "Allie " + userName.getValue() +" message");
+               logoutMessage.setHeaderText("Message");
+               logoutMessage.setContentText("UBoat player:"+ contestInformationDTO.getUBoatName()+ " have logged out");
+               logoutMessage.showAndWait();
+               cleanContestData();
+
+
+               String finalUrl = HttpUrl
+                       .parse(CommonConstants.LOGOUT_REQUEST)
+                       .newBuilder()
+                       .addQueryParameter(CommonConstants.LOGOUT_ACTION_TYPE, "deleteAllieFromUBoat")
+                       .build()
+                       .toString();
+               Request request = new Request.Builder()
+                       .url(finalUrl)
+                       .build();
+
+
+               HttpClientUtil.runAsync(request, new Callback() {
+
+                   @Override
+                   public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                       alertShowException(new RuntimeException
+                               ("faild call :Something went wrong:"  + e.getMessage()));
+
+                   }
+
+                   @Override
+                   public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                       String responseString = response.body().string();
+                       if (response.code() != 200) {
+                           alertShowException(new RuntimeException(responseString));
+                       }
+                       else{
+                       }
+
+
+                   }
+               });
+           });}
+
+
+
+    }
 
     @FXML
     private void updateMissionSizeAction(ActionEvent event){
@@ -405,7 +524,6 @@ public class alliesController {
                 } else {
                     Platform.runLater(() -> {
                         contestStatusAndErrorsProperty.set("Mission size updated successfully");
-                        System.out.println("update mission size!");
                     });
                 }
             }

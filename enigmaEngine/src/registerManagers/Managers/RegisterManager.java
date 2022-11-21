@@ -87,20 +87,86 @@ public class RegisterManager {
 
     public UBoat.GameStatus getContestStatusByUBoat(String uBoatUsername) {
         UBoat uBoat = getUBoatByName(uBoatUsername);
-        UBoat.GameStatus uBoatStatus = uBoat.getContestStatus();
-        return uBoatStatus;
+        return uBoat.getContestStatus();
     }
 
     public Allie.AllieStatus getContestStatusByAllie(String  allieUserName) {
         Allie allie = getAllieByName(allieUserName);
         return allie.getAllieStatus();
     }
+    synchronized public void signoutAllieFromContest(Allie allie){
+        mediator.removeAllieFromContest(allie);
+    }
+
+    synchronized public void signoutAllieFromContestAndRestDM(String allieName) {
+        Allie allie = getAllieByName(allieName);
+        signoutAllieFromContest(allie);
+        allie.restDM();
+        mediator.notifyWaitingAgentsSignedToALlie(allie);
+        //mediator.restAgentsSignedToAllie(allie);
+    }
+
+    public void restUBoatAfterContest(String uBoatName) {
+        UBoat uBoat = getUBoatByName(uBoatName);
+        uBoat.initUBoatForNewContest();
+    }
+
+    public Battlefield signoutUBoat(String uBoatName) {
+        UBoat uBoat = getUBoatByName(uBoatName);
+        Battlefield battlefield = uBoat.getBattlefield();
+        uBoat.inLogoutMode();
+        if(uBoat.getAlliesSignedAmount()==0){
+            removeUBoatFromManagers(uBoat);
+            return battlefield;
+        }
+        else{
+            mediator.activateSignoutModeForEachAllieSignedToUBoat(uBoat);
+            return null;
+        }
+    }
+
+    public Battlefield signoutAllieFromContestAfterUBoatLogout(String allieName) {
+        Allie allie = alliesManager.getClientByName(allieName);
+        UBoat uBoat = mediator.getUBoatByAllie(allie);
+        Battlefield battlefield = uBoat.getBattlefield();
+        signoutAllieFromContest(allie);
+        allie.cancelUBoatLogoutAction();
+        if(uBoat.getAlliesSignedAmount() == 0){
+            removeUBoatFromManagers(uBoat);
+            return battlefield;
+        }
+        return null;
+
+
+    }
+    synchronized public void removeUBoatFromManagers(UBoat uBoat){
+        Battlefield battlefield = uBoat.getBattlefield();
+        battlefieldManager.removeClient(battlefield);
+        ClientUser uBoatUser = userManager.getClientByName(uBoat.getUserName());
+        userManager.removeClient(uBoatUser);
+        UBoatManager.removeClient(uBoat);
+    }
+
+     public boolean checkIfUBoatLogOut(String allieName) {
+        Allie allie = getAllieByName(allieName);
+        return allie.isSignoutFromUBoatAction();
+    }
+
+    synchronized public UBoat getUBoatByAgentName(String agentUserName) {
+        Allie allie = getAllieByAgentName(agentUserName);
+        return mediator.getUBoatByAllie(allie);
+    }
+
+    public boolean isAgentWaiting(String usernameFromSession) {
+        Agent agent = agentManager.getClientByName(usernameFromSession);
+        return agent.isWaiting();
+    }
 
 
     // TODO: 10/20/2022 create dm and make it work with this
 
 
-    public static enum ClientType {
+    public enum ClientType {
         UBOAT, ALLIE, AGENT
     }
 
@@ -108,12 +174,12 @@ public class RegisterManager {
         return mediator;
     }
 
-    private Mediator mediator;
-    private GenericManager<ClientUser> userManager;
-    private GenericManager<Battlefield> battlefieldManager;
-    private GenericManager<UBoat> UBoatManager;
-    private GenericManager<Allie> alliesManager;
-    private GenericManager<Agent> agentManager;
+    private final Mediator mediator;
+    private final GenericManager<ClientUser> userManager;
+    private final GenericManager<Battlefield> battlefieldManager;
+    private final GenericManager<UBoat> UBoatManager;
+    private final GenericManager<Allie> alliesManager;
+    private final GenericManager<Agent> agentManager;
 
     private static final Object alliesAndUBoatLock = new Object();
 
@@ -132,7 +198,6 @@ public class RegisterManager {
         Allie allie = getAllieByAgentName(agentUserName);
         EnigmaMachine enigmaMachine = allie.getDm().getMachine().clone();
         if(enigmaMachine == null){
-            System.out.println("Machine is not config at agent");
             throw new RuntimeException("Machine is not config at agent");
         }
         Dictionary dictionary = agent.getDictionary();
@@ -151,6 +216,7 @@ public class RegisterManager {
         Allie allie = getAllieByAgentName(agentUserName);
         return allie.getBlockingQueue();
     }
+
     synchronized public ContestInformationDTO getContestFromAllieByAgentName(String agentName) {
         Allie allie = getAllieByAgentName(agentName);
         if(!allie.isSigned())
@@ -166,7 +232,7 @@ public class RegisterManager {
     }
     public List<AlliesDetailDTO> getSignedAllies(String userName) {
         UBoat uBoat = getUBoatByName(userName);
-        return mediator.getUBoatSignedAllies(uBoat);
+        return mediator.getUBoatSignedAlliesDTO(uBoat);
     }
 
     public List<AlliesDetailDTO> getParticipantAlliesInContest(String allieName) {
@@ -206,16 +272,21 @@ public class RegisterManager {
         Allie allie = getAllieByName(agentDTO.getAllieName());
         return allie.areInContest();
     }
-    public List<ContestInformationDTO> getContestInformation(){
+    public List<ContestInformationDTO> getContestInformation() {
         List<UBoat> uBoatList = UBoatManager.getClients();
-        List<ContestInformationDTO> contestInformationDTOS;
-        synchronized (UBoatManager) {
-            contestInformationDTOS = uBoatList.stream().
-                    filter(u -> u.isActive())
-                    .map(UBoat::getContestInformationDTO)
-                    .collect(Collectors.toList());
+        if (uBoatList.size() > 0) {
+            List<ContestInformationDTO> contestInformationDTOS;
+            synchronized (UBoatManager) {
+                contestInformationDTOS = uBoatList.stream().
+                        filter(u -> u.isActive() && (!u.isLogoutMode()))
+                        .map(UBoat::getContestInformationDTO)
+                        .collect(Collectors.toList());
+            }
+            return contestInformationDTOS;
         }
-        return contestInformationDTOS;
+        else{
+            return new ArrayList<>();
+        }
     }
     synchronized public void makeClientReady(String usernameFromSession) {
         ClientType clientType = getTypeByName(usernameFromSession);
@@ -311,7 +382,8 @@ public class RegisterManager {
                 break;
             case ALLIE:
                 Allie allie = getAllieByName(username);
-                winner = mediator.getWinnerByAllie(allie);
+               // winner = mediator.getWinnerByAllie(allie);
+                winner = allie.getWinner();
                 break;
             case AGENT:
                 Agent agent = agentManager.getClientByName(username);

@@ -8,21 +8,22 @@ import registerManagers.mediators.Mediator;
 
 public class Agent implements Client,User {
     private Mediator mediator;
-    private String agentName;
-    private String chosenAlliesName;
+    private final String agentName;
+    private final String chosenAlliesName;
 
 
 
     private EnigmaMachine enigmaMachine;
     private Dictionary dictionary;
     private boolean isReadyForContest;
-    private int missionAmount;
-    private int threadAmount;
+    private final int missionAmount;
+    private final int threadAmount;
 
     private long acceptedMissions;
     private int waitingMissions;
     private int candidateAmount;
     private long completedMissions;
+    private boolean waiting;
 
     public String getChosenAlliesName() {
         return chosenAlliesName;
@@ -35,6 +36,7 @@ public class Agent implements Client,User {
         this.missionAmount = agentInfoDTO.getMissionAmount();
         this.threadAmount = agentInfoDTO.getThreadAmount();
         this.isReadyForContest = false;
+        this.waiting = false;
     }
     //public AgentInfoDTO(String userName, String allieName, int threadAmount, int missionAmount) {
 
@@ -79,5 +81,21 @@ public class Agent implements Client,User {
     }
     synchronized public AgentProgressDTO getProgressDTO(){
        return new AgentProgressDTO(agentName,acceptedMissions,waitingMissions,candidateAmount, completedMissions);
+    }
+    synchronized public void restProgressDTO(){
+        acceptedMissions = 0;
+        waitingMissions = 0;
+        candidateAmount = 0;
+        completedMissions = 0;
+    }
+
+    public void needToWait() {
+        waiting = true;
+    }
+    public boolean isWaiting(){
+        return waiting;
+    }
+    public void finishWaiting(){
+        waiting = false;
     }
 }

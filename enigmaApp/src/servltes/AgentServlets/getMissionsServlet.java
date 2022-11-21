@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import registerManagers.Managers.RegisterManager;
+import registerManagers.clients.UBoat;
 import servltes.constants.Constants;
 import servltes.utils.ServletUtils;
 import servltes.utils.SessionUtils;
@@ -42,25 +43,31 @@ public class getMissionsServlet extends HttpServlet {
             String agentUserName = SessionUtils.getUsername(req);
             BlockingQueue<AgentTaskConfigurationDTO> blockingQueue = registerManager.getBlockingQueueByAgentName(agentUserName);
             List<AgentTaskConfigurationDTO> missionTaskList = new ArrayList<>();
-            AtomicLong atomicLong = registerManager.getTotalTaskAmount(agentUserName);
-            synchronized (registerManager.getBlockingQueueByAgentName(agentUserName)) {
-                for (int i = 0; i < missionAmount; i++) {
+            AtomicLong atomicMissionAmount = registerManager.getTotalTaskAmount(agentUserName);
+            //4 new line of if and else
+              UBoat uBoat = registerManager.getUBoatByAgentName(agentUserName);
+              if (!uBoat.isActiveContest()) {
+                      registerManager.finishContestInAllieByAgentName(agentUserName);
+                      resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            } else {
+                synchronized (registerManager.getBlockingQueueByAgentName(agentUserName)) {
+                    for (int i = 0; i < missionAmount; i++) {
+                        AgentTaskConfigurationDTO agentTaskConfiguration = blockingQueue.poll();
+                        if (agentTaskConfiguration != null) {
+                            missionTaskList.add(agentTaskConfiguration);
+                            long missionAmountLeft = atomicMissionAmount.decrementAndGet();
 
-                    AgentTaskConfigurationDTO agentTaskConfiguration = blockingQueue.poll();
-                    if (agentTaskConfiguration != null) {
-                        missionTaskList.add(agentTaskConfiguration);
-                        long missionAmountLeft = atomicLong.decrementAndGet();
-                        if (missionAmountLeft < 1) {
-                            registerManager.finishContestInAllieByAgentName(agentUserName);
-                            break;
+                            }
                         }
+
                     }
                 }
-            }
-            String jsonTasks = gson.toJson(missionTaskList);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            out.println(jsonTasks);
-            out.flush();
+
+                String jsonTasks = gson.toJson(missionTaskList);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                out.println(jsonTasks);
+                out.flush();
+           // }
         }
 
     }

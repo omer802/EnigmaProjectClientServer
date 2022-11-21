@@ -120,6 +120,7 @@ public class UBoatLoginController {
             Parent UBoatScreen = fxmlLoader.load(UBoatScreenURL.openStream());
             mainController = fxmlLoader.getController();
             mainController.setPrimaryStage(primaryStage);
+            mainController.setLoginController(this);
             primaryStage.setTitle("UBoat Client");
             UBoatScene = new Scene(UBoatScreen, 800,600);
             primaryStage.setMinHeight(300f);

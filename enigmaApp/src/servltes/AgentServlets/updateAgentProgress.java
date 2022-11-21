@@ -29,10 +29,7 @@ public class updateAgentProgress extends HttpServlet {
         AgentProgressDTO agentProgressDTO = gson.fromJson(agentProgressDTOBuffer, AgentProgressDTO.class);
         String agentUsername = SessionUtils.getUsername(req);
         RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
-        //System.out.println(agentProgressDTO.getAgentName());
-        //System.out.println(agentProgressDTO.getAcceptedMissions());
-        //System.out.println(agentProgressDTO.getWaitingMissions());
-        //System.out.println(agentProgressDTO.getCandidatesAmount());
+
 
         registerManager.updateAgentProgress(agentUsername,agentProgressDTO);
     }

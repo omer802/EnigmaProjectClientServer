@@ -56,7 +56,6 @@ public class AlliesLoginController {
             return;
         }
 
-        //noinspection ConstantConditions
         String finalUrl = HttpUrl
                 .parse(CommonConstants.LOGIN_PAGE)
                 .newBuilder()

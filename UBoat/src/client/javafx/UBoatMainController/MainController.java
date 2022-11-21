@@ -153,6 +153,7 @@ public class MainController {
     @FXML
     public void initialize() {
         ContestController.setActiveContestProperty(inActiveContest);
+
         this.userName = new SimpleStringProperty();
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
 
@@ -180,7 +181,7 @@ public class MainController {
         CheckBoxIsPluged.disableProperty().bind(isFileSelected.not());
         ContestController.setErrorHandlerMainController(this::alertShowException);
 
-        ContestController.setMainPageController(this);
+        ContestController.setMainPageController(this,userName);
 
     }
 
@@ -377,7 +378,6 @@ public class MainController {
         sendCodeConfigurationToServer(UserConfiguration);
 
 
-        //api.DecipherMessage("ICJ AOZKR", DM.DifficultyLevel.IMPOSSIBLE,10, uiAdapter);
 
         // TODO: 9/5/2022  think how to bind statitsics to encrypted decrypted
 
@@ -442,7 +442,6 @@ public class MainController {
         Collections.reverse(chosenRotors);
         if (isIdenticalRotors(chosenRotors)) {
             alertShowException(new RuntimeException("Error: You have chose more than one identical rotor"));
-            //System.out.println("error accoured");
             return null;
         }
         String chosenPositions = getChosenPosition();
@@ -477,7 +476,6 @@ public class MainController {
         String positionsToReturn = chosenPositions.stream().
                 map(p -> p.getValue().
                         toString()).reduce("", String::concat);
-        //System.out.println(positionsToReturn);
         return positionsToReturn;
     }
 
@@ -542,6 +540,7 @@ public class MainController {
     }
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.ContestController.setPrimaryStage(primaryStage);
 
 
     }
@@ -549,12 +548,10 @@ public class MainController {
         String connections = PlugBoardUI.getConnections();
         if (PlugBoardUI.amountOfCharacterSelected % 2 != 0) {
             alertShowException(new RuntimeException("One of the plugs doesn't have a pair"));
-            //System.out.println("One of the plugs doesn't have a pair\n");
             return false;
         }
         else{
             Specification.setPlugBoardConnections(connections);
-            //System.out.println(connections);
             return true;
         }
     }
@@ -604,4 +601,6 @@ public class MainController {
     }
 
 
+    public void setLoginController(UBoatLoginController uBoatLoginController) {
+    }
 }

@@ -59,7 +59,6 @@ public class RotatingRotors  implements Serializable {
         setRotorsChain();
     }
 
-    // TODO: 8/6/2022 think about what exption i need here. like if the position is not in the scoop in every rotor
 
     public void advanceRotorsInChain()
     {

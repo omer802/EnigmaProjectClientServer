@@ -20,7 +20,9 @@ public class CommonConstants {
     public final static String UPDATE_AGENT_PROGRESS = FULL_SERVER_PATH + "/updateAgentProgress";
     public final static String GET_AGENT_AND_DM_PROGRESS = FULL_SERVER_PATH + "/getAgentsAndDMProgress";
     public final static String GET_WINNER = FULL_SERVER_PATH + "/getWinnerServlet";
-
+    public static final String REST_CONTEST = FULL_SERVER_PATH +  "/finishContestAndRest";
+    public final static String LOGOUT_REQUEST = FULL_SERVER_PATH + "/logoutServlet";
+    public static final String LOGOUT_ACTION_TYPE = "logoutActionType";
 
 
 }

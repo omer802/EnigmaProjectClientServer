@@ -54,7 +54,6 @@ public class TeamsDetailsController {
         missionSize.setCellValueFactory(new PropertyValueFactory<AlliesDetailDTO, Long>("missionSize"));
         autoUpdate = new SimpleBooleanProperty(true);
         participantTeamsInContest = new SimpleIntegerProperty(0);
-        //participantTeamsInContest.addListener((observable,  oldValue, newValue) -> chosenContestController.updateAmountOfSignedTeam(newValue.intValue()));
     }
     public void startListRefresher() {
         participantTeams = new participantTeamsRefresher(
@@ -75,9 +74,6 @@ public class TeamsDetailsController {
             if (!contestInformationDTOList.equals(items)) {
                 items.clear();
                 items.addAll(contestInformationDTOList);
-
-
-                //participantTeamsInContest.set(contestInformationDTOList.size());
 
             }
         });

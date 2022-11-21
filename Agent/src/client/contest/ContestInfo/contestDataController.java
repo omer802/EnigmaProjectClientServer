@@ -23,11 +23,9 @@ public class contestDataController {
     @FXML
     private TableColumn<ContestInformationDTO, String> UBoatName;
 
-    // TODO: 10/14/2022 replace status with enum
     @FXML
     private TableColumn<ContestInformationDTO, String> status;
 
-    // TODO: 10/14/2022 same as above
     @FXML
     private TableColumn<ContestInformationDTO, String> level;
 
@@ -52,10 +50,12 @@ public class contestDataController {
 
     }
 
-    public void setChosenContests(ContestInformationDTO contestInformationDTOList) {
+    public void setChosenContests(ContestInformationDTO contestInformationDTO) {
+
         ObservableList<ContestInformationDTO> items = table.getItems();
         items.clear();
-        items.add(contestInformationDTOList);
+        if(contestInformationDTO !=null)
+          items.add(contestInformationDTO);
     }
 
     public void removeContest() {

@@ -8,9 +8,9 @@
           <element id="module-output" name="DTO" />
         </element>
         <element id="directory" name="lib">
-          <element id="artifact" artifact-name="EnigmaEngine:jar" />
+          <element id="artifact" artifact-name="EnigmaEngine" />
           <element id="library" level="project" name="gson-2.8.8" />
-          <element id="artifact" artifact-name="commonUtils:jar" />
+          <element id="artifact" artifact-name="commonUtils" />
           <element id="library" level="project" name="okHttp" />
         </element>
       </element>

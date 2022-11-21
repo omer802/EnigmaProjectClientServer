@@ -50,6 +50,9 @@ public class activeTeamsDetailsController implements Initializable, Closeable {
     public void addTeamToTable(AlliesDetailDTO teamDetail){
         table.getItems().add(teamDetail);
     }
+    public void terminateListRefresher(){
+        timer.cancel();
+    }
 
     public void startListRefresher() {
         signedAlliesRefresher = new SignedAlliesRefresher(

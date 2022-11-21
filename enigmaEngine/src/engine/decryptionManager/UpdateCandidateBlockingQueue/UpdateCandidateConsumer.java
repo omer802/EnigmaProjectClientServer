@@ -38,7 +38,6 @@ public class UpdateCandidateConsumer implements Runnable {
             }
 
         } catch (InterruptedException e) {
-            System.out.println("Was interrupted !");
         }
     }
     public void finish() {
@@ -47,7 +46,6 @@ public class UpdateCandidateConsumer implements Runnable {
         try {
             blockingDeque.put(agentCandidatesList);
         } catch (InterruptedException e) {
-            System.out.println("problem at poison pill");
         }
         Running = false;
 

@@ -19,9 +19,9 @@ import static util.CommonConstants.GSON_INSTANCE;
 
 public class UpdateAgentProgressRefresher extends TimerTask {
     private AgentMainPageController.AgentStatus shouldRefreshContestStatus;
-    private Consumer<String> httpRequestLoggerConsumer;
+    private final Consumer<String> httpRequestLoggerConsumer;
     private Consumer<Boolean> contestInformationConsumer;
-    private PropertiesToUpdate propertiesToUpdate;
+    private final PropertiesToUpdate propertiesToUpdate;
 
     public UpdateAgentProgressRefresher(AgentMainPageController.AgentStatus agentStatus, Consumer<String> httpRequestLoggerConsumer, PropertiesToUpdate propertiesToUpdate) {
         this.shouldRefreshContestStatus = agentStatus;
@@ -31,11 +31,6 @@ public class UpdateAgentProgressRefresher extends TimerTask {
 
     @Override
     public void run() {
-      //  if (shouldRefreshContestStatus.equals(AgentMainPageController.AgentStatus.WAITING_CONTEST_TO_END)
-      //  ){//|| shouldRefreshContestStatus.equals(AgentMainPageController.AgentStatus.FINISHED)) {
-      //      return;
-      //  }
-
         AgentProgressDTO agentProgressDTO = propertiesToUpdate.createAgentProgressDTO();
         String agentProgressDTOString = GSON_INSTANCE.toJson(agentProgressDTO);
         RequestBody body =
@@ -63,20 +58,7 @@ public class UpdateAgentProgressRefresher extends TimerTask {
                     Platform.runLater(() ->  httpRequestLoggerConsumer.accept("Something went wrong: " + AllieStatus));
                 } else {
                     Platform.runLater(() -> {
-                 //    httpRequestLoggerConsumer.accept("");
-                 //    if (shouldRefreshContestStatus.equals(AgentMainPageController.AgentStatus.WAITING_FOR_CONTEST)) {
-                 //        Allie.AllieStatus allieStatus = Allie.AllieStatus.valueOf(AllieStatus);
-                 //        switch (allieStatus) {
-                 //            case IN_CONTEST:
-                 //                contestInformationConsumer.accept(true);
-                 //                shouldRefreshContestStatus = AgentMainPageController.AgentStatus.IN_CONTEST;
-                 //                break;
-                 //            case FINISHED_CONTEST:
-                 //                shouldRefreshContestStatus = AgentMainPageController.AgentStatus.FINISHED;
-                 //                break;
 
-                 //           }
-                //        }
                     });
 
                 }

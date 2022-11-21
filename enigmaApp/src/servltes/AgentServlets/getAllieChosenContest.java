@@ -27,7 +27,7 @@ public class getAllieChosenContest extends HttpServlet {
             ContestInformationDTO contestInformationDTO = null;
             try {
                 contestInformationDTO = registerManager.getContestFromAllieByAgentName(username);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 out.println(e.getMessage());
                 resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;

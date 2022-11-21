@@ -112,7 +112,6 @@ public class AgentLoginController {
         ObservableList<String> items = alliesComboBox.getItems();
         List<String> allieNameList = alliesDetailDTOS.stream().map(AlliesDetailDTO::getTeamName).collect(Collectors.toList());
         String allieChosenName = alliesComboBox.getSelectionModel().getSelectedItem();
-        //commonUtilsFunctions.listEqualsIgnoreOrder(allieNameList,items);
         if (!allieNameList.equals(items)) {
             items.clear();
             items.addAll(allieNameList);
@@ -166,7 +165,6 @@ public class AgentLoginController {
                         .addFormDataPart("jsonAgentInfoDTO", jsonAgentInfoDTO)
                         .build();
 
-        //noinspection ConstantConditions
         String finalUrl = HttpUrl
                 .parse(CommonConstants.LOGIN_PAGE)
                 .newBuilder()
@@ -197,15 +195,12 @@ public class AgentLoginController {
 
                     Platform.runLater(() -> {
                         mainPageController.setAgentInfo(agentInfoDTO);
-                        boolean needToWait = needToWaitResponse.equals("true");
+
+                        boolean needToWait = needToWaitResponse.trim().equals("true");
                         mainPageController.updateAgentStatus(needToWait);
                         //if need to active start refresher
                         primaryStage.setScene(AgentScene);
                         primaryStage.show();
-                        // primaryStage.setScene(alliesScene);
-                        //primaryStage.show();
-                        //alliesController.setUserName(userName);
-                       // alliesController.startServerUpdateTimer();
                     });
                 }
             }

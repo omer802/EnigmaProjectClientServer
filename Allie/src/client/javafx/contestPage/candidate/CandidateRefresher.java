@@ -37,7 +37,6 @@ public class CandidateRefresher extends TimerTask {
         /*if (!shouldUpdate.get()) {
             return;
         }*/
-        System.out.println("***********Refresh now");
 
         HttpClientUtil.runAsync(CommonConstants.GET_CANDIDATE, new Callback() {
 

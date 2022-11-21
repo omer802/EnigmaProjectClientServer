@@ -26,7 +26,6 @@ public class getWinnerServlet extends HttpServlet {
             RegisterManager.ClientType clientType = ServletUtils.getTypeByName(username, getServletContext());
             CandidateDTO candidateDTO = registerManager.getWinnerByClientType(username,clientType);
             String json = gson.toJson(candidateDTO);
-            System.out.println("*********************"+json);
             out.print(json);
             out.flush();
         }

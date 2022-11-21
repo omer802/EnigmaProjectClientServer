@@ -17,7 +17,6 @@ public class xmlFileValidatorDTO {
     private String alphabet;
 
 
-    // TODO: 10/10/2022 add check if the file end with .xml in the client UBOAT!
     public xmlFileValidatorDTO() {
         listOfExceptions = new ArrayList<>();
     }

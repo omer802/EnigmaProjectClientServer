@@ -149,4 +149,8 @@ public class DM implements Cloneable {
     public DMProgressDTO getDMProgressDTO(){
         return new DMProgressDTO(totalAmountOfMissions,generatedMissionsAmount.getValue());
     }
+    public void restDMProgress(){
+        totalAmountOfMissions = 0;
+        tasksCreator.restGeneratedAmount();
+    }
 }

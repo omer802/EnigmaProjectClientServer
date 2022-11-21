@@ -44,7 +44,6 @@ public class CandidateController {
     public void updateCandidate(List<CandidateDTO> candidateList) {
         if (candidateList != null)
         {
-            System.out.println("in candidate ");
             Platform.runLater(() -> {
                 ObservableList<CandidateDTO> items = table.getItems();
                 items.forEach(candidateDTO-> candidateDTO.setHowFind(getAgentName()));
@@ -98,5 +97,10 @@ public class CandidateController {
 
     public void setErrorLabel(SimpleStringProperty errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public void restCandidates() {
+        ObservableList<CandidateDTO> items = table.getItems();
+        items.clear();
     }
 }

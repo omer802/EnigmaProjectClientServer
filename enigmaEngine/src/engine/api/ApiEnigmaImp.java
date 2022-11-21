@@ -30,11 +30,8 @@ import keyboard.Keyboard;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
-// TODO: 9/8/2022 move api to ui and Enigma machine to warper class that contain DM
-
 public class ApiEnigmaImp implements ApiEnigma {
     
-    //private EnigmaMachine enigmaMachine;
     private Enigma enigma;
 
     FileConfigurationDTOAdapter fileConfigurationDTOAdapter;
@@ -106,7 +103,6 @@ public class ApiEnigmaImp implements ApiEnigma {
 
     public void selectInitialCodeConfiguration(UserConfigurationDTO configuration){
         enigma.getMachine().selectInitialCodeConfiguration(configuration);
-        //updateStatisticsProperty();
 
     }
 
@@ -136,10 +132,8 @@ public class ApiEnigmaImp implements ApiEnigma {
         UpdateCode(config);
     }
 
-    // TODO: 9/3/2022 update code
     public UserConfigurationDTO automaticallyInitialCodeConfiguration(){
         enigma.getMachine().automaticInitialCodeConfiguration();
-       // updateStatisticsProperty();
          return getCurrentConfiguration();
     }
 
@@ -159,7 +153,6 @@ public class ApiEnigmaImp implements ApiEnigma {
 
         if(!possibleRotors.containsAll(chosenRotorsList))
             RotorsErrors.add("Error: The rotors you are trying to insert is out of range. You have to insert " + getAmountOfRotors()+" rotors from: "+ getPossibleRotors());
-        // TODO: 9/1/2022 check if working with console
         if(isIdenticalRotors(chosenRotorsList))
             RotorsErrors.add("Error: You have entered more than one identical rotor. You have to insert " + getAmountOfRotors()+" rotors from: "+ getPossibleRotors());
         return RotorsErrors;

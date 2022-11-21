@@ -18,7 +18,7 @@
 
 <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.allies.alliesController">
    <content>
-      <BorderPane minHeight="-Infinity" minWidth="-Infinity">
+      <BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0">
          <top>
             <GridPane maxHeight="-Infinity" prefHeight="60.0" prefWidth="796.0">
                <columnConstraints>
@@ -48,9 +48,9 @@
             </GridPane>
          </top>
          <center>
-            <TabPane prefHeight="293.0" prefWidth="798.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <TabPane fx:id="tabPaneManager" prefHeight="293.0" prefWidth="798.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
               <tabs>
-                <Tab text="Dashboard">
+                <Tab fx:id="dashboardTab" text="Dashboard">
                   <content>
                     <AnchorPane prefHeight="508.0" prefWidth="798.0">
                            <children>
@@ -92,7 +92,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Contest">
+                <Tab fx:id="contestTab" text="Contest">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>

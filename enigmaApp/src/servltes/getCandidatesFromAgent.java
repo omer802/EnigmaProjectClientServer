@@ -22,7 +22,6 @@ public class getCandidatesFromAgent extends HttpServlet {
         resp.setContentType("application/json");
         try (PrintWriter out = resp.getWriter()) {
             Gson gson = new Gson();
-            //System.out.println("in candidate");
             RegisterManager registerManager = ServletUtils.getRegisterManager(getServletContext());
             String username = SessionUtils.getUsername(req);
             RegisterManager.ClientType clientType = ServletUtils.getTypeByName(username, getServletContext());

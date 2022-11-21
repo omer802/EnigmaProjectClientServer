@@ -32,8 +32,8 @@ public class FetchMachineAndDictionaryFromAllie extends HttpServlet {
                 return;
             }
             String json = gson.toJson(machineAndDictionaryContainerDTO);
-            resp.setStatus(HttpServletResponse.SC_OK);
             out.println(json);
+            resp.setStatus(HttpServletResponse.SC_OK);
             out.flush();
         }
     }

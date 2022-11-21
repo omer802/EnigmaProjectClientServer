@@ -19,8 +19,8 @@ import static util.CommonConstants.GSON_INSTANCE;
 
 public class ContestRefresher extends TimerTask {
     private BooleanProperty shouldUpdate;
-    private Consumer<String> httpRequestLoggerConsumer;
-    private Consumer<ContestInformationDTO> contestInformationConsumer;
+    private final Consumer<String> httpRequestLoggerConsumer;
+    private final Consumer<ContestInformationDTO> contestInformationConsumer;
 
     public ContestRefresher(BooleanProperty shouldUpdate, Consumer<String> httpRequestLoggerConsumer, Consumer<ContestInformationDTO> contestInformationConsumer) {
         this.shouldUpdate = shouldUpdate;
@@ -30,9 +30,6 @@ public class ContestRefresher extends TimerTask {
 
     @Override
     public void run() {
-      //  if (!shouldUpdate.get()) {
-      //      return;
-      //  }
         String finalUrl = HttpUrl
                 .parse(AgentConstants.GET_CHOSEN_CONTEST)
                 .newBuilder()
@@ -52,7 +49,7 @@ public class ContestRefresher extends TimerTask {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String jsonChosenContest = response.body().string();
                 if (response.code() != 200) {
-                    httpRequestLoggerConsumer.accept("Something went wrong: " + jsonChosenContest);
+                    contestInformationConsumer.accept(null);
                 } else {
                     Platform.runLater(() -> {
                         httpRequestLoggerConsumer.accept("");

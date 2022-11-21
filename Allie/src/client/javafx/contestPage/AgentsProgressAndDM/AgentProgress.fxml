@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <AnchorPane prefHeight="241.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.javafx.contestPage.AgentsProgressAndDM.AgentProgressController">
    <children>
       <TableView fx:id="table" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="380.0">
@@ -22,9 +21,9 @@
       </TableView>
       <VBox layoutX="6.0" layoutY="192.0">
          <children>
-            <Label fx:id="totalMissionAmountLabel" minWidth="-Infinity" text="aaaaaa" />
-            <Label fx:id="totalGeneratedMissionsLabel" minWidth="-Infinity" text="aaaa" />
-            <Label fx:id="totalFinishMissionsLabel" minWidth="-Infinity" text="aaaa" />
+            <Label fx:id="totalMissionAmountLabel" minWidth="-Infinity" />
+            <Label fx:id="totalGeneratedMissionsLabel" minWidth="-Infinity" />
+            <Label fx:id="totalFinishMissionsLabel" minWidth="-Infinity" />
          </children>
       </VBox>
    </children>

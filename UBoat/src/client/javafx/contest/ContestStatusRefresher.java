@@ -45,7 +45,6 @@ public class ContestStatusRefresher extends TimerTask {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String statusResponse = response.body().string();
-                System.out.println(statusResponse);
                 if (!response.isSuccessful()) {
                     errorConsumer.accept(new RuntimeException("Something went wrong:" + statusResponse));
                 } else {

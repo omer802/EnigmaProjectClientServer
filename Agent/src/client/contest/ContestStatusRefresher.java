@@ -16,9 +16,9 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 
 public class ContestStatusRefresher extends TimerTask {
-    private AgentMainPageController.AgentStatus shouldRefreshContestStatus;
-    private Consumer<String> httpRequestLoggerConsumer;
-    private Consumer<Allie.AllieStatus> contestInformationConsumer;
+    private final AgentMainPageController.AgentStatus shouldRefreshContestStatus;
+    private final Consumer<String> httpRequestLoggerConsumer;
+    private final Consumer<Allie.AllieStatus> contestInformationConsumer;
 
     public ContestStatusRefresher(AgentMainPageController.AgentStatus agentStatus, Consumer<String> httpRequestLoggerConsumer, Consumer<Allie.AllieStatus> contestStatusConsumer) {
         this.shouldRefreshContestStatus = agentStatus;
@@ -28,10 +28,6 @@ public class ContestStatusRefresher extends TimerTask {
 
     @Override
     public void run() {
-        if (shouldRefreshContestStatus.equals(AgentMainPageController.AgentStatus.WAITING_CONTEST_TO_END)
-        ){// ||shouldRefreshContestStatus.equals(AgentMainPageController.AgentStatus.FINISHED)) {
-            return;
-        }
         String finalUrl = HttpUrl
                 .parse(CommonConstants.GET_CONTEST_STATUS)
                 .newBuilder()
@@ -54,27 +50,17 @@ public class ContestStatusRefresher extends TimerTask {
                     httpRequestLoggerConsumer.accept("Something went wrong: " + AllieStatus);
                 } else {
                     Platform.runLater(() -> {
-                        httpRequestLoggerConsumer.accept("");
-                        if(shouldRefreshContestStatus.equals(AgentMainPageController.AgentStatus.WAITING_FOR_CONTEST)) {
-                            Allie.AllieStatus allieStatus = Allie.AllieStatus.valueOf(AllieStatus);
-                            contestInformationConsumer.accept(allieStatus);
-                            switch (allieStatus){
-                                case IN_CONTEST:
-                                  // contestInformationConsumer.accept(true);
-                                   shouldRefreshContestStatus = AgentMainPageController.AgentStatus.IN_CONTEST;
-                                   break;
-                               case FINISHED_CONTEST:
-                                   //contestInformationConsumer.accept(false);
-                                   shouldRefreshContestStatus = AgentMainPageController.AgentStatus.FINISHED;
-                                   break;
-//
+                                httpRequestLoggerConsumer.accept("");
+
+                                Allie.AllieStatus allieStatus = Allie.AllieStatus.valueOf(AllieStatus);
+                                contestInformationConsumer.accept(allieStatus);
                             }
-                        }
-                    });
+                    );
 
                 }
             }
-        });
 
+        });
     }
 }
+

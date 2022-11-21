@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 import static util.CommonConstants.GSON_INSTANCE;
+import static util.CommonConstants.REFRESH_RATE;
 
 public class AgentDecipherManager implements Task {
     private EnigmaMachine enigmaMachine;
@@ -36,7 +37,7 @@ public class AgentDecipherManager implements Task {
     Consumer<String> errorMessageConsumer;
     private int missionAmount;
     private boolean isEmptyQueue;
-    private BlockingQueue<Runnable> blockingQueue;
+    private BlockingQueue<Runnable> threadPoolBlockingQueue;
     private CustomThreadPoolExecutor executor;
     private CodeGenerator codeGenerator;
     private int positionsLength;
@@ -55,14 +56,14 @@ public class AgentDecipherManager implements Task {
         this.isActiveContest.set(isActiveContest);
     }
 
-    public SimpleBooleanProperty isActiveContest;
+    public SimpleBooleanProperty isActiveContest = new SimpleBooleanProperty();
     private CandidateController candidatesController;
     private BlockingDeque<CandidateDTO> candidateQueue;
-    PropertiesToUpdate propertiesToUpdate;
+    final PropertiesToUpdate propertiesToUpdate;
     private CountDownLatch cdl;
 
     public AgentDecipherManager(EnigmaMachine enigmaMachine, Dictionary dictionary, int missionSize, AgentInfoDTO agentInfoDTO,
-                                int missionAmount, Consumer<String> errorMessageConsumer, String alphabet, CandidateController candidatesController, PropertiesToUpdate propertiesToUpdateInBruteForce) {
+                                int missionAmount, Consumer<String> errorMessageConsumer, String alphabet, CandidateController candidatesController, PropertiesToUpdate propertiesToUpdateInBruteForce, SimpleBooleanProperty isActiveContest) {
         this.enigmaMachine = enigmaMachine;
         this.dictionary = dictionary;
         this.missionSize = missionSize;
@@ -74,16 +75,16 @@ public class AgentDecipherManager implements Task {
         this.positionsLength = enigmaMachine.getRotorsAmountInUse();
         this.keyboard = new Keyboard(alphabet);
         this.codeGenerator = new CodeGenerator(positionsLength);
-        this.isActiveContest = new SimpleBooleanProperty(true);
+        this.isActiveContest.bind(isActiveContest);
         this.candidatesController = candidatesController;
         this.candidateQueue = new LinkedBlockingDeque<>();
         this.propertiesToUpdate = propertiesToUpdateInBruteForce;
-        setThreadPool(agentInfoDTO.getThreadAmount(),agentInfoDTO.getMissionAmount());
+        setThreadPool(agentInfoDTO.getThreadAmount(), agentInfoDTO.getMissionAmount());
     }
 
     private void setThreadPool(int threadAmount, int missionAmount) {
-        this.blockingQueue =
-                new LinkedBlockingQueue<>(missionAmount+OVERHEAD);
+        this.threadPoolBlockingQueue =
+                new LinkedBlockingQueue<>(missionAmount + OVERHEAD);
 
         ThreadFactory customThreadFactory = new ThreadFactoryBuilder()
                 .setNamePrefix("Thread")
@@ -100,54 +101,82 @@ public class AgentDecipherManager implements Task {
                 }).build();
         this.executor =
                 new CustomThreadPoolExecutor(threadAmount, threadAmount, 1000, TimeUnit.MINUTES,
-                        this.blockingQueue, customThreadFactory);
+                        this.threadPoolBlockingQueue, customThreadFactory);
     }
 
     @Override
     public void run() {
         executor.prestartAllCoreThreads();
-        /*System.out.println("Fetch tasks from server");
-        getTasksFromServer();*/
-        while(isActiveContest.getValue()){
+
+        while (isActiveContest.get()) {
             try {
                 currentAgentTaskConfigurationDTOList = getTasksFromServerAndUpdateCDL();
-               // while (currentAgentTaskConfigurationDTOList == null) {
-               //     currentAgentTaskConfigurationDTOList = getTasksFromServerAndUpdateCDL();
-               // }
+                while (currentAgentTaskConfigurationDTOList == null && isActiveContest.getValue()) {
+                    currentAgentTaskConfigurationDTOList = getTasksFromServerAndUpdateCDL();
+
+                }
+                if (!isActiveContest.getValue())
+                    return;
                 cdl = new CountDownLatch(currentAgentTaskConfigurationDTOList.size());
                 pushMissionsToQueue(currentAgentTaskConfigurationDTOList);
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-            try {
-                cdl.await();
-                synchronized (blockingQueue) {
-                    propertiesToUpdate.setMissionInQueue(blockingQueue.size());
-                }
-                //cdl = new CountDownLatch(countDown);
-                //System.out.println("about to check candidate queue after count down");
-                if((!candidateQueue.isEmpty())) {
-                    List<CandidateDTO> candidateList = new ArrayList<>();
+                try {
+                    cdl.await();
+                    synchronized (propertiesToUpdate) {
 
-                    while ((!candidateQueue.isEmpty())) {
-                        CandidateDTO candidate = candidateQueue.poll();
-                        candidateList.add(candidate);
+                        if (isActiveContest.get()) {
+                            synchronized (threadPoolBlockingQueue) {
+                                propertiesToUpdate.setMissionInQueue(threadPoolBlockingQueue.size());
+                            }
+                            if ((!candidateQueue.isEmpty())) {
+                                List<CandidateDTO> candidateList = new ArrayList<>();
+
+                                while ((!candidateQueue.isEmpty())) {
+                                    CandidateDTO candidate = candidateQueue.poll();
+                                    candidateList.add(candidate);
+                                }
+                                candidatesController.updateCandidate(candidateList);
+                            }
+                        }
                     }
-                    candidatesController.updateCandidate(candidateList);
+                    if (!isActiveContest.get()) {
+                        try {
+                            executor.awaitTermination(20, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException("throw exception while waiting for thread-pool to finish");
+                        }
+                    }
+
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ExceptionInInitializerError e) {
+                isActiveContest.set(false);
+                try {
+                    executor.awaitTermination(20, TimeUnit.SECONDS);
+                } catch (InterruptedException ex) {
+                    e.printStackTrace();
+                }
             }
+
         }
     }
-    public void shutDownBruteForce(){
-        try {
-            isActiveContest.set(false);
-            executor.awaitTermination(20, TimeUnit.SECONDS);
-            System.out.println("finished task! ready for a new one");
-        } catch (InterruptedException e) {
-            throw new RuntimeException("throw exception while waiting for thread-pool to finish");
-        }
+
+
+
+
+    public void shutDownBruteForce() {
+        initPropertiesToUpdate();
+    }
+
+    private void initPropertiesToUpdate() {
+        propertiesToUpdate.setMissionInQueue(0);
+        propertiesToUpdate.setMissionFromServer(0);
+        propertiesToUpdate.setCandidates(0);
+        propertiesToUpdate.setCompletedMissions(0);
+
     }
 
 
@@ -163,25 +192,28 @@ public class AgentDecipherManager implements Task {
                 .url(finalUrl)
                 .build();
         Response response = HttpClientUtil.runSync(request);
-        if(response.code() == 200){
+        if (response.code() == 200) {
             String jsonTasksFromServer = response.body().string();
             AgentTaskConfigurationDTO[] agentTaskConfigurationDTOS = GSON_INSTANCE.fromJson(jsonTasksFromServer, AgentTaskConfigurationDTO[].class);
-            if(agentTaskConfigurationDTOS==null) {
+            if (agentTaskConfigurationDTOS == null) {
                 return null;
             }
-            List<AgentTaskConfigurationDTO> agentTaskConfigurationDTOList  = Arrays.asList(agentTaskConfigurationDTOS);
-            cdl = new CountDownLatch(agentTaskConfigurationDTOList.size());
-            //pushMissionsToQueue(currentAgentTaskConfigurationDTOList,cdl);
+            List<AgentTaskConfigurationDTO> agentTaskConfigurationDTOList = Arrays.asList(agentTaskConfigurationDTOS);
             Platform.runLater(() -> {
-                        errorMessageConsumer.accept("");
+                errorMessageConsumer.accept("");
 
-        });
+            });
             return agentTaskConfigurationDTOList;
-        } else{
+        } else if (response.code() == 403) {
+            throw new ExceptionInInitializerError("finish game allready");
+        } else {
             String jsonTasksFromServer = response.body().string();
-            errorMessageConsumer.accept("Something went wrong while fetching agent data from server: "+ jsonTasksFromServer);
+            errorMessageConsumer.accept("Something went wrong while fetching agent data from server: " + jsonTasksFromServer);
             return null;
         }
+    }
+
+
 
 
        /* HttpClientUtil.runAsync(finalUrl, new Callback() {
@@ -211,18 +243,21 @@ public class AgentDecipherManager implements Task {
             }
         });*/
 
-    }
+
+
 
     public void pushMissionsToQueue(List<AgentTaskConfigurationDTO> agentTaskConfigurationDTOS){
-        propertiesToUpdate.addAmountToMissionFromServer(agentTaskConfigurationDTOS.size());
+        synchronized (propertiesToUpdate) {
+            propertiesToUpdate.addAmountToMissionFromServer(agentTaskConfigurationDTOS.size());
+        }
         for (AgentTaskConfigurationDTO agentConfig: agentTaskConfigurationDTOS) {
             enigmaMachine.selectInitialCodeConfiguration(agentConfig.getUserConfigurationDTO());
             List<String> positionList = codeGenerator.generatePositionsGivenStartAndSize(agentConfig.getStartPosition(), agentConfig.getMissionSize());
             MissionTask missionTask = new MissionTask(enigmaMachine.clone(), positionList, agentConfig.getMessageToDecode(), dictionary, cdl, candidateQueue, propertiesToUpdate);
-            blockingQueue.offer(missionTask);
-            synchronized (blockingQueue) {
-                // waiting missions = blockingQueue size - remaining capacity
-                propertiesToUpdate.setMissionInQueue(blockingQueue.size());
+            threadPoolBlockingQueue.offer(missionTask);
+            synchronized (threadPoolBlockingQueue) {
+                // waiting missions = threadPoolBlockingQueue size - remaining capacity
+                propertiesToUpdate.setMissionInQueue(threadPoolBlockingQueue.size());
             }
         }
     }

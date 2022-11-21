@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 @WebServlet(name = "Update allie contest", urlPatterns = "/updateAllieContest")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
 public class setAllieContest extends HttpServlet {
+    private static int counter = 0;
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/plain;charset=UTF-8");
@@ -40,6 +41,7 @@ public class setAllieContest extends HttpServlet {
     }
 
     private void sendRequestToRegisterManager(HttpServletRequest req, RegisterManager registerManager, String usernameFromSession) throws ServletException, IOException {
+        counter++;
         InputStream jsonChosenContestDTO = req.getParts().stream().findFirst().get().getInputStream();
         BufferedReader ChosenContestStreamReader = new BufferedReader(new InputStreamReader(jsonChosenContestDTO, StandardCharsets.UTF_8));
         Gson gson = new Gson();

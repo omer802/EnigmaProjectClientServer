@@ -18,7 +18,6 @@ public class HttpClientUtil {
                         .cookieJar(simpleCookieManager)
                         .followRedirects(false)
                         .build();
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
     }
     private final static OkHttpClient HTTP_CLIENT;
 
@@ -62,7 +61,6 @@ public class HttpClientUtil {
     }
 
     public static void shutdown() {
-        System.out.println("Shutting down HTTP CLIENT");
         HTTP_CLIENT.dispatcher().executorService().shutdown();
         HTTP_CLIENT.connectionPool().evictAll();
     }

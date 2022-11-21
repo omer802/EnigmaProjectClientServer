@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import servltes.constants.Constants;
 import servltes.utils.ServletUtils;
 import servltes.utils.SessionUtils;
 
@@ -29,6 +30,7 @@ public class UploadFileServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        Constants.COUNTER++;
         String usernameFromSession = SessionUtils.getUsername(req);
         RegisterManager.ClientType client = ServletUtils.getTypeByName(usernameFromSession, getServletContext());
 

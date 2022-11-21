@@ -15,5 +15,5 @@ public class AgentConstants {
     public static final String UPDATE_CANDIDATE = FULL_SERVER_PATH +  "/updateCandidate";
 
 
-
+    public static final String CURRENT_CONTEST_STATUS = FULL_SERVER_PATH +  "/isStillActiveContest";
 }

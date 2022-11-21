@@ -50,20 +50,17 @@ public class AgentMainPageController {
 
     @FXML
     private Label missionFromServerAmountLabel;
-   // private SimpleLongProperty missionCounterFromServer;
     @FXML
     private Label completedMissionAmountLabel;
-    //private SimpleLongProperty completedMissionAmount;
 
     @FXML
     private Label candidateAmountLabel;
-   // private SimpleIntegerProperty candidateAmount;
 
     @FXML
     private Label amountOfMissionsInQueueLabel;
-    //private SimpleIntegerProperty queueMissionAmount;
     @FXML
     private Label agentStatusLabel;
+    private SimpleStringProperty agentStatusProperty;
     private Stage agentStage;
     private SimpleBooleanProperty isWaiting;
 
@@ -75,6 +72,7 @@ public class AgentMainPageController {
     @FXML
     private Label errorMessageLabel;
     private SimpleStringProperty errorMessage;
+    private boolean decipherUp;
 
 
     @FXML
@@ -91,30 +89,29 @@ public class AgentMainPageController {
     private UpdateAgentProgressRefresher updateAgentProgressRefresher;
     private Timer timerAgentUpdate;
     private Allie.AllieStatus prevAllieStatus;
+    private SimpleBooleanProperty isActiveContest;
+    private Timer stillWaitingTimer;
+    private StillWaitingStatusRefresher stillWaitingStatusRefresher;
+
     public AgentMainPageController() {
         this.userGreetingString = new SimpleStringProperty();
         this.allieName = new SimpleStringProperty();
-        //this.missionCounterFromServer = new SimpleLongProperty();
-        //this.completedMissionAmount = new SimpleLongProperty();
-        //this.candidateAmount = new SimpleIntegerProperty();
-        //this.queueMissionAmount = new SimpleIntegerProperty();
+        this.agentStatusProperty = new SimpleStringProperty("");
         this.propertiesToUpdateInBruteForce = new PropertiesToUpdate();
         this.isWaiting = new SimpleBooleanProperty();
         this.userName = new SimpleStringProperty();
         this.errorMessage = new SimpleStringProperty();
         this.agentStatus = AgentStatus.WAITING_FOR_CONTEST;
         this.prevAllieStatus = Allie.AllieStatus.IDLE;
+        this.isActiveContest = new SimpleBooleanProperty(false);
+        this.decipherUp = false;
     }
-
     @FXML
     public void initialize() {
         userGreetingLabel.textProperty().bind(Bindings.concat("Hello ", userName));
         allieNameLabel.textProperty().bind(Bindings.concat("Signed to ", allieName));
+        agentStatusLabel.textProperty().bind(Bindings.format("%s",agentStatusProperty));
         propertiesToUpdateInBruteForce.bindUIComponent(amountOfMissionsInQueueLabel,missionFromServerAmountLabel,completedMissionAmountLabel,candidateAmountLabel,userName);
-       //amountOfMissionsInQueueLabel.textProperty().bind(Bindings.format("%,d", queueMissionAmount));
-       //missionFromServerAmountLabel.textProperty().bind(Bindings.format("%,d", missionCounterFromServer));
-       //completedMissionAmountLabel.textProperty().bind(Bindings.format("%,d", completedMissionAmount));
-       //candidateAmountLabel.textProperty().bind(Bindings.format("%,d", candidateAmount));
         errorMessageLabel.textProperty().bind(errorMessage);
         candidatesController.setAgentName(userName);
         candidatesController.setErrorLabel(errorMessage);
@@ -135,14 +132,60 @@ public class AgentMainPageController {
     public void updateAgentStatus(boolean needToWait) {
         agentStatus = needToWait ? AgentStatus.WAITING_CONTEST_TO_END : AgentStatus.WAITING_FOR_CONTEST;
         this.isWaiting.set(needToWait);
-        if (!agentStatus.equals(AgentStatus.WAITING_CONTEST_TO_END)) {
-            startContestStatusRefresher(agentStatus);
-            contestInfoController.fetchContestFromServerRefresher((errorMessage) ->
-                  Platform.runLater(() ->
-                           this.errorMessage.set(errorMessage)));
+        if (isWaiting.getValue()) {
+            agentStatusProperty.set("Waiting for the contest to end");
+            stillWaitingStatusRefresher = new StillWaitingStatusRefresher((error) -> errorMessage.set(error), isWaiting, this::startAgentProcessByRefresher);
+            stillWaitingTimer = new Timer();
+            stillWaitingTimer.schedule(stillWaitingStatusRefresher, REFRESH_RATE, REFRESH_RATE);
+        } else {
+            startAgentProcess();
+        }
+
+    }
+    public void startAgentProcessByRefresher(boolean startProcess) {
+        if (startProcess) {
+            stillWaitingTimer.cancel();
+            agentStatus = AgentStatus.WAITING_FOR_CONTEST;
+            isWaiting.unbind();
+            startAgentProcess();
 
         }
     }
+
+    private void startAgentProcess() {
+        if (!agentStatus.equals(AgentStatus.WAITING_CONTEST_TO_END)) {
+            Platform.runLater(()->{ agentStatusProperty.set("Ready for contest");
+                startContestStatusRefresher(agentStatus);
+                contestInfoController.fetchContestFromServerRefresher((errorMessage) ->
+                        Platform.runLater(() ->
+                                this.errorMessage.set(errorMessage)));});
+
+        }
+
+    }
+
+    private boolean isAgentFinishWaiting() throws IOException {
+        String finalUrl = HttpUrl
+                .parse(AgentConstants.CURRENT_CONTEST_STATUS)
+                .newBuilder()
+                .build()
+                .toString();
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .build();
+        Response response = HttpClientUtil.runSync(request);
+        String responseBody = response.body().string();
+        if (response.code() == 200) {
+            responseBody = responseBody.trim();
+            errorMessage.set("Finish waiting");
+            return responseBody.equals("true");
+        }
+        else {
+            errorMessage.set("Something went wrong while check if contest is finished");
+            return false;
+        }
+    }
+
     public void startContestStatusRefresher(AgentStatus agentStatus){
 
         contestStatusRefresher = new ContestStatusRefresher(agentStatus,(responseBody) ->
@@ -154,25 +197,41 @@ public class AgentMainPageController {
     public void startContestIfThereIsActiveContest(Allie.AllieStatus contestStatus){
         switch (contestStatus){
             case IDLE:
+                restAgentProgress();
+                isActiveContest.set(false);
                 if(prevAllieStatus.equals(Allie.AllieStatus.FINISHED_CONTEST)){
                     //cleanshowingdata
+                    decipherManager.shutDownBruteForce();
                     this.prevAllieStatus = Allie.AllieStatus.IDLE;
                 }
                 break;
             case IN_CONTEST:
-                fetchMachineAndDictionaryFromAllieAndStartPullingMissions();
-                startAgentProgressUpdates();
-                this.prevAllieStatus = Allie.AllieStatus.IN_CONTEST;
+                if(prevAllieStatus.equals(Allie.AllieStatus.IDLE)) {
+                    isActiveContest.set(true);
+                    fetchMachineAndDictionaryFromAllieAndStartPullingMissions();
+                    startAgentProgressUpdates();
+                    this.prevAllieStatus = Allie.AllieStatus.IN_CONTEST;
+                }
                 break;
             case FINISHED_CONTEST:
-                prevAllieStatus = Allie.AllieStatus.FINISHED_CONTEST;
-                decipherManager.shutDownBruteForce();
-                //show alert
+                if(prevAllieStatus.equals(Allie.AllieStatus.IN_CONTEST)) {
+                    isActiveContest.set(false);
+                    prevAllieStatus = Allie.AllieStatus.FINISHED_CONTEST;
+                    if (decipherUp) {
+                        decipherUp = false;
+                    }
+                }
 
 
         }
 
     }
+
+    private void restAgentProgress() {
+        candidatesController.restCandidates();
+
+    }
+
     public void startAgentProgressUpdates(){
         updateAgentProgressRefresher = new UpdateAgentProgressRefresher(agentStatus,(responseBody) ->
                 Platform.runLater(() ->
@@ -196,7 +255,6 @@ public class AgentMainPageController {
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Platform.runLater(() ->{
                     errorMessage.set("faild call :Something went wrong:" +e.getMessage());
-                    System.out.println("badddddddddddddd");
                 });
             }
 
@@ -204,8 +262,7 @@ public class AgentMainPageController {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String jsonConfigurationForAgentBruteForceDTO = response.body().string();
                 if (response.code() != 200) {
-                    System.out.println(response.code());
-                    System.out.println("badddddddddddddd wahhtaattttt");
+
 
                     Platform.runLater(() ->errorMessage.set("Something went wrong: "+ jsonConfigurationForAgentBruteForceDTO));
                 } else {
@@ -217,8 +274,9 @@ public class AgentMainPageController {
                                 configurationForAgentBruteForce.getMissionSize(), agentInfoDTO, missionAmount,
                                 (responseBody) ->
                                         Platform.runLater(() ->
-                                                errorMessage.set(responseBody)),configurationForAgentBruteForce.getAlphabet(),candidatesController,propertiesToUpdateInBruteForce);
+                                                errorMessage.set(responseBody)),configurationForAgentBruteForce.getAlphabet(),candidatesController,propertiesToUpdateInBruteForce,isActiveContest);
                         new Thread(decipherManager, "Decipher manager thread").start();
+                        decipherUp = true;
                     });
                 }
             }

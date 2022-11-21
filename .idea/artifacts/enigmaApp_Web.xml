@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="enigmaApp:Web">
+    <output-path>$PROJECT_DIR$/out/artifacts/enigmaApp_Web</output-path>
+    <root id="archive" name="enigmaApp_Web.war">
+      <element id="artifact" artifact-name="enigmaApp:Web exploded" />
+      <element id="javaee-facet-resources" facet="enigmaApp/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="javaee-facet-classes" facet="enigmaApp/web/Web" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

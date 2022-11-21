@@ -12,6 +12,11 @@ public class Constants {
     public static final String MISSION_AMOUNT_PARAMETER = "missionAmount";
 
     public static final String MISSION_SIZE_PARAMETER = "missionSize";
+    public static final String LOGOUT_ACTION_TYPE = "logoutActionType";
+
+    public static int COUNTER = 0;
+
+
 
 
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;

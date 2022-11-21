@@ -65,17 +65,13 @@ public interface ApiEnigma {
 
     boolean haveConfigFromFile();
 
-    // void saveMachineStateToFile(String filePath) throws IOException;
-
-    //void loadMachineStateFromFIle(InputStream fileInputStream) throws IOException, ClassNotFoundException;
-
     boolean validateStringToEncrypt(String stringToEncrypt);
 
     void setDTOConfigurationAdapter(FileConfigurationDTOAdapter fileConfigurationDTOAdapter);
 
-    public xmlFileValidatorDTO readDataJavaFx(InputStream fileInputStream, BattlefieldManager battlefieldManager);
+    xmlFileValidatorDTO readDataJavaFx(InputStream fileInputStream, BattlefieldManager battlefieldManager);
 
-        StringBuilder getStringDataReceiveFromUser(UserConfigurationDTO machineConfigUser);
+    StringBuilder getStringDataReceiveFromUser(UserConfigurationDTO machineConfigUser);
 
     void setCurrentConfigurationProperties(UserConfigurationDTOAdapter DTOPropertiesToConfig);
 
@@ -98,7 +94,7 @@ public interface ApiEnigma {
     String cleanStringFromExcludeChars(String words);
 
     Trie getTrieFromDictionary();
-    public Dictionary getDictionary();
+    Dictionary getDictionary();
 
 
     double calculateAmountOfTasks(long missionSize, UBoat.DifficultyLevel level);

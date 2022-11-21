@@ -27,8 +27,13 @@ public class UBoat implements Client,User {
     public void finishContest() {
         gameStatus  = FINISH_CONTEST_WAITING;
     }
+    public void initUBoatForNewContest(){
+        makeUBoatActive();
+    }
 
-
+    public void inLogoutMode() {
+        logoutMode = true;
+    }
 
 
     public static enum DifficultyLevel{
@@ -59,6 +64,12 @@ public class UBoat implements Client,User {
 
     private List<CandidateDTO> candidateList;
 
+    public boolean isLogoutMode() {
+        return logoutMode;
+    }
+
+    private boolean logoutMode;
+
     public CandidateDTO getWinner() {
         return winner;
     }
@@ -76,6 +87,7 @@ public class UBoat implements Client,User {
         this.uBoatStatus = UBoatStatus.WAITING_FOR_CONFIG;
         this.gameStatus = OFF;
         this.candidateList = new ArrayList<>();
+        this.logoutMode = false;
     }
     @Override
     public void setMediator(Mediator mediator) {
@@ -86,6 +98,8 @@ public class UBoat implements Client,User {
     public void startContest() {
         if (canStartContest()){
             gameStatus = ACTIVE_GAME;
+             winner = null;
+
         }
     }
     public boolean isActiveContest(){
@@ -129,10 +143,10 @@ public class UBoat implements Client,User {
         uBoatStatus = ACTIVE;
         gameStatus = WAITING;
     }
-    public void addOneToAlliesCounter(){
+   synchronized public void addOneToAlliesCounter(){
         alliesSignedAmount++;
     }
-    public void subOneFromAlliesCounter(){
+   synchronized public void subOneFromAlliesCounter(){
         alliesSignedAmount--;
     }
 
@@ -141,7 +155,8 @@ public class UBoat implements Client,User {
         /*if (battlefield.getAmountOfAlliesNeededForContest() == alliesSignedAmount)
             gameStatus = HAVE_ENOUGH_FOR_CONTEST;
         else*/
-            gameStatus = WAITING_AND_READY;
+        gameStatus = WAITING_AND_READY;
+        candidateList = new ArrayList<>();
     }
     public boolean isReady(){
         return uBoatStatus.equals(READY);
@@ -193,7 +208,7 @@ public class UBoat implements Client,User {
         return Objects.equals(name, uBoat.name);
     }
 
-    public int getAlliesSignedAmount() {
+    synchronized public int getAlliesSignedAmount() {
         return alliesSignedAmount;
     }
     @Override
@@ -202,7 +217,6 @@ public class UBoat implements Client,User {
     }
 
     public boolean isDecodingCorrect(CandidateDTO candidatesDTO){
-        System.out.println(originalStringNotEncrypted);
        // candidatesDTO.stream().map(CandidateDTO::getCandidateString).forEach(System.out::println);
         return candidatesDTO.getCandidateString().equals(originalStringNotEncrypted);
     }

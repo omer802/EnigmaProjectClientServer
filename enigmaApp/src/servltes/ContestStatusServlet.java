@@ -28,13 +28,11 @@ public class ContestStatusServlet extends HttpServlet {
             switch (clientType) {
                 case AGENT:
                     Allie.AllieStatus allieStatusFromAgent = registerManager.getContestStatusByAgent(usernameFromSession);
-                    //System.out.println(allieStatus.name());
                     out.print(allieStatusFromAgent.name());
                     resp.setStatus(HttpServletResponse.SC_OK);
                     break;
                 case ALLIE:
                     Allie.AllieStatus allieStatus = registerManager.getContestStatusByAllie(usernameFromSession);
-                    //System.out.println(allieStatus.name());
                     out.print(allieStatus.name());
                     resp.setStatus(HttpServletResponse.SC_OK);
                     break;

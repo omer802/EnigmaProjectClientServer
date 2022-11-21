@@ -5,6 +5,7 @@ import DTOS.Configuration.UserConfigurationDTO;
 import DTOS.agentInformationDTO.CandidateDTO;
 import client.javafx.Candidate.candidateController;
 import DTOS.AllieInformationDTO.AlliesDetailDTO;
+import client.javafx.Login.UBoatLoginController;
 import client.javafx.activeTeamsDetails.activeTeamsDetailsController;
 import dictionary.Dictionary;
 import dictionary.Trie;
@@ -14,13 +15,18 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import keyboard.Keyboard;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -29,16 +35,19 @@ import util.CommonConstants;
 import util.http.HttpClientUtil;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Timer;
 import java.util.function.Consumer;
 
+import static client.constants.ConstantsUBoat.LOGIN_PAGE_CSS_RESOURCE_LOCATION;
+import static client.constants.ConstantsUBoat.LOGIN_PAGE_FXML_RESOURCE_LOCATION;
 import static util.CommonConstants.GSON_INSTANCE;
 import static util.CommonConstants.REFRESH_RATE;
 
 public class ContestController {
 
-    private  SimpleStringProperty encryptionTextFiled;
+    private final SimpleStringProperty encryptionTextFiled;
     @FXML
     private BorderPane bruteForceBorderPane;
 
@@ -83,7 +92,7 @@ public class ContestController {
     private Button readyButton;
     @FXML
     private Label labelIndication;
-    private SimpleStringProperty contestStatus;
+    private final SimpleStringProperty contestStatus;
 
     @FXML
     private BorderPane encryptionBorderPane;
@@ -94,8 +103,8 @@ public class ContestController {
 
     private MainController mainController;
     public  SimpleBooleanProperty isConfig;
-    private SimpleStringProperty encryptionResultProperty;
-    private SimpleStringProperty codeConfiguration;
+    private final SimpleStringProperty encryptionResultProperty;
+    private final SimpleStringProperty codeConfiguration;
     private String encryptionResult;
     private Dictionary dictionary;
     private Keyboard keyboard;
@@ -107,15 +116,21 @@ public class ContestController {
     ContestStatusRefresher contestStatusRefresher;
     private Timer contestStatusRefresherTimer;
     private UBoat.GameStatus gameStatus;
+    private final SimpleStringProperty username;
+    private SimpleBooleanProperty canBeReady;
+    private Stage primaryStage;
+    private UBoatLoginController loginController;
+    private SimpleBooleanProperty canShowLogout;
+    private boolean hadContest;
 
     @FXML
     private void initialize() {
         this.inActiveContest = new SimpleBooleanProperty(false);
         this.isReady = new SimpleBooleanProperty(false);
         bruteForceBorderPane.disableProperty().bind(isConfig.not());
-        readyButton.disableProperty().bind(isReady);
+        readyButton.disableProperty().bind(canBeReady.not());
         ProcessButton.disableProperty().bind(isReady);
-        logoutButton.visibleProperty().bind(inActiveContest);
+        logoutButton.visibleProperty().bind(canShowLogout);
         //encryptionBorderPane.disableProperty().bind(isConfig.not());
         //candidate.disableProperty().bind(isConfig.not());
         EncryptDecryptResultLabel.textProperty().bind(Bindings.format("%s", encryptionResultProperty));
@@ -126,16 +141,21 @@ public class ContestController {
     }
 
     public ContestController(){
+        this.canShowLogout = new SimpleBooleanProperty(false);
+        this.username = new SimpleStringProperty();
         this.encryptionResultProperty = new SimpleStringProperty("");
         this.codeConfiguration = new SimpleStringProperty("");
         this.encryptionTextFiled = new SimpleStringProperty("");
-        this.contestStatus = new SimpleStringProperty("To start contest press ready");
+        this.contestStatus = new SimpleStringProperty("Press ready to start game");
         this.isConfig = new SimpleBooleanProperty();
+        this.canBeReady = new SimpleBooleanProperty(false);
+        this.hadContest = false;
     }
 
-    public void setMainPageController(MainController mainController) {
+    public void setMainPageController(MainController mainController, StringProperty username) {
         this.mainController = mainController;
         this.isConfig.bind(mainController.isConfigProperty());
+        this.username.bind(username);
     }
 
 
@@ -205,9 +225,9 @@ public class ContestController {
                     Platform.runLater(() -> {
                         try {
                             String jsonConfigurationDTOString = response.body().string();
-                            //System.out.println(jsonConfigurationDTOString);
                             UserConfigurationDTO configurationDTO = GSON_INSTANCE.fromJson(jsonConfigurationDTOString, UserConfigurationDTO.class);
                             updateCurrentConfiguration(configurationDTO);
+                            canBeReady.set(true);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -253,7 +273,6 @@ public class ContestController {
                         try {
                             String dictionaryJsonString = response.body().string();
                             dictionary = GSON_INSTANCE.fromJson(dictionaryJsonString, Dictionary.class);
-                           // System.out.println(" fill dictionary");
                             fillDictionary();
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -375,6 +394,7 @@ public class ContestController {
                     Platform.runLater(() -> {
                         isReady.set(true);
                         startContestStatusRefresher();
+                        canBeReady.set(false);
                     });
                     }
                 }
@@ -391,22 +411,29 @@ public class ContestController {
     }
     public void updateCurrentState(UBoat.GameStatus gameStatus){
         this.gameStatus = gameStatus;
-        switch (gameStatus){
+        switch (gameStatus) {
             case WAITING_AND_READY:
                 isReady.set(true);
+                canBeReady.set(false);
                 contestStatus.set("Ready, Waiting for allies...");
+                canShowLogout.set(false);
                 break;
             case ACTIVE_GAME:
                 inActiveContest.set(true);
                 contestStatus.set("In active game...");
+                hadContest = true;
+                canShowLogout.set(false);
                 break;
-            case FINISH_CONTEST_WAITING:// TODO: 10/28/2022 change to active in server 
-                /// fetching winner
-                isReady.set(false);
-                inActiveContest.set(false);
-                contestStatus.set("finished...");
-                getWinnerFromSever();
-                contestStatus.set("To start contest press ready");
+            case FINISH_CONTEST_WAITING:
+                if (isReady.getValue()) {
+                    /// fetching winner
+                    isReady.set(false);
+                    inActiveContest.set(false);
+                    contestStatus.set("finished...");
+                    getWinnerFromSever();
+                    contestStatus.set("Press ready to start game");
+                    canShowLogout.set(true);
+                }
         }
     }
     private void getWinnerFromSever() {
@@ -420,8 +447,9 @@ public class ContestController {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String winnerResponse = response.body().string();
-                System.out.println(winnerResponse);
-                if(winnerResponse==null){
+                if(winnerResponse.equals("null")){
+                    cleanContestData();
+                    restContestAtServer();
                     return;
                 }
                 if (!response.isSuccessful()) {
@@ -432,12 +460,14 @@ public class ContestController {
                         StringBuilder sb = new StringBuilder();
 
                         Alert winnerAlert = new Alert(Alert.AlertType.INFORMATION);
-                        winnerAlert.setTitle("UBoat Message: We Have A Winner!");
+                        winnerAlert.setTitle("Message from UBoat "+ username.getValue()+ ": finish contest message");
                         sb.append("The Winner is: "+ candidatesDTO.getHowFind()+"\n");
-                        sb.append("Found in the following code: "+ candidatesDTO.getCode());
+                        sb.append("The string found in the following code: \n"+ candidatesDTO.getCode());
+                        winnerAlert.setHeaderText("Message");
                         winnerAlert.setHeaderText(sb.toString());
                         winnerAlert.showAndWait();
                         cleanContestData();
+                        restContestAtServer();
 
                     });
 
@@ -454,6 +484,10 @@ public class ContestController {
         activeTeamDetailsController.startListRefresher();
 
     }
+    public void terminatesListRefresher(){
+        gameStatus = UBoat.GameStatus.OFF;
+        activeTeamDetailsController.terminateListRefresher();
+    }
 
     public void setErrorHandlerMainController(Consumer<Exception> httpRequestLoggerConsumer) {
         this.httpRequestErrorLoggerConsumer = httpRequestLoggerConsumer;
@@ -468,9 +502,107 @@ public class ContestController {
     
 
     private void cleanContestData() {
+        canBeReady.set(true);
         candidateController.terminateCandidateRefresher();
         contestStatusRefresherTimer.cancel();
         candidateController.cleanCandidateTable();
 
+
+    }
+    private void restContestAtServer(){
+        HttpClientUtil.runAsync(CommonConstants.REST_CONTEST, new Callback() {
+
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        httpRequestErrorLoggerConsumer.accept(new RuntimeException("failed call :Something went wrong: " + e.getMessage()));
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        String winnerResponse = response.body().string();
+                        if (!response.isSuccessful()) {
+                            Platform.runLater(() -> httpRequestErrorLoggerConsumer.accept(new RuntimeException("Something went wrong:" + winnerResponse)));
+                        } else {
+                            Platform.runLater(() -> {
+                                //maybe make ready again
+                                // move to before contest page
+
+                            });
+                        }
+                    }
+                }
+        );
+    }
+    @FXML
+    void logoutAction(){
+        if(inActiveContest.getValue()||isReady.getValue()){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Unable to disconnect at this stage" + "\n");
+            alert.setTitle("Error!");
+            alert.getDialogPane().setExpanded(true);
+            alert.showAndWait();
+        }
+        else{
+            try {
+                logoutFromServerRequest();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        }
+
+
+    public void logoutFromServerRequest() throws IOException {
+        String finalUrl = HttpUrl
+                .parse(CommonConstants.LOGOUT_REQUEST)
+                .newBuilder()
+                .build()
+                .toString();
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .build();
+        Response response = HttpClientUtil.runSync(request);
+        String responseBody = response.body().string();
+        if (response.code() == 200) {
+            terminatesListRefresher();
+            cleanContestData();
+            Alert logoutMessage = new Alert(Alert.AlertType.INFORMATION);
+            logoutMessage.setTitle( "UBoat " + username.getValue() +" message");
+            logoutMessage.setHeaderText("Message");
+            logoutMessage.setContentText("UBoat have logged out");
+            logoutMessage.showAndWait();
+            HttpClientUtil.removeCookiesOf(CommonConstants.BASE_DOMAIN);
+            Platform.runLater(this::loadLoginPage);
+        }
+        else{
+
+            httpRequestErrorLoggerConsumer.accept(new Exception("Something went wrong in server while logout action"));
+        }
+    }
+    private void loadLoginPage(){
+        primaryStage.setMinHeight(100);
+        primaryStage.setMinWidth(200);
+        primaryStage.setTitle("UBoat Login");
+        URL loginPage = getClass().getResource(LOGIN_PAGE_FXML_RESOURCE_LOCATION);
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(loginPage);
+            Parent root = fxmlLoader.load();
+            loginController = fxmlLoader.getController();
+            loginController.backgroundLoadAlliesScreen(primaryStage);
+            Scene scene = new Scene(root, 303, 192);
+            scene.getStylesheets().add(getClass().getResource(LOGIN_PAGE_CSS_RESOURCE_LOCATION).toExternalForm());
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
 }

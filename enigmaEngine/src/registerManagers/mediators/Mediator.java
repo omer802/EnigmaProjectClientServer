@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 
 // TODO: 10/17/2022 think if makeing mediator implement interface
 public class Mediator {
-    private Map<UBoat, Set<Allie>> mapUBoatToAllies;
-    private Map<Allie, UBoat> mapAlliesToUBoat;
-    private Map<Allie, List<Agent>> mapAllieToAgents;
-    private Map<Agent, Allie> mapAgentToAllie;
+    private final Map<UBoat, Set<Allie>> mapUBoatToAllies;
+    private final Map<Allie, UBoat> mapAlliesToUBoat;
+    private final Map<Allie, List<Agent>> mapAllieToAgents;
+    private final Map<Agent, Allie> mapAgentToAllie;
 
     public Mediator() {
         this.mapUBoatToAllies = new HashMap<>();
@@ -68,7 +68,7 @@ public class Mediator {
 
     }
 
-    private void removeAllieFromContest(Allie allie) {
+    synchronized public void removeAllieFromContest(Allie allie) {
         allie.signOutFromContest();
         UBoat uBoat = mapAlliesToUBoat.get(allie);
         uBoat.subOneFromAlliesCounter();
@@ -78,7 +78,7 @@ public class Mediator {
     }
 
 
-    public synchronized List<AlliesDetailDTO> getUBoatSignedAllies(UBoat uBoat) {
+    public synchronized List<AlliesDetailDTO> getUBoatSignedAlliesDTO(UBoat uBoat) {
         if (uBoat.getAlliesSignedAmount() == 0) {
             // return empty list
             return new ArrayList<>();
@@ -110,6 +110,9 @@ public class Mediator {
     synchronized public void addAgentToAllie(Agent agent, Allie allie) {
 
         List<Agent> agentList = mapAllieToAgents.computeIfAbsent(allie, key -> new ArrayList<>());
+        if(allie.areInContest()){
+            agent.needToWait();
+        }
         agentList.add(agent);
         allie.addOneToAgentAmount();
         mapAgentToAllie.put(agent,allie);
@@ -124,14 +127,13 @@ public class Mediator {
         if(agentList==null)
             return new ArrayList<>();
         else
-            return agentList.stream().map(Agent::createAgentInfoDTO).collect(Collectors.toList());
+            return agentList.stream().filter(agent -> !agent.isWaiting()).map(Agent::createAgentInfoDTO).collect(Collectors.toList());
     }
 
     synchronized public void addCandidatesFromAgent(Agent agent, List<CandidateDTO> candidatesListDTO) {
         Allie allie = mapAgentToAllie.get(agent);
         UBoat uBoat = mapAlliesToUBoat.get(allie);
-
-            // add candidates to allie
+        Set<Allie> allieSet = mapUBoatToAllies.get(uBoat);
             for (CandidateDTO candidateDTO : candidatesListDTO) {
                 if(uBoat.isActiveContest()) {
                 // add candidates to allie
@@ -140,8 +142,9 @@ public class Mediator {
                 uBoat.addCandidate(allie, candidateDTO);
                 if (uBoat.isDecodingCorrect(candidateDTO)) {
                     uBoat.setWinner(candidateDTO);
+                    allie.setWinner(candidateDTO);
+                    allieSet.forEach(a->a.setWinner(candidateDTO));
                     uBoat.finishContest();
-                    Set<Allie> allieSet = mapUBoatToAllies.get(uBoat);
                     allieSet.forEach(Allie::terminateContest);
                 }
             }
@@ -160,14 +163,14 @@ public class Mediator {
 
     synchronized public void startContestIfAllAlliesAndUBoatsReady(Allie allie) {
         UBoat uBoat = mapAlliesToUBoat.get(allie);
-        if (uBoat.isReady()&&uBoat.isAlliesCapacityFull()) {
+        if (uBoat.isReady()&&uBoat.isAlliesCapacityFull()&&(!uBoat.getContestStatus().equals(UBoat.GameStatus.FINISH_CONTEST_WAITING))) {
             startContestIfAllAlliesAndUBoatsReady(uBoat);
         }
     }
 
     public List<AgentProgressDTO> getAgentsProgressAtAllie(Allie allie) {
         List<Agent> agentList = mapAllieToAgents.get(allie);
-        List<AgentProgressDTO> agentProgressDTOS = agentList.stream().map(Agent::getProgressDTO).collect(Collectors.toList());
+        List<AgentProgressDTO> agentProgressDTOS = agentList.stream().filter(agent -> !agent.isWaiting()).map(Agent::getProgressDTO).collect(Collectors.toList());
         return agentProgressDTOS;
     }
 
@@ -179,5 +182,31 @@ public class Mediator {
     public CandidateDTO getWinnerByAgent(Agent agent) {
         Allie allie = mapAgentToAllie.get(agent);
         return getWinnerByAllie(allie);
+    }
+
+    synchronized public void restAgentsSignedToAllie(Allie allie) {
+        List<Agent> agentList = mapAllieToAgents.get(allie);
+        for (Agent agent :agentList) {
+            agent.restProgressDTO();
+        }
+        //agentList.forEach(Agent::restProgressDTO);
+    }
+
+    synchronized public UBoat getUBoatByAllie(Allie allie) {
+        return mapAlliesToUBoat.get(allie);
+    }
+
+    public void removeUBoat(UBoat uBoat) {
+    }
+
+    synchronized public void activateSignoutModeForEachAllieSignedToUBoat(UBoat uBoat) {
+        Set<Allie> allieSet = mapUBoatToAllies.get(uBoat);
+        if(allieSet != null && allieSet.size()>0)
+            allieSet.forEach(Allie::uBoatLogoutActionMode);
+    }
+
+    public void notifyWaitingAgentsSignedToALlie(Allie allie) {
+        List<Agent> agentList = mapAllieToAgents.get(allie);
+        agentList.stream().filter(Agent::isWaiting).forEach(Agent::finishWaiting);
     }
 }

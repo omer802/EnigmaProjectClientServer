@@ -44,13 +44,13 @@ public class TasksManager implements Runnable {
     //private Thread blockingConsumer;
     private Dictionary dictionary;
     private SimpleLongProperty generatedMissionsAmount = new SimpleLongProperty();
-    public int counter = 0;
     public boolean isActiveContest() {
         return activeContest;
     }
 
     public void setActiveContest(boolean activeContest) {
         this.activeContest = activeContest;
+        blockingQueue.notifyAll();
     }
 
     private boolean activeContest;
@@ -72,6 +72,9 @@ public class TasksManager implements Runnable {
         generatedMissionsAmount.bind(this.generatedMissionsAmount);
         activeContest = true;
 
+    }
+    public void restGeneratedAmount(){
+        generatedMissionsAmount.set(0);
     }
 
     @Override
@@ -205,29 +208,33 @@ public class TasksManager implements Runnable {
         String startingPosition = positionsList.get(0);
         AgentTaskConfigurationDTO agentTaskConfiguration =
                 new AgentTaskConfigurationDTO(new UserConfigurationDTO(machine), startingPosition, missionSize, messageToDecode);
-        //System.out.println(" in task manger!!");
-        //System.out.println(positionsList);
-        //MissionTask task = new MissionTask(machine.clone(),positionsList,messageToDecode,dictionary, timeToCalc);
         if (activeContest) {
             pushTaskToBlockingQueue(agentTaskConfiguration);
         }
     }
     private void pushTaskToBlockingQueue(AgentTaskConfigurationDTO agentTaskConfiguration)  {
         boolean insertToBlockingQueue = false;
-        generatedMissionsAmount.setValue(generatedMissionsAmount.getValue()+1);
-        System.out.println(counter++);
-        while (!insertToBlockingQueue) {
-            synchronized (blockingQueue) {
+        //while (!insertToBlockingQueue) {
+           // synchronized (blockingQueue) {
                 if (activeContest) {
-                    insertToBlockingQueue = blockingQueue.offer(agentTaskConfiguration);
+
+                    try {
+                        blockingQueue.put(agentTaskConfiguration);
+                    } catch (InterruptedException e) {
+                       throw new RuntimeException();
+                    }
+                    // if(insertToBlockingQueue)
+                        generatedMissionsAmount.setValue(generatedMissionsAmount.getValue()+1);
+                   // break;
                 }
                 else{
-                    System.out.println("************* task manager finish task");
                     throw new RuntimeException();
                 }
             }
-        }
-    }
+
+
+
+
     public double calculateAmountOfCodes(){
         int alphabetSize = Keyboard.alphabet.length();
         int exponent = machine.getRotorsAmountInUse();

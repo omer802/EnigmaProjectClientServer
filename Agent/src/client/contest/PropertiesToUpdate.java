@@ -9,12 +9,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Label;
 
 public class PropertiesToUpdate {
-    private SimpleIntegerProperty missionInQueue;
-    private SimpleLongProperty missionFromServer;
-    private SimpleLongProperty completedMissions;
+    private final SimpleIntegerProperty missionInQueue;
+    private final SimpleLongProperty missionFromServer;
+    private final SimpleLongProperty completedMissions;
 
-    private SimpleIntegerProperty candidates;
-    private SimpleStringProperty agentName;
+    private final SimpleIntegerProperty candidates;
+    private final SimpleStringProperty agentName;
 
 
     public PropertiesToUpdate() {
@@ -24,13 +24,6 @@ public class PropertiesToUpdate {
         this.candidates        = new SimpleIntegerProperty(0);
         this.agentName         = new SimpleStringProperty();
     }
-
-    public void addOneToMissionInQueue(){
-        Platform.runLater(()->missionInQueue.setValue(missionInQueue.getValue()+1));
-    }
-    public void addOneToMissionFromServer(){
-        Platform.runLater(()-> missionFromServer.setValue(missionFromServer.getValue()+1));
-    }
     public void addOneToCompletedMissions(){
         Platform.runLater(()-> completedMissions.setValue(completedMissions.getValue()+1));
     }
@@ -38,15 +31,7 @@ public class PropertiesToUpdate {
         Platform.runLater(()->candidates.setValue(candidates.getValue()+1));
     }
 
-    public long getMissionInQueue() {
-        return missionInQueue.get();
-    }
-
-    public SimpleIntegerProperty missionInQueueProperty() {
-        return missionInQueue;
-    }
-
-    public void setMissionInQueue(int missionInQueue) {
+     public void setMissionInQueue(int missionInQueue) {
         Platform.runLater(()->this.missionInQueue.set(missionInQueue));
     }
 
@@ -54,38 +39,23 @@ public class PropertiesToUpdate {
         return missionFromServer.get();
     }
 
-    public SimpleLongProperty missionFromServerProperty() {
-        return missionFromServer;
-    }
 
-    public void setMissionFromServer(long missionFromServer) {
+     public void setMissionFromServer(long missionFromServer) {
         Platform.runLater(()->this.missionFromServer.set(missionFromServer));
     }
-    public void addAmountToMissionFromServer(long missionsFromServer){
+     public void addAmountToMissionFromServer(long missionsFromServer){
         Platform.runLater(()-> this.missionFromServer.setValue(this.missionFromServer.getValue()+ missionsFromServer));
     }
-
-    public long getCompletedMissions() {
-        return completedMissions.get();
-    }
-
-    public SimpleLongProperty completedMissionsProperty() {
-        return completedMissions;
-    }
-
-    public void setCompletedMissions(long completedMissions) {
+     public void setCompletedMissions(long completedMissions) {
         Platform.runLater(()->this.completedMissions.set(completedMissions));
     }
 
-    public int getCandidates() {
+     public int getCandidates() {
         return candidates.get();
     }
 
-    public SimpleIntegerProperty candidatesProperty() {
-        return candidates;
-    }
 
-    public void setCandidates(int candidates) {
+     public void setCandidates(int candidates) {
         Platform.runLater(()->this.candidates.set(candidates));
     }
 
@@ -98,11 +68,9 @@ public class PropertiesToUpdate {
         this.agentName.bind(userName);
     }
     public AgentProgressDTO createAgentProgressDTO(){
-        AgentProgressDTO agentProgressDTO =
-                                            new AgentProgressDTO(agentName.getValue(),
-                                                                getMissionFromServer(),
-                                                                missionInQueue.getValue(),
-                                                                    getCandidates(),completedMissions.getValue());
-        return agentProgressDTO;
+        return new AgentProgressDTO(agentName.getValue(),
+                            getMissionFromServer(),
+                            missionInQueue.getValue(),
+                                getCandidates(),completedMissions.getValue());
     }
 }

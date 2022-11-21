@@ -18,7 +18,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Allie implements Client,User {
 
 
-
+    public void setWinner(CandidateDTO candidateDTO) {
+        this.winnerDTO = candidateDTO;
+    }
 
     public enum AllieStatus{
         IDLE, READY, IN_CONTEST,FINISHED_CONTEST
@@ -33,7 +35,11 @@ public class Allie implements Client,User {
     private String name;
     private int agentAmount;
 
+    synchronized public boolean isSignoutFromUBoatAction() {
+        return signoutFromUBoatAction;
+    }
 
+    private boolean signoutFromUBoatAction;
 
     private long missionSize;
     private ContestInformationDTO contestInformationDTO;
@@ -46,6 +52,10 @@ public class Allie implements Client,User {
     Mediator mediator;
     private boolean isReady;
     private double missionAmount;
+    private CandidateDTO winnerDTO;
+    public CandidateDTO getWinner(){
+        return winnerDTO;
+    }
 
     public AtomicLong getPulledMissionsAmount() {
         return pulledMissionsAmount;
@@ -84,6 +94,13 @@ public class Allie implements Client,User {
         this.missionSize = 1;
         this.agentAmount = 0;
         candidateList = new ArrayList<>();
+        signoutFromUBoatAction = false;
+    }
+    synchronized public void uBoatLogoutActionMode() {
+        signoutFromUBoatAction = true;
+    }
+    public void cancelUBoatLogoutAction(){
+        signoutFromUBoatAction = false;
     }
     public BlockingQueue<AgentTaskConfigurationDTO> getBlockingQueue(){
         return dm.getBlockingQueue();
@@ -97,9 +114,11 @@ public class Allie implements Client,User {
     public boolean canBeReady(){
         return (agentAmount>0)&&(!allieStatus.equals(AllieStatus.FINISHED_CONTEST));
     }
-    public void makeAllieReady(){
-        if(canBeReady())
+    public void makeAllieReady() {
+        if (canBeReady()) {
+            candidateList = new ArrayList<>();
             allieStatus = AllieStatus.READY;
+        }
     }
     public void setMissionSize(long missionSize) {
         this.missionSize = missionSize;
@@ -154,6 +173,7 @@ public class Allie implements Client,User {
         setDM(dm);
         this.contestInformationDTO = contestInformationDTO;
         this.signed = true;
+        this.signoutFromUBoatAction = false;
     }
     public void setDM(DM dm) {
         this.dm = dm;
@@ -198,8 +218,11 @@ public class Allie implements Client,User {
     }
     public void signOutFromContest() {
         contestInformationDTO = null;
-        //removeDM();
         this.signed = false;
+        allieStatus = AllieStatus.IDLE;
+    }
+    public void restDM(){
+        dm.restDMProgress();
     }
 
 

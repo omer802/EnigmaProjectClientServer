@@ -11,13 +11,11 @@ import keyboard.Keyboard;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MissionTask implements Runnable{
-
-
-    //private final TimeToCalc timeToCalc;
 
     public volatile static AtomicBoolean finish;
     private EnigmaMachine machine;
@@ -44,23 +42,20 @@ public class MissionTask implements Runnable{
     }
 
     public AgentCandidatesList candidatesList;
-    //Runnable updateProgress;
     private Dictionary dictionary;
 
     private CountDownLatch cdl;
     BlockingDeque<CandidateDTO> candidateQueue;
     PropertiesToUpdate propertiesToUpdate;
+
     public MissionTask(EnigmaMachine machine, List<String> positions,
                        String toDecode, Dictionary dictionary,
                        CountDownLatch cdl, BlockingDeque<CandidateDTO> candidateQueue, PropertiesToUpdate propertiesToUpdate){
         this.machine = machine;
         this.positions = positions;
         this.toDecode = toDecode;
-        //this.candidateBlockingQueue = candidateBlockingQueue;
         this.dictionary = dictionary;
         this.cdl = cdl;
-        //this.timeToCalc = timeToCalc;
-        //this.updateProgress = updateProgress;
         finish = new AtomicBoolean(false);
         this.candidateQueue = candidateQueue;
         this.propertiesToUpdate = propertiesToUpdate;
@@ -73,7 +68,6 @@ public class MissionTask implements Runnable{
         this.StartingTime = System.nanoTime();
         String threadName = Thread.currentThread().getName();
         this.candidatesList = new AgentCandidatesList(StartingTime, threadName);
-        System.out.println(positions);
         exectuteMission(positions);
         if (!candidatesList.isEmpty()) {
             candidatesList.setDuration();
@@ -116,9 +110,7 @@ public class MissionTask implements Runnable{
         machine.setPositions(position);
         String decryptionResult = machine.encodeString(toDecode);
         List<String> words = splitDecryptionToWords(decryptionResult);
-      //  System.out.println(position);
         if(dictionary.isWordsInDictionary(words)) {
-            System.out.println("found!");
             return decryptionResult;
         }
         else
@@ -132,17 +124,12 @@ public class MissionTask implements Runnable{
     // TODO: 9/14/2022 maybe update in after execute 
     public void updateCandidate(String words) {
         String threadName = Thread.currentThread().getName();
-        System.out.println("-------------------------------------------------------------------------------------------");
         UserConfigurationDTO configurationDTO = new UserConfigurationDTO(machine);
-        // candidateBlockingQueue.put(threadName+ ":" +words);
 
-       // System.out.println(configurationDTO.getCodeConfigurationString());
         StringBuilder currConfig = configurationDTO.getCodeConfigurationString();
-        System.out.println("*****************************"+words);
         synchronized (candidateQueue) {
             CandidateDTO candidate = new CandidateDTO(words,currConfig.toString());
             boolean isPused = candidateQueue.offer(candidate);
-            System.out.println(isPused);
         }
         synchronized (propertiesToUpdate){
             propertiesToUpdate.addOneToCandidateAmount();

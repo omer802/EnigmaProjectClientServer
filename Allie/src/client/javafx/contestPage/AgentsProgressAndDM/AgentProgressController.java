@@ -92,7 +92,6 @@ public class AgentProgressController {
         Platform.runLater(()->{
             if (agentAndDMProgressDTO != null) {
                 if(firstTimeFetchStringToHack&&agentAndDMProgressDTO.getStringToHack()!=null) {
-                    System.out.println(agentAndDMProgressDTO.getStringToHack());
                     stringToHackProperty.set(agentAndDMProgressDTO.getStringToHack());
                     firstTimeFetchStringToHack = false;
                 }
@@ -112,6 +111,20 @@ public class AgentProgressController {
                 }
             }
         }});
+
+
+    }
+
+    public void terminateAgentAndDMProgressRefresher() {
+        timer.cancel();
+    }
+
+    public void clearProgress() {
+        ObservableList<AgentProgressDTO> item = table.getItems();
+        item.clear();
+        totalMissionAmountProperty.set(0);
+        totalGeneratedMissionsProperty.set(0);
+        totalFinishMissionsProperty.set(0);
 
 
     }
